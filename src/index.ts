@@ -13,6 +13,7 @@ window.Webflow.push(() => {
   const purple = '#c092b6';
   const pink = '#ea958f';
   const yellow = '#f4d791';
+
   const originalColors: string[] = [
     '#9ccca1',
     '#96c1d4',
