@@ -903,11 +903,11 @@
     return values;
   };
   var _formatColors = function _formatColors2(s, toHSL, orderMatchData) {
-    var result = "", colors = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
-    if (!colors) {
+    var result = "", colors2 = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
+    if (!colors2) {
       return s;
     }
-    colors = colors.map(function(color) {
+    colors2 = colors2.map(function(color) {
       return (color = splitColor(color, toHSL, 1)) && type + (toHSL ? color[0] + "," + color[1] + "%," + color[2] + "%," + color[3] : color.join(",")) + ")";
     });
     if (orderMatchData) {
@@ -917,7 +917,7 @@
         shell = s.replace(_colorExp, "1").split(_numWithUnitExp);
         l = shell.length - 1;
         for (; i < l; i++) {
-          result += shell[i] + (~c.indexOf(i) ? colors.shift() || type + "0,0,0,0)" : (d.length ? d : colors.length ? colors : orderMatchData).shift());
+          result += shell[i] + (~c.indexOf(i) ? colors2.shift() || type + "0,0,0,0)" : (d.length ? d : colors2.length ? colors2 : orderMatchData).shift());
         }
       }
     }
@@ -925,7 +925,7 @@
       shell = s.split(_colorExp);
       l = shell.length - 1;
       for (; i < l; i++) {
-        result += shell[i] + colors[i];
+        result += shell[i] + colors2[i];
       }
     }
     return result + shell[l];
@@ -6540,61 +6540,118 @@
 
   // src/index.ts
   gsapWithCSS.registerPlugin(ScrollTrigger2);
+  var green = "#9ccca1";
+  var aqua = "#96c1d4";
+  var marine = "#729dad";
+  var purple = "#c092b6";
+  var pink = "#ea958f";
+  var yellow = "#f4d791";
+  var colors = [green, aqua, marine, purple, yellow, pink];
+  function loopLogoLetters(letters) {
+    gsapWithCSS.utils.shuffle(colors);
+    gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colors), duration: 0.25 });
+  }
   window.Webflow ||= [];
   window.Webflow.push(() => {
-    const green = "#9ccca1";
-    const aqua = "#96c1d4";
-    const marine = "#729dad";
-    const purple = "#c092b6";
-    const pink = "#ea958f";
-    const yellow = "#f4d791";
-    const originalColors = [
-      "#9ccca1",
-      "#96c1d4",
-      "#729dad",
-      "#c092b6",
-      "#ea958f",
-      "#f4d791"
-    ];
-    const colors = [...originalColors];
-    function fadeColors(el) {
-      const logoChildren = Array.from(el.querySelectorAll("[hh-color]"));
-      const colors2 = originalColors;
-      logoChildren.forEach((child) => {
-        const randomColor = getRandomColor(colors2)[0];
-        child.style.color = randomColor;
-      });
-    }
-    function getRandomColor(colors2) {
-      if (colors2.length === 0) {
-        colors2 = [...originalColors];
+    const mm = gsapWithCSS.matchMedia();
+    const breakPoint = 800;
+    mm.add(
+      {
+        isDesktop: `(min-width: ${breakPoint}px)`,
+        isMobile: `(max-width: ${breakPoint - 1}px)`,
+        reduceMotion: "(prefers-reduced-motion: reduce)"
+      },
+      (context3) => {
+        const { isDesktop, isMobile, reduceMotion } = context3.conditions;
+        const logoLetters = gsapWithCSS.utils.toArray(".logo_letter");
+        if (logoLetters.length > 0) {
+          setInterval(() => loopLogoLetters(logoLetters), 1e3);
+        }
+        const docWidth = document.documentElement.offsetWidth;
+        [].forEach.call(document.querySelectorAll("*"), function(el) {
+          if (el.offsetWidth > docWidth) {
+            console.log(el);
+          }
+        });
+        const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
+        const hhpAside = document.querySelector('[cs-el="hhp-aside"]');
+        const hhpUserCard = document.querySelector('[cs-el="hhp-user-card"]');
+        const hhpBody = document.querySelector('[cs-el="hha-body"]');
+        ScrollTrigger2.create({
+          trigger: hhpAside,
+          start: "top 34rem",
+          endTrigger: hhpBody,
+          end: () => `bottom ${document.querySelector(".hhp_user-card-wrap").offsetHeight + 64}`,
+          markers: false,
+          pin: hhpUserCard,
+          pinSpacing: true,
+          invalidateOnRefresh: true
+        });
+        const slider = document.querySelector('[cs-el="hhp-slider"]');
+        if (slider) {
+          let count = 0;
+          const fadeTime = 2;
+          const turnTime = 5;
+          const slides = document.querySelectorAll('[cs-el="hhp-slide"]');
+          if (slides.length > 0) {
+            let fadeIt2 = function() {
+              gsapWithCSS.to(slides[count], { duration: fadeTime, opacity: 0 });
+              count = count < slides.length - 1 ? ++count : 0;
+              gsapWithCSS.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
+              gsapWithCSS.to({}, { duration: turnTime, onComplete: fadeIt2 });
+            };
+            var fadeIt = fadeIt2;
+            gsapWithCSS.set(slides, { opacity: 0 });
+            gsapWithCSS.set(slides[0], { opacity: 1 });
+            gsapWithCSS.delayedCall(turnTime, () => fadeIt2());
+          }
+        }
+        const hhaTab = document.querySelector('[cs-el="hha-tab"]');
+        if (hhaTab) {
+          const hhaPanel = document.querySelector('[cs-el="hha-admin-panel"]');
+          let isOpen = false;
+          const openPanel = gsapWithCSS.timeline({ paused: true });
+          openPanel.to(hhaPanel, { left: 0, ease: "Power2.out" });
+          hhaTab.addEventListener("click", () => {
+            console.log("!");
+            if (isOpen) {
+              isOpen = false;
+              openPanel.timeScale(1.75).reverse();
+            } else {
+              isOpen = true;
+              openPanel.timeScale(1).play();
+            }
+          });
+        }
+        const nav = document.querySelector('[cs-el="nav"]');
+        if (nav && isMobile) {
+          const toggleNavMob = gsapWithCSS.from(nav, {
+            yPercent: -100,
+            paused: true,
+            duration: 0.5,
+            ease: "Power1.out"
+          }).progress(1);
+          ScrollTrigger2.create({
+            start: "top top",
+            end: 99999,
+            onUpdate: (self) => {
+              self.direction === -1 ? toggleNavMob.play() : toggleNavMob.reverse();
+            }
+          });
+        }
+        function init4() {
+        }
+        window.addEventListener("resize", () => {
+          init4();
+        });
+        window.addEventListener("load", () => {
+          init4();
+        });
+        return () => {
+        };
       }
-      const index = Math.floor(Math.random() * colors2.length);
-      return [colors2.splice(index, 1)[0], colors2];
-    }
-    function updateBackgroundColor(el, colors2) {
-      const [randomColor, remainingColors] = getRandomColor(colors2);
-      el.style.backgroundColor = randomColor;
-      colors2 = remainingColors;
-    }
-    function updateLetterColors(letters, colors2) {
-      letters.forEach((el) => {
-        const [randomColor, remainingColors] = getRandomColor(colors2);
-        el.style.transition = "color 250ms";
-        el.style.color = randomColor;
-        colors2 = remainingColors;
-      });
-    }
-    const bgColorFades = document.querySelectorAll("[data-bgcolors]");
-    bgColorFades.forEach((el) => {
-      el.style.transition = "background-color 3s";
-      const setBGColorsInt = setInterval(() => updateBackgroundColor(el, colors), 3e3);
-    });
-    const loopLogos = document.querySelectorAll('[hh-colors="loop"]');
-    loopLogos.forEach((el) => {
-      const letters = el.querySelectorAll("[hh-color]");
-      const setLetterColorsInt = setInterval(() => updateLetterColors(letters, colors), 1e3);
-    });
+      // End: MM Context
+    );
   });
 })();
 /*! Bundled license information:
