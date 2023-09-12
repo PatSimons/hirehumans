@@ -51,12 +51,13 @@ window.Webflow.push(() => {
       });
 
       // HHP User Card
-      const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
       const hhpAside = document.querySelector('[cs-el="hhp-aside"]');
       const hhpUserCard = document.querySelector('[cs-el="hhp-user-card"]');
       const hhpBody = document.querySelector('[cs-el="hha-body"]');
 
-      ScrollTrigger.create({
+      const toggleNav = gsap.timeline({ paused: true });
+
+      const stNav = ScrollTrigger.create({
         trigger: hhpAside,
         start: 'top 34rem',
         endTrigger: hhpBody,
@@ -65,7 +66,20 @@ window.Webflow.push(() => {
         pin: hhpUserCard,
         pinSpacing: true,
         invalidateOnRefresh: true,
+        onEnter: () => toggleNav.timeScale(1).play(),
+        onLeaveBack: () => toggleNav.timeScale(2).reverse(),
       });
+      const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
+      if (hhpNav) {
+        const navItems = gsap.utils.toArray('[cs-el="nav-item"]');
+        toggleNav.from(navItems, {
+          autoAlpha: 0,
+          duration: 0.3,
+          y: '-2rem',
+          ease: 'back.out',
+          stagger: 0.1,
+        });
+      }
       // End: HHP User Card
 
       // HHP Slider
