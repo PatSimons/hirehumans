@@ -950,8 +950,8 @@
   };
   var _tickerActive;
   var _ticker = function() {
-    var _getTime3 = Date.now, _lagThreshold = 500, _adjustedLag = 33, _startTime = _getTime3(), _lastUpdate = _startTime, _gap = 1e3 / 240, _nextTime = _gap, _listeners3 = [], _id, _req, _raf, _self, _delta, _i2, _tick = function _tick2(v) {
-      var elapsed = _getTime3() - _lastUpdate, manual = v === true, overlap, dispatch, time, frame;
+    var _getTime4 = Date.now, _lagThreshold = 500, _adjustedLag = 33, _startTime = _getTime4(), _lastUpdate = _startTime, _gap = 1e3 / 240, _nextTime = _gap, _listeners3 = [], _id, _req, _raf, _self, _delta, _i2, _tick = function _tick2(v) {
+      var elapsed = _getTime4() - _lastUpdate, manual = v === true, overlap, dispatch, time, frame;
       elapsed > _lagThreshold && (_startTime += elapsed - _adjustedLag);
       _lastUpdate += elapsed;
       time = _lastUpdate - _startTime;
@@ -4228,6 +4228,2180 @@
   var gsapWithCSS = gsap.registerPlugin(CSSPlugin) || gsap;
   var TweenMaxWithCSS = gsapWithCSS.core.Tween;
 
+  // node_modules/gsap/utils/matrix.js
+  var _doc3;
+  var _win3;
+  var _docElement2;
+  var _body;
+  var _divContainer;
+  var _svgContainer;
+  var _identityMatrix;
+  var _gEl;
+  var _transformProp2 = "transform";
+  var _transformOriginProp2 = _transformProp2 + "Origin";
+  var _hasOffsetBug;
+  var _setDoc = function _setDoc2(element) {
+    var doc = element.ownerDocument || element;
+    if (!(_transformProp2 in element.style) && "msTransform" in element.style) {
+      _transformProp2 = "msTransform";
+      _transformOriginProp2 = _transformProp2 + "Origin";
+    }
+    while (doc.parentNode && (doc = doc.parentNode)) {
+    }
+    _win3 = window;
+    _identityMatrix = new Matrix2D();
+    if (doc) {
+      _doc3 = doc;
+      _docElement2 = doc.documentElement;
+      _body = doc.body;
+      _gEl = _doc3.createElementNS("http://www.w3.org/2000/svg", "g");
+      _gEl.style.transform = "none";
+      var d1 = doc.createElement("div"), d2 = doc.createElement("div");
+      _body.appendChild(d1);
+      d1.appendChild(d2);
+      d1.style.position = "static";
+      d1.style[_transformProp2] = "translate3d(0,0,1px)";
+      _hasOffsetBug = d2.offsetParent !== d1;
+      _body.removeChild(d1);
+    }
+    return doc;
+  };
+  var _forceNonZeroScale = function _forceNonZeroScale2(e) {
+    var a, cache;
+    while (e && e !== _body) {
+      cache = e._gsap;
+      cache && cache.uncache && cache.get(e, "x");
+      if (cache && !cache.scaleX && !cache.scaleY && cache.renderTransform) {
+        cache.scaleX = cache.scaleY = 1e-4;
+        cache.renderTransform(1, cache);
+        a ? a.push(cache) : a = [cache];
+      }
+      e = e.parentNode;
+    }
+    return a;
+  };
+  var _svgTemps = [];
+  var _divTemps = [];
+  var _getDocScrollTop = function _getDocScrollTop2() {
+    return _win3.pageYOffset || _doc3.scrollTop || _docElement2.scrollTop || _body.scrollTop || 0;
+  };
+  var _getDocScrollLeft = function _getDocScrollLeft2() {
+    return _win3.pageXOffset || _doc3.scrollLeft || _docElement2.scrollLeft || _body.scrollLeft || 0;
+  };
+  var _svgOwner = function _svgOwner2(element) {
+    return element.ownerSVGElement || ((element.tagName + "").toLowerCase() === "svg" ? element : null);
+  };
+  var _isFixed = function _isFixed2(element) {
+    if (_win3.getComputedStyle(element).position === "fixed") {
+      return true;
+    }
+    element = element.parentNode;
+    if (element && element.nodeType === 1) {
+      return _isFixed2(element);
+    }
+  };
+  var _createSibling = function _createSibling2(element, i) {
+    if (element.parentNode && (_doc3 || _setDoc(element))) {
+      var svg = _svgOwner(element), ns = svg ? svg.getAttribute("xmlns") || "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", type = svg ? i ? "rect" : "g" : "div", x = i !== 2 ? 0 : 100, y = i === 3 ? 100 : 0, css = "position:absolute;display:block;pointer-events:none;margin:0;padding:0;", e = _doc3.createElementNS ? _doc3.createElementNS(ns.replace(/^https/, "http"), type) : _doc3.createElement(type);
+      if (i) {
+        if (!svg) {
+          if (!_divContainer) {
+            _divContainer = _createSibling2(element);
+            _divContainer.style.cssText = css;
+          }
+          e.style.cssText = css + "width:0.1px;height:0.1px;top:" + y + "px;left:" + x + "px";
+          _divContainer.appendChild(e);
+        } else {
+          _svgContainer || (_svgContainer = _createSibling2(element));
+          e.setAttribute("width", 0.01);
+          e.setAttribute("height", 0.01);
+          e.setAttribute("transform", "translate(" + x + "," + y + ")");
+          _svgContainer.appendChild(e);
+        }
+      }
+      return e;
+    }
+    throw "Need document and parent.";
+  };
+  var _consolidate = function _consolidate2(m) {
+    var c = new Matrix2D(), i = 0;
+    for (; i < m.numberOfItems; i++) {
+      c.multiply(m.getItem(i).matrix);
+    }
+    return c;
+  };
+  var _getCTM = function _getCTM2(svg) {
+    var m = svg.getCTM(), transform;
+    if (!m) {
+      transform = svg.style[_transformProp2];
+      svg.style[_transformProp2] = "none";
+      svg.appendChild(_gEl);
+      m = _gEl.getCTM();
+      svg.removeChild(_gEl);
+      transform ? svg.style[_transformProp2] = transform : svg.style.removeProperty(_transformProp2.replace(/([A-Z])/g, "-$1").toLowerCase());
+    }
+    return m || _identityMatrix.clone();
+  };
+  var _placeSiblings = function _placeSiblings2(element, adjustGOffset) {
+    var svg = _svgOwner(element), isRootSVG = element === svg, siblings = svg ? _svgTemps : _divTemps, parent = element.parentNode, container, m, b, x, y, cs;
+    if (element === _win3) {
+      return element;
+    }
+    siblings.length || siblings.push(_createSibling(element, 1), _createSibling(element, 2), _createSibling(element, 3));
+    container = svg ? _svgContainer : _divContainer;
+    if (svg) {
+      if (isRootSVG) {
+        b = _getCTM(element);
+        x = -b.e / b.a;
+        y = -b.f / b.d;
+        m = _identityMatrix;
+      } else if (element.getBBox) {
+        b = element.getBBox();
+        m = element.transform ? element.transform.baseVal : {};
+        m = !m.numberOfItems ? _identityMatrix : m.numberOfItems > 1 ? _consolidate(m) : m.getItem(0).matrix;
+        x = m.a * b.x + m.c * b.y;
+        y = m.b * b.x + m.d * b.y;
+      } else {
+        m = new Matrix2D();
+        x = y = 0;
+      }
+      if (adjustGOffset && element.tagName.toLowerCase() === "g") {
+        x = y = 0;
+      }
+      (isRootSVG ? svg : parent).appendChild(container);
+      container.setAttribute("transform", "matrix(" + m.a + "," + m.b + "," + m.c + "," + m.d + "," + (m.e + x) + "," + (m.f + y) + ")");
+    } else {
+      x = y = 0;
+      if (_hasOffsetBug) {
+        m = element.offsetParent;
+        b = element;
+        while (b && (b = b.parentNode) && b !== m && b.parentNode) {
+          if ((_win3.getComputedStyle(b)[_transformProp2] + "").length > 4) {
+            x = b.offsetLeft;
+            y = b.offsetTop;
+            b = 0;
+          }
+        }
+      }
+      cs = _win3.getComputedStyle(element);
+      if (cs.position !== "absolute" && cs.position !== "fixed") {
+        m = element.offsetParent;
+        while (parent && parent !== m) {
+          x += parent.scrollLeft || 0;
+          y += parent.scrollTop || 0;
+          parent = parent.parentNode;
+        }
+      }
+      b = container.style;
+      b.top = element.offsetTop - y + "px";
+      b.left = element.offsetLeft - x + "px";
+      b[_transformProp2] = cs[_transformProp2];
+      b[_transformOriginProp2] = cs[_transformOriginProp2];
+      b.position = cs.position === "fixed" ? "fixed" : "absolute";
+      element.parentNode.appendChild(container);
+    }
+    return container;
+  };
+  var _setMatrix = function _setMatrix2(m, a, b, c, d, e, f) {
+    m.a = a;
+    m.b = b;
+    m.c = c;
+    m.d = d;
+    m.e = e;
+    m.f = f;
+    return m;
+  };
+  var Matrix2D = /* @__PURE__ */ function() {
+    function Matrix2D2(a, b, c, d, e, f) {
+      if (a === void 0) {
+        a = 1;
+      }
+      if (b === void 0) {
+        b = 0;
+      }
+      if (c === void 0) {
+        c = 0;
+      }
+      if (d === void 0) {
+        d = 1;
+      }
+      if (e === void 0) {
+        e = 0;
+      }
+      if (f === void 0) {
+        f = 0;
+      }
+      _setMatrix(this, a, b, c, d, e, f);
+    }
+    var _proto = Matrix2D2.prototype;
+    _proto.inverse = function inverse() {
+      var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f, determinant = a * d - b * c || 1e-10;
+      return _setMatrix(this, d / determinant, -b / determinant, -c / determinant, a / determinant, (c * f - d * e) / determinant, -(a * f - b * e) / determinant);
+    };
+    _proto.multiply = function multiply(matrix) {
+      var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f, a2 = matrix.a, b2 = matrix.c, c2 = matrix.b, d2 = matrix.d, e2 = matrix.e, f2 = matrix.f;
+      return _setMatrix(this, a2 * a + c2 * c, a2 * b + c2 * d, b2 * a + d2 * c, b2 * b + d2 * d, e + e2 * a + f2 * c, f + e2 * b + f2 * d);
+    };
+    _proto.clone = function clone() {
+      return new Matrix2D2(this.a, this.b, this.c, this.d, this.e, this.f);
+    };
+    _proto.equals = function equals(matrix) {
+      var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f;
+      return a === matrix.a && b === matrix.b && c === matrix.c && d === matrix.d && e === matrix.e && f === matrix.f;
+    };
+    _proto.apply = function apply(point, decoratee) {
+      if (decoratee === void 0) {
+        decoratee = {};
+      }
+      var x = point.x, y = point.y, a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f;
+      decoratee.x = x * a + y * c + e || 0;
+      decoratee.y = x * b + y * d + f || 0;
+      return decoratee;
+    };
+    return Matrix2D2;
+  }();
+  function getGlobalMatrix(element, inverse, adjustGOffset, includeScrollInFixed) {
+    if (!element || !element.parentNode || (_doc3 || _setDoc(element)).documentElement === element) {
+      return new Matrix2D();
+    }
+    var zeroScales = _forceNonZeroScale(element), svg = _svgOwner(element), temps = svg ? _svgTemps : _divTemps, container = _placeSiblings(element, adjustGOffset), b1 = temps[0].getBoundingClientRect(), b2 = temps[1].getBoundingClientRect(), b3 = temps[2].getBoundingClientRect(), parent = container.parentNode, isFixed = !includeScrollInFixed && _isFixed(element), m = new Matrix2D((b2.left - b1.left) / 100, (b2.top - b1.top) / 100, (b3.left - b1.left) / 100, (b3.top - b1.top) / 100, b1.left + (isFixed ? 0 : _getDocScrollLeft()), b1.top + (isFixed ? 0 : _getDocScrollTop()));
+    parent.removeChild(container);
+    if (zeroScales) {
+      b1 = zeroScales.length;
+      while (b1--) {
+        b2 = zeroScales[b1];
+        b2.scaleX = b2.scaleY = 0;
+        b2.renderTransform(1, b2);
+      }
+    }
+    return inverse ? m.inverse() : m;
+  }
+
+  // node_modules/gsap/Draggable.js
+  function _assertThisInitialized2(self) {
+    if (self === void 0) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+    return self;
+  }
+  function _inheritsLoose2(subClass, superClass) {
+    subClass.prototype = Object.create(superClass.prototype);
+    subClass.prototype.constructor = subClass;
+    subClass.__proto__ = superClass;
+  }
+  var gsap2;
+  var _win4;
+  var _doc4;
+  var _docElement3;
+  var _body2;
+  var _tempDiv2;
+  var _placeholderDiv;
+  var _coreInitted2;
+  var _checkPrefix;
+  var _toArray;
+  var _supportsPassive;
+  var _isTouchDevice;
+  var _touchEventLookup;
+  var _isMultiTouching;
+  var _isAndroid;
+  var InertiaPlugin;
+  var _defaultCursor;
+  var _supportsPointer;
+  var _context2;
+  var _getStyleSaver3;
+  var _dragCount = 0;
+  var _windowExists5 = function _windowExists6() {
+    return typeof window !== "undefined";
+  };
+  var _getGSAP = function _getGSAP2() {
+    return gsap2 || _windowExists5() && (gsap2 = window.gsap) && gsap2.registerPlugin && gsap2;
+  };
+  var _isFunction3 = function _isFunction4(value) {
+    return typeof value === "function";
+  };
+  var _isObject3 = function _isObject4(value) {
+    return typeof value === "object";
+  };
+  var _isUndefined3 = function _isUndefined4(value) {
+    return typeof value === "undefined";
+  };
+  var _emptyFunc3 = function _emptyFunc4() {
+    return false;
+  };
+  var _transformProp3 = "transform";
+  var _transformOriginProp3 = "transformOrigin";
+  var _round3 = function _round4(value) {
+    return Math.round(value * 1e4) / 1e4;
+  };
+  var _isArray2 = Array.isArray;
+  var _createElement3 = function _createElement4(type, ns) {
+    var e = _doc4.createElementNS ? _doc4.createElementNS((ns || "http://www.w3.org/1999/xhtml").replace(/^https/, "http"), type) : _doc4.createElement(type);
+    return e.style ? e : _doc4.createElement(type);
+  };
+  var _RAD2DEG2 = 180 / Math.PI;
+  var _bigNum3 = 1e20;
+  var _identityMatrix2 = new Matrix2D();
+  var _getTime = Date.now || function() {
+    return (/* @__PURE__ */ new Date()).getTime();
+  };
+  var _renderQueue = [];
+  var _lookup = {};
+  var _lookupCount = 0;
+  var _clickableTagExp = /^(?:a|input|textarea|button|select)$/i;
+  var _lastDragTime = 0;
+  var _temp1 = {};
+  var _windowProxy = {};
+  var _copy = function _copy2(obj, factor) {
+    var copy = {}, p;
+    for (p in obj) {
+      copy[p] = factor ? obj[p] * factor : obj[p];
+    }
+    return copy;
+  };
+  var _extend = function _extend2(obj, defaults2) {
+    for (var p in defaults2) {
+      if (!(p in obj)) {
+        obj[p] = defaults2[p];
+      }
+    }
+    return obj;
+  };
+  var _setTouchActionForAllDescendants = function _setTouchActionForAllDescendants2(elements, value) {
+    var i = elements.length, children;
+    while (i--) {
+      value ? elements[i].style.touchAction = value : elements[i].style.removeProperty("touch-action");
+      children = elements[i].children;
+      children && children.length && _setTouchActionForAllDescendants2(children, value);
+    }
+  };
+  var _renderQueueTick = function _renderQueueTick2() {
+    return _renderQueue.forEach(function(func) {
+      return func();
+    });
+  };
+  var _addToRenderQueue = function _addToRenderQueue2(func) {
+    _renderQueue.push(func);
+    if (_renderQueue.length === 1) {
+      gsap2.ticker.add(_renderQueueTick);
+    }
+  };
+  var _renderQueueTimeout = function _renderQueueTimeout2() {
+    return !_renderQueue.length && gsap2.ticker.remove(_renderQueueTick);
+  };
+  var _removeFromRenderQueue = function _removeFromRenderQueue2(func) {
+    var i = _renderQueue.length;
+    while (i--) {
+      if (_renderQueue[i] === func) {
+        _renderQueue.splice(i, 1);
+      }
+    }
+    gsap2.to(_renderQueueTimeout, {
+      overwrite: true,
+      delay: 15,
+      duration: 0,
+      onComplete: _renderQueueTimeout,
+      data: "_draggable"
+    });
+  };
+  var _setDefaults3 = function _setDefaults4(obj, defaults2) {
+    for (var p in defaults2) {
+      if (!(p in obj)) {
+        obj[p] = defaults2[p];
+      }
+    }
+    return obj;
+  };
+  var _addListener = function _addListener2(element, type, func, capture) {
+    if (element.addEventListener) {
+      var touchType = _touchEventLookup[type];
+      capture = capture || (_supportsPassive ? {
+        passive: false
+      } : null);
+      element.addEventListener(touchType || type, func, capture);
+      touchType && type !== touchType && element.addEventListener(type, func, capture);
+    }
+  };
+  var _removeListener = function _removeListener2(element, type, func, capture) {
+    if (element.removeEventListener) {
+      var touchType = _touchEventLookup[type];
+      element.removeEventListener(touchType || type, func, capture);
+      touchType && type !== touchType && element.removeEventListener(type, func, capture);
+    }
+  };
+  var _preventDefault = function _preventDefault2(event) {
+    event.preventDefault && event.preventDefault();
+    event.preventManipulation && event.preventManipulation();
+  };
+  var _hasTouchID = function _hasTouchID2(list, ID) {
+    var i = list.length;
+    while (i--) {
+      if (list[i].identifier === ID) {
+        return true;
+      }
+    }
+  };
+  var _onMultiTouchDocumentEnd = function _onMultiTouchDocumentEnd2(event) {
+    _isMultiTouching = event.touches && _dragCount < event.touches.length;
+    _removeListener(event.target, "touchend", _onMultiTouchDocumentEnd2);
+  };
+  var _onMultiTouchDocument = function _onMultiTouchDocument2(event) {
+    _isMultiTouching = event.touches && _dragCount < event.touches.length;
+    _addListener(event.target, "touchend", _onMultiTouchDocumentEnd);
+  };
+  var _getDocScrollTop3 = function _getDocScrollTop4(doc) {
+    return _win4.pageYOffset || doc.scrollTop || doc.documentElement.scrollTop || doc.body.scrollTop || 0;
+  };
+  var _getDocScrollLeft3 = function _getDocScrollLeft4(doc) {
+    return _win4.pageXOffset || doc.scrollLeft || doc.documentElement.scrollLeft || doc.body.scrollLeft || 0;
+  };
+  var _addScrollListener = function _addScrollListener2(e, callback) {
+    _addListener(e, "scroll", callback);
+    if (!_isRoot(e.parentNode)) {
+      _addScrollListener2(e.parentNode, callback);
+    }
+  };
+  var _removeScrollListener = function _removeScrollListener2(e, callback) {
+    _removeListener(e, "scroll", callback);
+    if (!_isRoot(e.parentNode)) {
+      _removeScrollListener2(e.parentNode, callback);
+    }
+  };
+  var _isRoot = function _isRoot2(e) {
+    return !!(!e || e === _docElement3 || e.nodeType === 9 || e === _doc4.body || e === _win4 || !e.nodeType || !e.parentNode);
+  };
+  var _getMaxScroll = function _getMaxScroll2(element, axis) {
+    var dim = axis === "x" ? "Width" : "Height", scroll = "scroll" + dim, client = "client" + dim;
+    return Math.max(0, _isRoot(element) ? Math.max(_docElement3[scroll], _body2[scroll]) - (_win4["inner" + dim] || _docElement3[client] || _body2[client]) : element[scroll] - element[client]);
+  };
+  var _recordMaxScrolls = function _recordMaxScrolls2(e, skipCurrent) {
+    var x = _getMaxScroll(e, "x"), y = _getMaxScroll(e, "y");
+    if (_isRoot(e)) {
+      e = _windowProxy;
+    } else {
+      _recordMaxScrolls2(e.parentNode, skipCurrent);
+    }
+    e._gsMaxScrollX = x;
+    e._gsMaxScrollY = y;
+    if (!skipCurrent) {
+      e._gsScrollX = e.scrollLeft || 0;
+      e._gsScrollY = e.scrollTop || 0;
+    }
+  };
+  var _setStyle = function _setStyle2(element, property, value) {
+    var style = element.style;
+    if (!style) {
+      return;
+    }
+    if (_isUndefined3(style[property])) {
+      property = _checkPrefix(property, element) || property;
+    }
+    if (value == null) {
+      style.removeProperty && style.removeProperty(property.replace(/([A-Z])/g, "-$1").toLowerCase());
+    } else {
+      style[property] = value;
+    }
+  };
+  var _getComputedStyle = function _getComputedStyle2(element) {
+    return _win4.getComputedStyle(element instanceof Element ? element : element.host || (element.parentNode || {}).host || element);
+  };
+  var _tempRect = {};
+  var _parseRect = function _parseRect2(e) {
+    if (e === _win4) {
+      _tempRect.left = _tempRect.top = 0;
+      _tempRect.width = _tempRect.right = _docElement3.clientWidth || e.innerWidth || _body2.clientWidth || 0;
+      _tempRect.height = _tempRect.bottom = (e.innerHeight || 0) - 20 < _docElement3.clientHeight ? _docElement3.clientHeight : e.innerHeight || _body2.clientHeight || 0;
+      return _tempRect;
+    }
+    var doc = e.ownerDocument || _doc4, r = !_isUndefined3(e.pageX) ? {
+      left: e.pageX - _getDocScrollLeft3(doc),
+      top: e.pageY - _getDocScrollTop3(doc),
+      right: e.pageX - _getDocScrollLeft3(doc) + 1,
+      bottom: e.pageY - _getDocScrollTop3(doc) + 1
+    } : !e.nodeType && !_isUndefined3(e.left) && !_isUndefined3(e.top) ? e : _toArray(e)[0].getBoundingClientRect();
+    if (_isUndefined3(r.right) && !_isUndefined3(r.width)) {
+      r.right = r.left + r.width;
+      r.bottom = r.top + r.height;
+    } else if (_isUndefined3(r.width)) {
+      r = {
+        width: r.right - r.left,
+        height: r.bottom - r.top,
+        right: r.right,
+        left: r.left,
+        bottom: r.bottom,
+        top: r.top
+      };
+    }
+    return r;
+  };
+  var _dispatchEvent = function _dispatchEvent2(target, type, callbackName) {
+    var vars = target.vars, callback = vars[callbackName], listeners = target._listeners[type], result;
+    if (_isFunction3(callback)) {
+      result = callback.apply(vars.callbackScope || target, vars[callbackName + "Params"] || [target.pointerEvent]);
+    }
+    if (listeners && target.dispatchEvent(type) === false) {
+      result = false;
+    }
+    return result;
+  };
+  var _getBounds = function _getBounds2(target, context3) {
+    var e = _toArray(target)[0], top, left, offset;
+    if (!e.nodeType && e !== _win4) {
+      if (!_isUndefined3(target.left)) {
+        offset = {
+          x: 0,
+          y: 0
+        };
+        return {
+          left: target.left - offset.x,
+          top: target.top - offset.y,
+          width: target.width,
+          height: target.height
+        };
+      }
+      left = target.min || target.minX || target.minRotation || 0;
+      top = target.min || target.minY || 0;
+      return {
+        left,
+        top,
+        width: (target.max || target.maxX || target.maxRotation || 0) - left,
+        height: (target.max || target.maxY || 0) - top
+      };
+    }
+    return _getElementBounds(e, context3);
+  };
+  var _point1 = {};
+  var _getElementBounds = function _getElementBounds2(element, context3) {
+    context3 = _toArray(context3)[0];
+    var isSVG = element.getBBox && element.ownerSVGElement, doc = element.ownerDocument || _doc4, left, right, top, bottom, matrix, p1, p2, p3, p4, bbox, width, height, cs;
+    if (element === _win4) {
+      top = _getDocScrollTop3(doc);
+      left = _getDocScrollLeft3(doc);
+      right = left + (doc.documentElement.clientWidth || element.innerWidth || doc.body.clientWidth || 0);
+      bottom = top + ((element.innerHeight || 0) - 20 < doc.documentElement.clientHeight ? doc.documentElement.clientHeight : element.innerHeight || doc.body.clientHeight || 0);
+    } else if (context3 === _win4 || _isUndefined3(context3)) {
+      return element.getBoundingClientRect();
+    } else {
+      left = top = 0;
+      if (isSVG) {
+        bbox = element.getBBox();
+        width = bbox.width;
+        height = bbox.height;
+      } else {
+        if (element.viewBox && (bbox = element.viewBox.baseVal)) {
+          left = bbox.x || 0;
+          top = bbox.y || 0;
+          width = bbox.width;
+          height = bbox.height;
+        }
+        if (!width) {
+          cs = _getComputedStyle(element);
+          bbox = cs.boxSizing === "border-box";
+          width = (parseFloat(cs.width) || element.clientWidth || 0) + (bbox ? 0 : parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth));
+          height = (parseFloat(cs.height) || element.clientHeight || 0) + (bbox ? 0 : parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth));
+        }
+      }
+      right = width;
+      bottom = height;
+    }
+    if (element === context3) {
+      return {
+        left,
+        top,
+        width: right - left,
+        height: bottom - top
+      };
+    }
+    matrix = getGlobalMatrix(context3, true).multiply(getGlobalMatrix(element));
+    p1 = matrix.apply({
+      x: left,
+      y: top
+    });
+    p2 = matrix.apply({
+      x: right,
+      y: top
+    });
+    p3 = matrix.apply({
+      x: right,
+      y: bottom
+    });
+    p4 = matrix.apply({
+      x: left,
+      y: bottom
+    });
+    left = Math.min(p1.x, p2.x, p3.x, p4.x);
+    top = Math.min(p1.y, p2.y, p3.y, p4.y);
+    return {
+      left,
+      top,
+      width: Math.max(p1.x, p2.x, p3.x, p4.x) - left,
+      height: Math.max(p1.y, p2.y, p3.y, p4.y) - top
+    };
+  };
+  var _parseInertia = function _parseInertia2(draggable, snap3, max, min, factor, forceZeroVelocity) {
+    var vars = {}, a, i, l;
+    if (snap3) {
+      if (factor !== 1 && snap3 instanceof Array) {
+        vars.end = a = [];
+        l = snap3.length;
+        if (_isObject3(snap3[0])) {
+          for (i = 0; i < l; i++) {
+            a[i] = _copy(snap3[i], factor);
+          }
+        } else {
+          for (i = 0; i < l; i++) {
+            a[i] = snap3[i] * factor;
+          }
+        }
+        max += 1.1;
+        min -= 1.1;
+      } else if (_isFunction3(snap3)) {
+        vars.end = function(value) {
+          var result = snap3.call(draggable, value), copy, p;
+          if (factor !== 1) {
+            if (_isObject3(result)) {
+              copy = {};
+              for (p in result) {
+                copy[p] = result[p] * factor;
+              }
+              result = copy;
+            } else {
+              result *= factor;
+            }
+          }
+          return result;
+        };
+      } else {
+        vars.end = snap3;
+      }
+    }
+    if (max || max === 0) {
+      vars.max = max;
+    }
+    if (min || min === 0) {
+      vars.min = min;
+    }
+    if (forceZeroVelocity) {
+      vars.velocity = 0;
+    }
+    return vars;
+  };
+  var _isClickable = function _isClickable2(element) {
+    var data;
+    return !element || !element.getAttribute || element === _body2 ? false : (data = element.getAttribute("data-clickable")) === "true" || data !== "false" && (_clickableTagExp.test(element.nodeName + "") || element.getAttribute("contentEditable") === "true") ? true : _isClickable2(element.parentNode);
+  };
+  var _setSelectable = function _setSelectable2(elements, selectable) {
+    var i = elements.length, e;
+    while (i--) {
+      e = elements[i];
+      e.ondragstart = e.onselectstart = selectable ? null : _emptyFunc3;
+      gsap2.set(e, {
+        lazy: true,
+        userSelect: selectable ? "text" : "none"
+      });
+    }
+  };
+  var _isFixed3 = function _isFixed4(element) {
+    if (_getComputedStyle(element).position === "fixed") {
+      return true;
+    }
+    element = element.parentNode;
+    if (element && element.nodeType === 1) {
+      return _isFixed4(element);
+    }
+  };
+  var _supports3D2;
+  var _addPaddingBR;
+  var ScrollProxy = function ScrollProxy2(element, vars) {
+    element = gsap2.utils.toArray(element)[0];
+    vars = vars || {};
+    var content = document.createElement("div"), style = content.style, node = element.firstChild, offsetTop = 0, offsetLeft = 0, prevTop = element.scrollTop, prevLeft = element.scrollLeft, scrollWidth = element.scrollWidth, scrollHeight = element.scrollHeight, extraPadRight = 0, maxLeft = 0, maxTop = 0, elementWidth, elementHeight, contentHeight, nextNode, transformStart, transformEnd;
+    if (_supports3D2 && vars.force3D !== false) {
+      transformStart = "translate3d(";
+      transformEnd = "px,0px)";
+    } else if (_transformProp3) {
+      transformStart = "translate(";
+      transformEnd = "px)";
+    }
+    this.scrollTop = function(value, force) {
+      if (!arguments.length) {
+        return -this.top();
+      }
+      this.top(-value, force);
+    };
+    this.scrollLeft = function(value, force) {
+      if (!arguments.length) {
+        return -this.left();
+      }
+      this.left(-value, force);
+    };
+    this.left = function(value, force) {
+      if (!arguments.length) {
+        return -(element.scrollLeft + offsetLeft);
+      }
+      var dif = element.scrollLeft - prevLeft, oldOffset = offsetLeft;
+      if ((dif > 2 || dif < -2) && !force) {
+        prevLeft = element.scrollLeft;
+        gsap2.killTweensOf(this, {
+          left: 1,
+          scrollLeft: 1
+        });
+        this.left(-prevLeft);
+        if (vars.onKill) {
+          vars.onKill();
+        }
+        return;
+      }
+      value = -value;
+      if (value < 0) {
+        offsetLeft = value - 0.5 | 0;
+        value = 0;
+      } else if (value > maxLeft) {
+        offsetLeft = value - maxLeft | 0;
+        value = maxLeft;
+      } else {
+        offsetLeft = 0;
+      }
+      if (offsetLeft || oldOffset) {
+        if (!this._skip) {
+          style[_transformProp3] = transformStart + -offsetLeft + "px," + -offsetTop + transformEnd;
+        }
+        if (offsetLeft + extraPadRight >= 0) {
+          style.paddingRight = offsetLeft + extraPadRight + "px";
+        }
+      }
+      element.scrollLeft = value | 0;
+      prevLeft = element.scrollLeft;
+    };
+    this.top = function(value, force) {
+      if (!arguments.length) {
+        return -(element.scrollTop + offsetTop);
+      }
+      var dif = element.scrollTop - prevTop, oldOffset = offsetTop;
+      if ((dif > 2 || dif < -2) && !force) {
+        prevTop = element.scrollTop;
+        gsap2.killTweensOf(this, {
+          top: 1,
+          scrollTop: 1
+        });
+        this.top(-prevTop);
+        if (vars.onKill) {
+          vars.onKill();
+        }
+        return;
+      }
+      value = -value;
+      if (value < 0) {
+        offsetTop = value - 0.5 | 0;
+        value = 0;
+      } else if (value > maxTop) {
+        offsetTop = value - maxTop | 0;
+        value = maxTop;
+      } else {
+        offsetTop = 0;
+      }
+      if (offsetTop || oldOffset) {
+        if (!this._skip) {
+          style[_transformProp3] = transformStart + -offsetLeft + "px," + -offsetTop + transformEnd;
+        }
+      }
+      element.scrollTop = value | 0;
+      prevTop = element.scrollTop;
+    };
+    this.maxScrollTop = function() {
+      return maxTop;
+    };
+    this.maxScrollLeft = function() {
+      return maxLeft;
+    };
+    this.disable = function() {
+      node = content.firstChild;
+      while (node) {
+        nextNode = node.nextSibling;
+        element.appendChild(node);
+        node = nextNode;
+      }
+      if (element === content.parentNode) {
+        element.removeChild(content);
+      }
+    };
+    this.enable = function() {
+      node = element.firstChild;
+      if (node === content) {
+        return;
+      }
+      while (node) {
+        nextNode = node.nextSibling;
+        content.appendChild(node);
+        node = nextNode;
+      }
+      element.appendChild(content);
+      this.calibrate();
+    };
+    this.calibrate = function(force) {
+      var widthMatches = element.clientWidth === elementWidth, cs, x, y;
+      prevTop = element.scrollTop;
+      prevLeft = element.scrollLeft;
+      if (widthMatches && element.clientHeight === elementHeight && content.offsetHeight === contentHeight && scrollWidth === element.scrollWidth && scrollHeight === element.scrollHeight && !force) {
+        return;
+      }
+      if (offsetTop || offsetLeft) {
+        x = this.left();
+        y = this.top();
+        this.left(-element.scrollLeft);
+        this.top(-element.scrollTop);
+      }
+      cs = _getComputedStyle(element);
+      if (!widthMatches || force) {
+        style.display = "block";
+        style.width = "auto";
+        style.paddingRight = "0px";
+        extraPadRight = Math.max(0, element.scrollWidth - element.clientWidth);
+        if (extraPadRight) {
+          extraPadRight += parseFloat(cs.paddingLeft) + (_addPaddingBR ? parseFloat(cs.paddingRight) : 0);
+        }
+      }
+      style.display = "inline-block";
+      style.position = "relative";
+      style.overflow = "visible";
+      style.verticalAlign = "top";
+      style.boxSizing = "content-box";
+      style.width = "100%";
+      style.paddingRight = extraPadRight + "px";
+      if (_addPaddingBR) {
+        style.paddingBottom = cs.paddingBottom;
+      }
+      elementWidth = element.clientWidth;
+      elementHeight = element.clientHeight;
+      scrollWidth = element.scrollWidth;
+      scrollHeight = element.scrollHeight;
+      maxLeft = element.scrollWidth - elementWidth;
+      maxTop = element.scrollHeight - elementHeight;
+      contentHeight = content.offsetHeight;
+      style.display = "block";
+      if (x || y) {
+        this.left(x);
+        this.top(y);
+      }
+    };
+    this.content = content;
+    this.element = element;
+    this._skip = false;
+    this.enable();
+  };
+  var _initCore3 = function _initCore4(required) {
+    if (_windowExists5() && document.body) {
+      var nav = window && window.navigator;
+      _win4 = window;
+      _doc4 = document;
+      _docElement3 = _doc4.documentElement;
+      _body2 = _doc4.body;
+      _tempDiv2 = _createElement3("div");
+      _supportsPointer = !!window.PointerEvent;
+      _placeholderDiv = _createElement3("div");
+      _placeholderDiv.style.cssText = "visibility:hidden;height:1px;top:-1px;pointer-events:none;position:relative;clear:both;cursor:grab";
+      _defaultCursor = _placeholderDiv.style.cursor === "grab" ? "grab" : "move";
+      _isAndroid = nav && nav.userAgent.toLowerCase().indexOf("android") !== -1;
+      _isTouchDevice = "ontouchstart" in _docElement3 && "orientation" in _win4 || nav && (nav.MaxTouchPoints > 0 || nav.msMaxTouchPoints > 0);
+      _addPaddingBR = function() {
+        var div = _createElement3("div"), child = _createElement3("div"), childStyle = child.style, parent = _body2, val;
+        childStyle.display = "inline-block";
+        childStyle.position = "relative";
+        div.style.cssText = "width:90px;height:40px;padding:10px;overflow:auto;visibility:hidden";
+        div.appendChild(child);
+        parent.appendChild(div);
+        val = child.offsetHeight + 18 > div.scrollHeight;
+        parent.removeChild(div);
+        return val;
+      }();
+      _touchEventLookup = function(types) {
+        var standard = types.split(","), converted = ("onpointerdown" in _tempDiv2 ? "pointerdown,pointermove,pointerup,pointercancel" : "onmspointerdown" in _tempDiv2 ? "MSPointerDown,MSPointerMove,MSPointerUp,MSPointerCancel" : types).split(","), obj = {}, i = 4;
+        while (--i > -1) {
+          obj[standard[i]] = converted[i];
+          obj[converted[i]] = standard[i];
+        }
+        try {
+          _docElement3.addEventListener("test", null, Object.defineProperty({}, "passive", {
+            get: function get() {
+              _supportsPassive = 1;
+            }
+          }));
+        } catch (e) {
+        }
+        return obj;
+      }("touchstart,touchmove,touchend,touchcancel");
+      _addListener(_doc4, "touchcancel", _emptyFunc3);
+      _addListener(_win4, "touchmove", _emptyFunc3);
+      _body2 && _body2.addEventListener("touchstart", _emptyFunc3);
+      _addListener(_doc4, "contextmenu", function() {
+        for (var p in _lookup) {
+          if (_lookup[p].isPressed) {
+            _lookup[p].endDrag();
+          }
+        }
+      });
+      gsap2 = _coreInitted2 = _getGSAP();
+    }
+    if (gsap2) {
+      InertiaPlugin = gsap2.plugins.inertia;
+      _context2 = gsap2.core.context || function() {
+      };
+      _checkPrefix = gsap2.utils.checkPrefix;
+      _transformProp3 = _checkPrefix(_transformProp3);
+      _transformOriginProp3 = _checkPrefix(_transformOriginProp3);
+      _toArray = gsap2.utils.toArray;
+      _getStyleSaver3 = gsap2.core.getStyleSaver;
+      _supports3D2 = !!_checkPrefix("perspective");
+    } else if (required) {
+      console.warn("Please gsap.registerPlugin(Draggable)");
+    }
+  };
+  var EventDispatcher = /* @__PURE__ */ function() {
+    function EventDispatcher2(target) {
+      this._listeners = {};
+      this.target = target || this;
+    }
+    var _proto = EventDispatcher2.prototype;
+    _proto.addEventListener = function addEventListener2(type, callback) {
+      var list = this._listeners[type] || (this._listeners[type] = []);
+      if (!~list.indexOf(callback)) {
+        list.push(callback);
+      }
+    };
+    _proto.removeEventListener = function removeEventListener2(type, callback) {
+      var list = this._listeners[type], i = list && list.indexOf(callback);
+      i >= 0 && list.splice(i, 1);
+    };
+    _proto.dispatchEvent = function dispatchEvent(type) {
+      var _this = this;
+      var result;
+      (this._listeners[type] || []).forEach(function(callback) {
+        return callback.call(_this, {
+          type,
+          target: _this.target
+        }) === false && (result = false);
+      });
+      return result;
+    };
+    return EventDispatcher2;
+  }();
+  var Draggable = /* @__PURE__ */ function(_EventDispatcher) {
+    _inheritsLoose2(Draggable2, _EventDispatcher);
+    function Draggable2(target, vars) {
+      var _this2;
+      _this2 = _EventDispatcher.call(this) || this;
+      _coreInitted2 || _initCore3(1);
+      target = _toArray(target)[0];
+      _this2.styles = _getStyleSaver3 && _getStyleSaver3(target, "transform,left,top");
+      if (!InertiaPlugin) {
+        InertiaPlugin = gsap2.plugins.inertia;
+      }
+      _this2.vars = vars = _copy(vars || {});
+      _this2.target = target;
+      _this2.x = _this2.y = _this2.rotation = 0;
+      _this2.dragResistance = parseFloat(vars.dragResistance) || 0;
+      _this2.edgeResistance = isNaN(vars.edgeResistance) ? 1 : parseFloat(vars.edgeResistance) || 0;
+      _this2.lockAxis = vars.lockAxis;
+      _this2.autoScroll = vars.autoScroll || 0;
+      _this2.lockedAxis = null;
+      _this2.allowEventDefault = !!vars.allowEventDefault;
+      gsap2.getProperty(target, "x");
+      var type = (vars.type || "x,y").toLowerCase(), xyMode = ~type.indexOf("x") || ~type.indexOf("y"), rotationMode = type.indexOf("rotation") !== -1, xProp = rotationMode ? "rotation" : xyMode ? "x" : "left", yProp = xyMode ? "y" : "top", allowX = !!(~type.indexOf("x") || ~type.indexOf("left") || type === "scroll"), allowY = !!(~type.indexOf("y") || ~type.indexOf("top") || type === "scroll"), minimumMovement = vars.minimumMovement || 2, self = _assertThisInitialized2(_this2), triggers = _toArray(vars.trigger || vars.handle || target), killProps = {}, dragEndTime = 0, checkAutoScrollBounds = false, autoScrollMarginTop = vars.autoScrollMarginTop || 40, autoScrollMarginRight = vars.autoScrollMarginRight || 40, autoScrollMarginBottom = vars.autoScrollMarginBottom || 40, autoScrollMarginLeft = vars.autoScrollMarginLeft || 40, isClickable = vars.clickableTest || _isClickable, clickTime = 0, gsCache = target._gsap || gsap2.core.getCache(target), isFixed = _isFixed3(target), getPropAsNum = function getPropAsNum2(property, unit) {
+        return parseFloat(gsCache.get(target, property, unit));
+      }, ownerDoc = target.ownerDocument || _doc4, enabled, scrollProxy, startPointerX, startPointerY, startElementX, startElementY, hasBounds, hasDragCallback, hasMoveCallback, maxX, minX, maxY, minY, touch, touchID, rotationOrigin, dirty, old, snapX, snapY, snapXY, isClicking, touchEventTarget, matrix, interrupted, allowNativeTouchScrolling, touchDragAxis, isDispatching, clickDispatch, trustedClickDispatch, isPreventingDefault, innerMatrix, dragged, onContextMenu = function onContextMenu2(e) {
+        _preventDefault(e);
+        e.stopImmediatePropagation && e.stopImmediatePropagation();
+        return false;
+      }, render3 = function render4(suppressEvents) {
+        if (self.autoScroll && self.isDragging && (checkAutoScrollBounds || dirty)) {
+          var e = target, autoScrollFactor = self.autoScroll * 15, parent, isRoot, rect, pointerX, pointerY, changeX, changeY, gap;
+          checkAutoScrollBounds = false;
+          _windowProxy.scrollTop = _win4.pageYOffset != null ? _win4.pageYOffset : ownerDoc.documentElement.scrollTop != null ? ownerDoc.documentElement.scrollTop : ownerDoc.body.scrollTop;
+          _windowProxy.scrollLeft = _win4.pageXOffset != null ? _win4.pageXOffset : ownerDoc.documentElement.scrollLeft != null ? ownerDoc.documentElement.scrollLeft : ownerDoc.body.scrollLeft;
+          pointerX = self.pointerX - _windowProxy.scrollLeft;
+          pointerY = self.pointerY - _windowProxy.scrollTop;
+          while (e && !isRoot) {
+            isRoot = _isRoot(e.parentNode);
+            parent = isRoot ? _windowProxy : e.parentNode;
+            rect = isRoot ? {
+              bottom: Math.max(_docElement3.clientHeight, _win4.innerHeight || 0),
+              right: Math.max(_docElement3.clientWidth, _win4.innerWidth || 0),
+              left: 0,
+              top: 0
+            } : parent.getBoundingClientRect();
+            changeX = changeY = 0;
+            if (allowY) {
+              gap = parent._gsMaxScrollY - parent.scrollTop;
+              if (gap < 0) {
+                changeY = gap;
+              } else if (pointerY > rect.bottom - autoScrollMarginBottom && gap) {
+                checkAutoScrollBounds = true;
+                changeY = Math.min(gap, autoScrollFactor * (1 - Math.max(0, rect.bottom - pointerY) / autoScrollMarginBottom) | 0);
+              } else if (pointerY < rect.top + autoScrollMarginTop && parent.scrollTop) {
+                checkAutoScrollBounds = true;
+                changeY = -Math.min(parent.scrollTop, autoScrollFactor * (1 - Math.max(0, pointerY - rect.top) / autoScrollMarginTop) | 0);
+              }
+              if (changeY) {
+                parent.scrollTop += changeY;
+              }
+            }
+            if (allowX) {
+              gap = parent._gsMaxScrollX - parent.scrollLeft;
+              if (gap < 0) {
+                changeX = gap;
+              } else if (pointerX > rect.right - autoScrollMarginRight && gap) {
+                checkAutoScrollBounds = true;
+                changeX = Math.min(gap, autoScrollFactor * (1 - Math.max(0, rect.right - pointerX) / autoScrollMarginRight) | 0);
+              } else if (pointerX < rect.left + autoScrollMarginLeft && parent.scrollLeft) {
+                checkAutoScrollBounds = true;
+                changeX = -Math.min(parent.scrollLeft, autoScrollFactor * (1 - Math.max(0, pointerX - rect.left) / autoScrollMarginLeft) | 0);
+              }
+              if (changeX) {
+                parent.scrollLeft += changeX;
+              }
+            }
+            if (isRoot && (changeX || changeY)) {
+              _win4.scrollTo(parent.scrollLeft, parent.scrollTop);
+              setPointerPosition(self.pointerX + changeX, self.pointerY + changeY);
+            }
+            e = parent;
+          }
+        }
+        if (dirty) {
+          var x = self.x, y = self.y;
+          if (rotationMode) {
+            self.deltaX = x - parseFloat(gsCache.rotation);
+            self.rotation = x;
+            gsCache.rotation = x + "deg";
+            gsCache.renderTransform(1, gsCache);
+          } else {
+            if (scrollProxy) {
+              if (allowY) {
+                self.deltaY = y - scrollProxy.top();
+                scrollProxy.top(y);
+              }
+              if (allowX) {
+                self.deltaX = x - scrollProxy.left();
+                scrollProxy.left(x);
+              }
+            } else if (xyMode) {
+              if (allowY) {
+                self.deltaY = y - parseFloat(gsCache.y);
+                gsCache.y = y + "px";
+              }
+              if (allowX) {
+                self.deltaX = x - parseFloat(gsCache.x);
+                gsCache.x = x + "px";
+              }
+              gsCache.renderTransform(1, gsCache);
+            } else {
+              if (allowY) {
+                self.deltaY = y - parseFloat(target.style.top || 0);
+                target.style.top = y + "px";
+              }
+              if (allowX) {
+                self.deltaX = x - parseFloat(target.style.left || 0);
+                target.style.left = x + "px";
+              }
+            }
+          }
+          if (hasDragCallback && !suppressEvents && !isDispatching) {
+            isDispatching = true;
+            if (_dispatchEvent(self, "drag", "onDrag") === false) {
+              if (allowX) {
+                self.x -= self.deltaX;
+              }
+              if (allowY) {
+                self.y -= self.deltaY;
+              }
+              render4(true);
+            }
+            isDispatching = false;
+          }
+        }
+        dirty = false;
+      }, syncXY = function syncXY2(skipOnUpdate, skipSnap) {
+        var x = self.x, y = self.y, snappedValue, cs;
+        if (!target._gsap) {
+          gsCache = gsap2.core.getCache(target);
+        }
+        gsCache.uncache && gsap2.getProperty(target, "x");
+        if (xyMode) {
+          self.x = parseFloat(gsCache.x);
+          self.y = parseFloat(gsCache.y);
+        } else if (rotationMode) {
+          self.x = self.rotation = parseFloat(gsCache.rotation);
+        } else if (scrollProxy) {
+          self.y = scrollProxy.top();
+          self.x = scrollProxy.left();
+        } else {
+          self.y = parseFloat(target.style.top || (cs = _getComputedStyle(target)) && cs.top) || 0;
+          self.x = parseFloat(target.style.left || (cs || {}).left) || 0;
+        }
+        if ((snapX || snapY || snapXY) && !skipSnap && (self.isDragging || self.isThrowing)) {
+          if (snapXY) {
+            _temp1.x = self.x;
+            _temp1.y = self.y;
+            snappedValue = snapXY(_temp1);
+            if (snappedValue.x !== self.x) {
+              self.x = snappedValue.x;
+              dirty = true;
+            }
+            if (snappedValue.y !== self.y) {
+              self.y = snappedValue.y;
+              dirty = true;
+            }
+          }
+          if (snapX) {
+            snappedValue = snapX(self.x);
+            if (snappedValue !== self.x) {
+              self.x = snappedValue;
+              if (rotationMode) {
+                self.rotation = snappedValue;
+              }
+              dirty = true;
+            }
+          }
+          if (snapY) {
+            snappedValue = snapY(self.y);
+            if (snappedValue !== self.y) {
+              self.y = snappedValue;
+            }
+            dirty = true;
+          }
+        }
+        dirty && render3(true);
+        if (!skipOnUpdate) {
+          self.deltaX = self.x - x;
+          self.deltaY = self.y - y;
+          _dispatchEvent(self, "throwupdate", "onThrowUpdate");
+        }
+      }, buildSnapFunc = function buildSnapFunc2(snap3, min, max, factor) {
+        if (min == null) {
+          min = -_bigNum3;
+        }
+        if (max == null) {
+          max = _bigNum3;
+        }
+        if (_isFunction3(snap3)) {
+          return function(n) {
+            var edgeTolerance = !self.isPressed ? 1 : 1 - self.edgeResistance;
+            return snap3.call(self, (n > max ? max + (n - max) * edgeTolerance : n < min ? min + (n - min) * edgeTolerance : n) * factor) * factor;
+          };
+        }
+        if (_isArray2(snap3)) {
+          return function(n) {
+            var i = snap3.length, closest = 0, absDif = _bigNum3, val, dif;
+            while (--i > -1) {
+              val = snap3[i];
+              dif = val - n;
+              if (dif < 0) {
+                dif = -dif;
+              }
+              if (dif < absDif && val >= min && val <= max) {
+                closest = i;
+                absDif = dif;
+              }
+            }
+            return snap3[closest];
+          };
+        }
+        return isNaN(snap3) ? function(n) {
+          return n;
+        } : function() {
+          return snap3 * factor;
+        };
+      }, buildPointSnapFunc = function buildPointSnapFunc2(snap3, minX2, maxX2, minY2, maxY2, radius, factor) {
+        radius = radius && radius < _bigNum3 ? radius * radius : _bigNum3;
+        if (_isFunction3(snap3)) {
+          return function(point) {
+            var edgeTolerance = !self.isPressed ? 1 : 1 - self.edgeResistance, x = point.x, y = point.y, result, dx, dy;
+            point.x = x = x > maxX2 ? maxX2 + (x - maxX2) * edgeTolerance : x < minX2 ? minX2 + (x - minX2) * edgeTolerance : x;
+            point.y = y = y > maxY2 ? maxY2 + (y - maxY2) * edgeTolerance : y < minY2 ? minY2 + (y - minY2) * edgeTolerance : y;
+            result = snap3.call(self, point);
+            if (result !== point) {
+              point.x = result.x;
+              point.y = result.y;
+            }
+            if (factor !== 1) {
+              point.x *= factor;
+              point.y *= factor;
+            }
+            if (radius < _bigNum3) {
+              dx = point.x - x;
+              dy = point.y - y;
+              if (dx * dx + dy * dy > radius) {
+                point.x = x;
+                point.y = y;
+              }
+            }
+            return point;
+          };
+        }
+        if (_isArray2(snap3)) {
+          return function(p) {
+            var i = snap3.length, closest = 0, minDist = _bigNum3, x, y, point, dist;
+            while (--i > -1) {
+              point = snap3[i];
+              x = point.x - p.x;
+              y = point.y - p.y;
+              dist = x * x + y * y;
+              if (dist < minDist) {
+                closest = i;
+                minDist = dist;
+              }
+            }
+            return minDist <= radius ? snap3[closest] : p;
+          };
+        }
+        return function(n) {
+          return n;
+        };
+      }, calculateBounds = function calculateBounds2() {
+        var bounds, targetBounds, snap3, snapIsRaw;
+        hasBounds = false;
+        if (scrollProxy) {
+          scrollProxy.calibrate();
+          self.minX = minX = -scrollProxy.maxScrollLeft();
+          self.minY = minY = -scrollProxy.maxScrollTop();
+          self.maxX = maxX = self.maxY = maxY = 0;
+          hasBounds = true;
+        } else if (!!vars.bounds) {
+          bounds = _getBounds(vars.bounds, target.parentNode);
+          if (rotationMode) {
+            self.minX = minX = bounds.left;
+            self.maxX = maxX = bounds.left + bounds.width;
+            self.minY = minY = self.maxY = maxY = 0;
+          } else if (!_isUndefined3(vars.bounds.maxX) || !_isUndefined3(vars.bounds.maxY)) {
+            bounds = vars.bounds;
+            self.minX = minX = bounds.minX;
+            self.minY = minY = bounds.minY;
+            self.maxX = maxX = bounds.maxX;
+            self.maxY = maxY = bounds.maxY;
+          } else {
+            targetBounds = _getBounds(target, target.parentNode);
+            self.minX = minX = Math.round(getPropAsNum(xProp, "px") + bounds.left - targetBounds.left);
+            self.minY = minY = Math.round(getPropAsNum(yProp, "px") + bounds.top - targetBounds.top);
+            self.maxX = maxX = Math.round(minX + (bounds.width - targetBounds.width));
+            self.maxY = maxY = Math.round(minY + (bounds.height - targetBounds.height));
+          }
+          if (minX > maxX) {
+            self.minX = maxX;
+            self.maxX = maxX = minX;
+            minX = self.minX;
+          }
+          if (minY > maxY) {
+            self.minY = maxY;
+            self.maxY = maxY = minY;
+            minY = self.minY;
+          }
+          if (rotationMode) {
+            self.minRotation = minX;
+            self.maxRotation = maxX;
+          }
+          hasBounds = true;
+        }
+        if (vars.liveSnap) {
+          snap3 = vars.liveSnap === true ? vars.snap || {} : vars.liveSnap;
+          snapIsRaw = _isArray2(snap3) || _isFunction3(snap3);
+          if (rotationMode) {
+            snapX = buildSnapFunc(snapIsRaw ? snap3 : snap3.rotation, minX, maxX, 1);
+            snapY = null;
+          } else {
+            if (snap3.points) {
+              snapXY = buildPointSnapFunc(snapIsRaw ? snap3 : snap3.points, minX, maxX, minY, maxY, snap3.radius, scrollProxy ? -1 : 1);
+            } else {
+              if (allowX) {
+                snapX = buildSnapFunc(snapIsRaw ? snap3 : snap3.x || snap3.left || snap3.scrollLeft, minX, maxX, scrollProxy ? -1 : 1);
+              }
+              if (allowY) {
+                snapY = buildSnapFunc(snapIsRaw ? snap3 : snap3.y || snap3.top || snap3.scrollTop, minY, maxY, scrollProxy ? -1 : 1);
+              }
+            }
+          }
+        }
+      }, onThrowComplete = function onThrowComplete2() {
+        self.isThrowing = false;
+        _dispatchEvent(self, "throwcomplete", "onThrowComplete");
+      }, onThrowInterrupt = function onThrowInterrupt2() {
+        self.isThrowing = false;
+      }, animate = function animate2(inertia, forceZeroVelocity) {
+        var snap3, snapIsRaw, tween, overshootTolerance;
+        if (inertia && InertiaPlugin) {
+          if (inertia === true) {
+            snap3 = vars.snap || vars.liveSnap || {};
+            snapIsRaw = _isArray2(snap3) || _isFunction3(snap3);
+            inertia = {
+              resistance: (vars.throwResistance || vars.resistance || 1e3) / (rotationMode ? 10 : 1)
+            };
+            if (rotationMode) {
+              inertia.rotation = _parseInertia(self, snapIsRaw ? snap3 : snap3.rotation, maxX, minX, 1, forceZeroVelocity);
+            } else {
+              if (allowX) {
+                inertia[xProp] = _parseInertia(self, snapIsRaw ? snap3 : snap3.points || snap3.x || snap3.left, maxX, minX, scrollProxy ? -1 : 1, forceZeroVelocity || self.lockedAxis === "x");
+              }
+              if (allowY) {
+                inertia[yProp] = _parseInertia(self, snapIsRaw ? snap3 : snap3.points || snap3.y || snap3.top, maxY, minY, scrollProxy ? -1 : 1, forceZeroVelocity || self.lockedAxis === "y");
+              }
+              if (snap3.points || _isArray2(snap3) && _isObject3(snap3[0])) {
+                inertia.linkedProps = xProp + "," + yProp;
+                inertia.radius = snap3.radius;
+              }
+            }
+          }
+          self.isThrowing = true;
+          overshootTolerance = !isNaN(vars.overshootTolerance) ? vars.overshootTolerance : vars.edgeResistance === 1 ? 0 : 1 - self.edgeResistance + 0.2;
+          if (!inertia.duration) {
+            inertia.duration = {
+              max: Math.max(vars.minDuration || 0, "maxDuration" in vars ? vars.maxDuration : 2),
+              min: !isNaN(vars.minDuration) ? vars.minDuration : overshootTolerance === 0 || _isObject3(inertia) && inertia.resistance > 1e3 ? 0 : 0.5,
+              overshoot: overshootTolerance
+            };
+          }
+          self.tween = tween = gsap2.to(scrollProxy || target, {
+            inertia,
+            data: "_draggable",
+            onComplete: onThrowComplete,
+            onInterrupt: onThrowInterrupt,
+            onUpdate: vars.fastMode ? _dispatchEvent : syncXY,
+            onUpdateParams: vars.fastMode ? [self, "onthrowupdate", "onThrowUpdate"] : snap3 && snap3.radius ? [false, true] : []
+          });
+          if (!vars.fastMode) {
+            if (scrollProxy) {
+              scrollProxy._skip = true;
+            }
+            tween.render(1e9, true, true);
+            syncXY(true, true);
+            self.endX = self.x;
+            self.endY = self.y;
+            if (rotationMode) {
+              self.endRotation = self.x;
+            }
+            tween.play(0);
+            syncXY(true, true);
+            if (scrollProxy) {
+              scrollProxy._skip = false;
+            }
+          }
+        } else if (hasBounds) {
+          self.applyBounds();
+        }
+      }, updateMatrix = function updateMatrix2(shiftStart) {
+        var start = matrix, p;
+        matrix = getGlobalMatrix(target.parentNode, true);
+        if (shiftStart && self.isPressed && !matrix.equals(start || new Matrix2D())) {
+          p = start.inverse().apply({
+            x: startPointerX,
+            y: startPointerY
+          });
+          matrix.apply(p, p);
+          startPointerX = p.x;
+          startPointerY = p.y;
+        }
+        if (matrix.equals(_identityMatrix2)) {
+          matrix = null;
+        }
+      }, recordStartPositions = function recordStartPositions2() {
+        var edgeTolerance = 1 - self.edgeResistance, offsetX = isFixed ? _getDocScrollLeft3(ownerDoc) : 0, offsetY = isFixed ? _getDocScrollTop3(ownerDoc) : 0, parsedOrigin, x, y;
+        if (xyMode) {
+          gsCache.x = getPropAsNum(xProp, "px") + "px";
+          gsCache.y = getPropAsNum(yProp, "px") + "px";
+          gsCache.renderTransform();
+        }
+        updateMatrix(false);
+        _point1.x = self.pointerX - offsetX;
+        _point1.y = self.pointerY - offsetY;
+        matrix && matrix.apply(_point1, _point1);
+        startPointerX = _point1.x;
+        startPointerY = _point1.y;
+        if (dirty) {
+          setPointerPosition(self.pointerX, self.pointerY);
+          render3(true);
+        }
+        innerMatrix = getGlobalMatrix(target);
+        if (scrollProxy) {
+          calculateBounds();
+          startElementY = scrollProxy.top();
+          startElementX = scrollProxy.left();
+        } else {
+          if (isTweening2()) {
+            syncXY(true, true);
+            calculateBounds();
+          } else {
+            self.applyBounds();
+          }
+          if (rotationMode) {
+            parsedOrigin = target.ownerSVGElement ? [gsCache.xOrigin - target.getBBox().x, gsCache.yOrigin - target.getBBox().y] : (_getComputedStyle(target)[_transformOriginProp3] || "0 0").split(" ");
+            rotationOrigin = self.rotationOrigin = getGlobalMatrix(target).apply({
+              x: parseFloat(parsedOrigin[0]) || 0,
+              y: parseFloat(parsedOrigin[1]) || 0
+            });
+            syncXY(true, true);
+            x = self.pointerX - rotationOrigin.x - offsetX;
+            y = rotationOrigin.y - self.pointerY + offsetY;
+            startElementX = self.x;
+            startElementY = self.y = Math.atan2(y, x) * _RAD2DEG2;
+          } else {
+            startElementY = getPropAsNum(yProp, "px");
+            startElementX = getPropAsNum(xProp, "px");
+          }
+        }
+        if (hasBounds && edgeTolerance) {
+          if (startElementX > maxX) {
+            startElementX = maxX + (startElementX - maxX) / edgeTolerance;
+          } else if (startElementX < minX) {
+            startElementX = minX - (minX - startElementX) / edgeTolerance;
+          }
+          if (!rotationMode) {
+            if (startElementY > maxY) {
+              startElementY = maxY + (startElementY - maxY) / edgeTolerance;
+            } else if (startElementY < minY) {
+              startElementY = minY - (minY - startElementY) / edgeTolerance;
+            }
+          }
+        }
+        self.startX = startElementX = _round3(startElementX);
+        self.startY = startElementY = _round3(startElementY);
+      }, isTweening2 = function isTweening3() {
+        return self.tween && self.tween.isActive();
+      }, removePlaceholder = function removePlaceholder2() {
+        if (_placeholderDiv.parentNode && !isTweening2() && !self.isDragging) {
+          _placeholderDiv.parentNode.removeChild(_placeholderDiv);
+        }
+      }, onPress = function onPress2(e, force) {
+        var i;
+        if (!enabled || self.isPressed || !e || (e.type === "mousedown" || e.type === "pointerdown") && !force && _getTime() - clickTime < 30 && _touchEventLookup[self.pointerEvent.type]) {
+          isPreventingDefault && e && enabled && _preventDefault(e);
+          return;
+        }
+        interrupted = isTweening2();
+        dragged = false;
+        self.pointerEvent = e;
+        if (_touchEventLookup[e.type]) {
+          touchEventTarget = ~e.type.indexOf("touch") ? e.currentTarget || e.target : ownerDoc;
+          _addListener(touchEventTarget, "touchend", onRelease);
+          _addListener(touchEventTarget, "touchmove", onMove);
+          _addListener(touchEventTarget, "touchcancel", onRelease);
+          _addListener(ownerDoc, "touchstart", _onMultiTouchDocument);
+        } else {
+          touchEventTarget = null;
+          _addListener(ownerDoc, "mousemove", onMove);
+        }
+        touchDragAxis = null;
+        if (!_supportsPointer || !touchEventTarget) {
+          _addListener(ownerDoc, "mouseup", onRelease);
+          e && e.target && _addListener(e.target, "mouseup", onRelease);
+        }
+        isClicking = isClickable.call(self, e.target) && vars.dragClickables === false && !force;
+        if (isClicking) {
+          _addListener(e.target, "change", onRelease);
+          _dispatchEvent(self, "pressInit", "onPressInit");
+          _dispatchEvent(self, "press", "onPress");
+          _setSelectable(triggers, true);
+          isPreventingDefault = false;
+          return;
+        }
+        allowNativeTouchScrolling = !touchEventTarget || allowX === allowY || self.vars.allowNativeTouchScrolling === false || self.vars.allowContextMenu && e && (e.ctrlKey || e.which > 2) ? false : allowX ? "y" : "x";
+        isPreventingDefault = !allowNativeTouchScrolling && !self.allowEventDefault;
+        if (isPreventingDefault) {
+          _preventDefault(e);
+          _addListener(_win4, "touchforcechange", _preventDefault);
+        }
+        if (e.changedTouches) {
+          e = touch = e.changedTouches[0];
+          touchID = e.identifier;
+        } else if (e.pointerId) {
+          touchID = e.pointerId;
+        } else {
+          touch = touchID = null;
+        }
+        _dragCount++;
+        _addToRenderQueue(render3);
+        startPointerY = self.pointerY = e.pageY;
+        startPointerX = self.pointerX = e.pageX;
+        _dispatchEvent(self, "pressInit", "onPressInit");
+        if (allowNativeTouchScrolling || self.autoScroll) {
+          _recordMaxScrolls(target.parentNode);
+        }
+        if (target.parentNode && self.autoScroll && !scrollProxy && !rotationMode && target.parentNode._gsMaxScrollX && !_placeholderDiv.parentNode && !target.getBBox) {
+          _placeholderDiv.style.width = target.parentNode.scrollWidth + "px";
+          target.parentNode.appendChild(_placeholderDiv);
+        }
+        recordStartPositions();
+        self.tween && self.tween.kill();
+        self.isThrowing = false;
+        gsap2.killTweensOf(scrollProxy || target, killProps, true);
+        scrollProxy && gsap2.killTweensOf(target, {
+          scrollTo: 1
+        }, true);
+        self.tween = self.lockedAxis = null;
+        if (vars.zIndexBoost || !rotationMode && !scrollProxy && vars.zIndexBoost !== false) {
+          target.style.zIndex = Draggable2.zIndex++;
+        }
+        self.isPressed = true;
+        hasDragCallback = !!(vars.onDrag || self._listeners.drag);
+        hasMoveCallback = !!(vars.onMove || self._listeners.move);
+        if (vars.cursor !== false || vars.activeCursor) {
+          i = triggers.length;
+          while (--i > -1) {
+            gsap2.set(triggers[i], {
+              cursor: vars.activeCursor || vars.cursor || (_defaultCursor === "grab" ? "grabbing" : _defaultCursor)
+            });
+          }
+        }
+        _dispatchEvent(self, "press", "onPress");
+      }, onMove = function onMove2(e) {
+        var originalEvent = e, touches, pointerX, pointerY, i, dx, dy;
+        if (!enabled || _isMultiTouching || !self.isPressed || !e) {
+          isPreventingDefault && e && enabled && _preventDefault(e);
+          return;
+        }
+        self.pointerEvent = e;
+        touches = e.changedTouches;
+        if (touches) {
+          e = touches[0];
+          if (e !== touch && e.identifier !== touchID) {
+            i = touches.length;
+            while (--i > -1 && (e = touches[i]).identifier !== touchID && e.target !== target) {
+            }
+            if (i < 0) {
+              return;
+            }
+          }
+        } else if (e.pointerId && touchID && e.pointerId !== touchID) {
+          return;
+        }
+        if (touchEventTarget && allowNativeTouchScrolling && !touchDragAxis) {
+          _point1.x = e.pageX - (isFixed ? _getDocScrollLeft3(ownerDoc) : 0);
+          _point1.y = e.pageY - (isFixed ? _getDocScrollTop3(ownerDoc) : 0);
+          matrix && matrix.apply(_point1, _point1);
+          pointerX = _point1.x;
+          pointerY = _point1.y;
+          dx = Math.abs(pointerX - startPointerX);
+          dy = Math.abs(pointerY - startPointerY);
+          if (dx !== dy && (dx > minimumMovement || dy > minimumMovement) || _isAndroid && allowNativeTouchScrolling === touchDragAxis) {
+            touchDragAxis = dx > dy && allowX ? "x" : "y";
+            if (allowNativeTouchScrolling && touchDragAxis !== allowNativeTouchScrolling) {
+              _addListener(_win4, "touchforcechange", _preventDefault);
+            }
+            if (self.vars.lockAxisOnTouchScroll !== false && allowX && allowY) {
+              self.lockedAxis = touchDragAxis === "x" ? "y" : "x";
+              _isFunction3(self.vars.onLockAxis) && self.vars.onLockAxis.call(self, originalEvent);
+            }
+            if (_isAndroid && allowNativeTouchScrolling === touchDragAxis) {
+              onRelease(originalEvent);
+              return;
+            }
+          }
+        }
+        if (!self.allowEventDefault && (!allowNativeTouchScrolling || touchDragAxis && allowNativeTouchScrolling !== touchDragAxis) && originalEvent.cancelable !== false) {
+          _preventDefault(originalEvent);
+          isPreventingDefault = true;
+        } else if (isPreventingDefault) {
+          isPreventingDefault = false;
+        }
+        if (self.autoScroll) {
+          checkAutoScrollBounds = true;
+        }
+        setPointerPosition(e.pageX, e.pageY, hasMoveCallback);
+      }, setPointerPosition = function setPointerPosition2(pointerX, pointerY, invokeOnMove) {
+        var dragTolerance = 1 - self.dragResistance, edgeTolerance = 1 - self.edgeResistance, prevPointerX = self.pointerX, prevPointerY = self.pointerY, prevStartElementY = startElementY, prevX = self.x, prevY = self.y, prevEndX = self.endX, prevEndY = self.endY, prevEndRotation = self.endRotation, prevDirty = dirty, xChange, yChange, x, y, dif, temp;
+        self.pointerX = pointerX;
+        self.pointerY = pointerY;
+        if (isFixed) {
+          pointerX -= _getDocScrollLeft3(ownerDoc);
+          pointerY -= _getDocScrollTop3(ownerDoc);
+        }
+        if (rotationMode) {
+          y = Math.atan2(rotationOrigin.y - pointerY, pointerX - rotationOrigin.x) * _RAD2DEG2;
+          dif = self.y - y;
+          if (dif > 180) {
+            startElementY -= 360;
+            self.y = y;
+          } else if (dif < -180) {
+            startElementY += 360;
+            self.y = y;
+          }
+          if (self.x !== startElementX || Math.abs(startElementY - y) > minimumMovement) {
+            self.y = y;
+            x = startElementX + (startElementY - y) * dragTolerance;
+          } else {
+            x = startElementX;
+          }
+        } else {
+          if (matrix) {
+            temp = pointerX * matrix.a + pointerY * matrix.c + matrix.e;
+            pointerY = pointerX * matrix.b + pointerY * matrix.d + matrix.f;
+            pointerX = temp;
+          }
+          yChange = pointerY - startPointerY;
+          xChange = pointerX - startPointerX;
+          if (yChange < minimumMovement && yChange > -minimumMovement) {
+            yChange = 0;
+          }
+          if (xChange < minimumMovement && xChange > -minimumMovement) {
+            xChange = 0;
+          }
+          if ((self.lockAxis || self.lockedAxis) && (xChange || yChange)) {
+            temp = self.lockedAxis;
+            if (!temp) {
+              self.lockedAxis = temp = allowX && Math.abs(xChange) > Math.abs(yChange) ? "y" : allowY ? "x" : null;
+              if (temp && _isFunction3(self.vars.onLockAxis)) {
+                self.vars.onLockAxis.call(self, self.pointerEvent);
+              }
+            }
+            if (temp === "y") {
+              yChange = 0;
+            } else if (temp === "x") {
+              xChange = 0;
+            }
+          }
+          x = _round3(startElementX + xChange * dragTolerance);
+          y = _round3(startElementY + yChange * dragTolerance);
+        }
+        if ((snapX || snapY || snapXY) && (self.x !== x || self.y !== y && !rotationMode)) {
+          if (snapXY) {
+            _temp1.x = x;
+            _temp1.y = y;
+            temp = snapXY(_temp1);
+            x = _round3(temp.x);
+            y = _round3(temp.y);
+          }
+          if (snapX) {
+            x = _round3(snapX(x));
+          }
+          if (snapY) {
+            y = _round3(snapY(y));
+          }
+        }
+        if (hasBounds) {
+          if (x > maxX) {
+            x = maxX + Math.round((x - maxX) * edgeTolerance);
+          } else if (x < minX) {
+            x = minX + Math.round((x - minX) * edgeTolerance);
+          }
+          if (!rotationMode) {
+            if (y > maxY) {
+              y = Math.round(maxY + (y - maxY) * edgeTolerance);
+            } else if (y < minY) {
+              y = Math.round(minY + (y - minY) * edgeTolerance);
+            }
+          }
+        }
+        if (self.x !== x || self.y !== y && !rotationMode) {
+          if (rotationMode) {
+            self.endRotation = self.x = self.endX = x;
+            dirty = true;
+          } else {
+            if (allowY) {
+              self.y = self.endY = y;
+              dirty = true;
+            }
+            if (allowX) {
+              self.x = self.endX = x;
+              dirty = true;
+            }
+          }
+          if (!invokeOnMove || _dispatchEvent(self, "move", "onMove") !== false) {
+            if (!self.isDragging && self.isPressed) {
+              self.isDragging = dragged = true;
+              _dispatchEvent(self, "dragstart", "onDragStart");
+            }
+          } else {
+            self.pointerX = prevPointerX;
+            self.pointerY = prevPointerY;
+            startElementY = prevStartElementY;
+            self.x = prevX;
+            self.y = prevY;
+            self.endX = prevEndX;
+            self.endY = prevEndY;
+            self.endRotation = prevEndRotation;
+            dirty = prevDirty;
+          }
+        }
+      }, onRelease = function onRelease2(e, force) {
+        if (!enabled || !self.isPressed || e && touchID != null && !force && (e.pointerId && e.pointerId !== touchID && e.target !== target || e.changedTouches && !_hasTouchID(e.changedTouches, touchID))) {
+          isPreventingDefault && e && enabled && _preventDefault(e);
+          return;
+        }
+        self.isPressed = false;
+        var originalEvent = e, wasDragging = self.isDragging, isContextMenuRelease = self.vars.allowContextMenu && e && (e.ctrlKey || e.which > 2), placeholderDelayedCall = gsap2.delayedCall(1e-3, removePlaceholder), touches, i, syntheticEvent, eventTarget, syntheticClick;
+        if (touchEventTarget) {
+          _removeListener(touchEventTarget, "touchend", onRelease2);
+          _removeListener(touchEventTarget, "touchmove", onMove);
+          _removeListener(touchEventTarget, "touchcancel", onRelease2);
+          _removeListener(ownerDoc, "touchstart", _onMultiTouchDocument);
+        } else {
+          _removeListener(ownerDoc, "mousemove", onMove);
+        }
+        _removeListener(_win4, "touchforcechange", _preventDefault);
+        if (!_supportsPointer || !touchEventTarget) {
+          _removeListener(ownerDoc, "mouseup", onRelease2);
+          e && e.target && _removeListener(e.target, "mouseup", onRelease2);
+        }
+        dirty = false;
+        if (wasDragging) {
+          dragEndTime = _lastDragTime = _getTime();
+          self.isDragging = false;
+        }
+        _removeFromRenderQueue(render3);
+        if (isClicking && !isContextMenuRelease) {
+          if (e) {
+            _removeListener(e.target, "change", onRelease2);
+            self.pointerEvent = originalEvent;
+          }
+          _setSelectable(triggers, false);
+          _dispatchEvent(self, "release", "onRelease");
+          _dispatchEvent(self, "click", "onClick");
+          isClicking = false;
+          return;
+        }
+        i = triggers.length;
+        while (--i > -1) {
+          _setStyle(triggers[i], "cursor", vars.cursor || (vars.cursor !== false ? _defaultCursor : null));
+        }
+        _dragCount--;
+        if (e) {
+          touches = e.changedTouches;
+          if (touches) {
+            e = touches[0];
+            if (e !== touch && e.identifier !== touchID) {
+              i = touches.length;
+              while (--i > -1 && (e = touches[i]).identifier !== touchID && e.target !== target) {
+              }
+              if (i < 0 && !force) {
+                return;
+              }
+            }
+          }
+          self.pointerEvent = originalEvent;
+          self.pointerX = e.pageX;
+          self.pointerY = e.pageY;
+        }
+        if (isContextMenuRelease && originalEvent) {
+          _preventDefault(originalEvent);
+          isPreventingDefault = true;
+          _dispatchEvent(self, "release", "onRelease");
+        } else if (originalEvent && !wasDragging) {
+          isPreventingDefault = false;
+          if (interrupted && (vars.snap || vars.bounds)) {
+            animate(vars.inertia || vars.throwProps);
+          }
+          _dispatchEvent(self, "release", "onRelease");
+          if ((!_isAndroid || originalEvent.type !== "touchmove") && originalEvent.type.indexOf("cancel") === -1) {
+            _dispatchEvent(self, "click", "onClick");
+            if (_getTime() - clickTime < 300) {
+              _dispatchEvent(self, "doubleclick", "onDoubleClick");
+            }
+            eventTarget = originalEvent.target || target;
+            clickTime = _getTime();
+            syntheticClick = function syntheticClick2() {
+              if (clickTime !== clickDispatch && self.enabled() && !self.isPressed && !originalEvent.defaultPrevented) {
+                if (eventTarget.click) {
+                  eventTarget.click();
+                } else if (ownerDoc.createEvent) {
+                  syntheticEvent = ownerDoc.createEvent("MouseEvents");
+                  syntheticEvent.initMouseEvent("click", true, true, _win4, 1, self.pointerEvent.screenX, self.pointerEvent.screenY, self.pointerX, self.pointerY, false, false, false, false, 0, null);
+                  eventTarget.dispatchEvent(syntheticEvent);
+                }
+              }
+            };
+            if (!_isAndroid && !originalEvent.defaultPrevented) {
+              gsap2.delayedCall(0.05, syntheticClick);
+            }
+          }
+        } else {
+          animate(vars.inertia || vars.throwProps);
+          if (!self.allowEventDefault && originalEvent && (vars.dragClickables !== false || !isClickable.call(self, originalEvent.target)) && wasDragging && (!allowNativeTouchScrolling || touchDragAxis && allowNativeTouchScrolling === touchDragAxis) && originalEvent.cancelable !== false) {
+            isPreventingDefault = true;
+            _preventDefault(originalEvent);
+          } else {
+            isPreventingDefault = false;
+          }
+          _dispatchEvent(self, "release", "onRelease");
+        }
+        isTweening2() && placeholderDelayedCall.duration(self.tween.duration());
+        wasDragging && _dispatchEvent(self, "dragend", "onDragEnd");
+        return true;
+      }, updateScroll = function updateScroll2(e) {
+        if (e && self.isDragging && !scrollProxy) {
+          var parent = e.target || target.parentNode, deltaX = parent.scrollLeft - parent._gsScrollX, deltaY = parent.scrollTop - parent._gsScrollY;
+          if (deltaX || deltaY) {
+            if (matrix) {
+              startPointerX -= deltaX * matrix.a + deltaY * matrix.c;
+              startPointerY -= deltaY * matrix.d + deltaX * matrix.b;
+            } else {
+              startPointerX -= deltaX;
+              startPointerY -= deltaY;
+            }
+            parent._gsScrollX += deltaX;
+            parent._gsScrollY += deltaY;
+            setPointerPosition(self.pointerX, self.pointerY);
+          }
+        }
+      }, onClick = function onClick2(e) {
+        var time = _getTime(), recentlyClicked = time - clickTime < 100, recentlyDragged = time - dragEndTime < 50, alreadyDispatched = recentlyClicked && clickDispatch === clickTime, defaultPrevented = self.pointerEvent && self.pointerEvent.defaultPrevented, alreadyDispatchedTrusted = recentlyClicked && trustedClickDispatch === clickTime, trusted = e.isTrusted || e.isTrusted == null && recentlyClicked && alreadyDispatched;
+        if ((alreadyDispatched || recentlyDragged && self.vars.suppressClickOnDrag !== false) && e.stopImmediatePropagation) {
+          e.stopImmediatePropagation();
+        }
+        if (recentlyClicked && !(self.pointerEvent && self.pointerEvent.defaultPrevented) && (!alreadyDispatched || trusted && !alreadyDispatchedTrusted)) {
+          if (trusted && alreadyDispatched) {
+            trustedClickDispatch = clickTime;
+          }
+          clickDispatch = clickTime;
+          return;
+        }
+        if (self.isPressed || recentlyDragged || recentlyClicked) {
+          if (!trusted || !e.detail || !recentlyClicked || defaultPrevented) {
+            _preventDefault(e);
+          }
+        }
+        if (!recentlyClicked && !recentlyDragged && !dragged) {
+          e && e.target && (self.pointerEvent = e);
+          _dispatchEvent(self, "click", "onClick");
+        }
+      }, localizePoint = function localizePoint2(p) {
+        return matrix ? {
+          x: p.x * matrix.a + p.y * matrix.c + matrix.e,
+          y: p.x * matrix.b + p.y * matrix.d + matrix.f
+        } : {
+          x: p.x,
+          y: p.y
+        };
+      };
+      old = Draggable2.get(target);
+      old && old.kill();
+      _this2.startDrag = function(event, align) {
+        var r1, r2, p1, p2;
+        onPress(event || self.pointerEvent, true);
+        if (align && !self.hitTest(event || self.pointerEvent)) {
+          r1 = _parseRect(event || self.pointerEvent);
+          r2 = _parseRect(target);
+          p1 = localizePoint({
+            x: r1.left + r1.width / 2,
+            y: r1.top + r1.height / 2
+          });
+          p2 = localizePoint({
+            x: r2.left + r2.width / 2,
+            y: r2.top + r2.height / 2
+          });
+          startPointerX -= p1.x - p2.x;
+          startPointerY -= p1.y - p2.y;
+        }
+        if (!self.isDragging) {
+          self.isDragging = dragged = true;
+          _dispatchEvent(self, "dragstart", "onDragStart");
+        }
+      };
+      _this2.drag = onMove;
+      _this2.endDrag = function(e) {
+        return onRelease(e || self.pointerEvent, true);
+      };
+      _this2.timeSinceDrag = function() {
+        return self.isDragging ? 0 : (_getTime() - dragEndTime) / 1e3;
+      };
+      _this2.timeSinceClick = function() {
+        return (_getTime() - clickTime) / 1e3;
+      };
+      _this2.hitTest = function(target2, threshold) {
+        return Draggable2.hitTest(self.target, target2, threshold);
+      };
+      _this2.getDirection = function(from, diagonalThreshold) {
+        var mode = from === "velocity" && InertiaPlugin ? from : _isObject3(from) && !rotationMode ? "element" : "start", xChange, yChange, ratio, direction, r1, r2;
+        if (mode === "element") {
+          r1 = _parseRect(self.target);
+          r2 = _parseRect(from);
+        }
+        xChange = mode === "start" ? self.x - startElementX : mode === "velocity" ? InertiaPlugin.getVelocity(target, xProp) : r1.left + r1.width / 2 - (r2.left + r2.width / 2);
+        if (rotationMode) {
+          return xChange < 0 ? "counter-clockwise" : "clockwise";
+        } else {
+          diagonalThreshold = diagonalThreshold || 2;
+          yChange = mode === "start" ? self.y - startElementY : mode === "velocity" ? InertiaPlugin.getVelocity(target, yProp) : r1.top + r1.height / 2 - (r2.top + r2.height / 2);
+          ratio = Math.abs(xChange / yChange);
+          direction = ratio < 1 / diagonalThreshold ? "" : xChange < 0 ? "left" : "right";
+          if (ratio < diagonalThreshold) {
+            if (direction !== "") {
+              direction += "-";
+            }
+            direction += yChange < 0 ? "up" : "down";
+          }
+        }
+        return direction;
+      };
+      _this2.applyBounds = function(newBounds, sticky) {
+        var x, y, forceZeroVelocity, e, parent, isRoot;
+        if (newBounds && vars.bounds !== newBounds) {
+          vars.bounds = newBounds;
+          return self.update(true, sticky);
+        }
+        syncXY(true);
+        calculateBounds();
+        if (hasBounds && !isTweening2()) {
+          x = self.x;
+          y = self.y;
+          if (x > maxX) {
+            x = maxX;
+          } else if (x < minX) {
+            x = minX;
+          }
+          if (y > maxY) {
+            y = maxY;
+          } else if (y < minY) {
+            y = minY;
+          }
+          if (self.x !== x || self.y !== y) {
+            forceZeroVelocity = true;
+            self.x = self.endX = x;
+            if (rotationMode) {
+              self.endRotation = x;
+            } else {
+              self.y = self.endY = y;
+            }
+            dirty = true;
+            render3(true);
+            if (self.autoScroll && !self.isDragging) {
+              _recordMaxScrolls(target.parentNode);
+              e = target;
+              _windowProxy.scrollTop = _win4.pageYOffset != null ? _win4.pageYOffset : ownerDoc.documentElement.scrollTop != null ? ownerDoc.documentElement.scrollTop : ownerDoc.body.scrollTop;
+              _windowProxy.scrollLeft = _win4.pageXOffset != null ? _win4.pageXOffset : ownerDoc.documentElement.scrollLeft != null ? ownerDoc.documentElement.scrollLeft : ownerDoc.body.scrollLeft;
+              while (e && !isRoot) {
+                isRoot = _isRoot(e.parentNode);
+                parent = isRoot ? _windowProxy : e.parentNode;
+                if (allowY && parent.scrollTop > parent._gsMaxScrollY) {
+                  parent.scrollTop = parent._gsMaxScrollY;
+                }
+                if (allowX && parent.scrollLeft > parent._gsMaxScrollX) {
+                  parent.scrollLeft = parent._gsMaxScrollX;
+                }
+                e = parent;
+              }
+            }
+          }
+          if (self.isThrowing && (forceZeroVelocity || self.endX > maxX || self.endX < minX || self.endY > maxY || self.endY < minY)) {
+            animate(vars.inertia || vars.throwProps, forceZeroVelocity);
+          }
+        }
+        return self;
+      };
+      _this2.update = function(applyBounds, sticky, ignoreExternalChanges) {
+        if (sticky && self.isPressed) {
+          var m = getGlobalMatrix(target), p = innerMatrix.apply({
+            x: self.x - startElementX,
+            y: self.y - startElementY
+          }), m2 = getGlobalMatrix(target.parentNode, true);
+          m2.apply({
+            x: m.e - p.x,
+            y: m.f - p.y
+          }, p);
+          self.x -= p.x - m2.e;
+          self.y -= p.y - m2.f;
+          render3(true);
+          recordStartPositions();
+        }
+        var x = self.x, y = self.y;
+        updateMatrix(!sticky);
+        if (applyBounds) {
+          self.applyBounds();
+        } else {
+          dirty && ignoreExternalChanges && render3(true);
+          syncXY(true);
+        }
+        if (sticky) {
+          setPointerPosition(self.pointerX, self.pointerY);
+          dirty && render3(true);
+        }
+        if (self.isPressed && !sticky && (allowX && Math.abs(x - self.x) > 0.01 || allowY && Math.abs(y - self.y) > 0.01 && !rotationMode)) {
+          recordStartPositions();
+        }
+        if (self.autoScroll) {
+          _recordMaxScrolls(target.parentNode, self.isDragging);
+          checkAutoScrollBounds = self.isDragging;
+          render3(true);
+          _removeScrollListener(target, updateScroll);
+          _addScrollListener(target, updateScroll);
+        }
+        return self;
+      };
+      _this2.enable = function(type2) {
+        var setVars = {
+          lazy: true
+        }, id, i, trigger;
+        if (vars.cursor !== false) {
+          setVars.cursor = vars.cursor || _defaultCursor;
+        }
+        if (gsap2.utils.checkPrefix("touchCallout")) {
+          setVars.touchCallout = "none";
+        }
+        if (type2 !== "soft") {
+          _setTouchActionForAllDescendants(triggers, allowX === allowY ? "none" : vars.allowNativeTouchScrolling && target.scrollHeight === target.clientHeight === (target.scrollWidth === target.clientHeight) || vars.allowEventDefault ? "manipulation" : allowX ? "pan-y" : "pan-x");
+          i = triggers.length;
+          while (--i > -1) {
+            trigger = triggers[i];
+            _supportsPointer || _addListener(trigger, "mousedown", onPress);
+            _addListener(trigger, "touchstart", onPress);
+            _addListener(trigger, "click", onClick, true);
+            gsap2.set(trigger, setVars);
+            if (trigger.getBBox && trigger.ownerSVGElement && allowX !== allowY) {
+              gsap2.set(trigger.ownerSVGElement, {
+                touchAction: vars.allowNativeTouchScrolling || vars.allowEventDefault ? "manipulation" : allowX ? "pan-y" : "pan-x"
+              });
+            }
+            vars.allowContextMenu || _addListener(trigger, "contextmenu", onContextMenu);
+          }
+          _setSelectable(triggers, false);
+        }
+        _addScrollListener(target, updateScroll);
+        enabled = true;
+        if (InertiaPlugin && type2 !== "soft") {
+          InertiaPlugin.track(scrollProxy || target, xyMode ? "x,y" : rotationMode ? "rotation" : "top,left");
+        }
+        target._gsDragID = id = "d" + _lookupCount++;
+        _lookup[id] = self;
+        if (scrollProxy) {
+          scrollProxy.enable();
+          scrollProxy.element._gsDragID = id;
+        }
+        (vars.bounds || rotationMode) && recordStartPositions();
+        vars.bounds && self.applyBounds();
+        return self;
+      };
+      _this2.disable = function(type2) {
+        var dragging = self.isDragging, i = triggers.length, trigger;
+        while (--i > -1) {
+          _setStyle(triggers[i], "cursor", null);
+        }
+        if (type2 !== "soft") {
+          _setTouchActionForAllDescendants(triggers, null);
+          i = triggers.length;
+          while (--i > -1) {
+            trigger = triggers[i];
+            _setStyle(trigger, "touchCallout", null);
+            _removeListener(trigger, "mousedown", onPress);
+            _removeListener(trigger, "touchstart", onPress);
+            _removeListener(trigger, "click", onClick, true);
+            _removeListener(trigger, "contextmenu", onContextMenu);
+          }
+          _setSelectable(triggers, true);
+          if (touchEventTarget) {
+            _removeListener(touchEventTarget, "touchcancel", onRelease);
+            _removeListener(touchEventTarget, "touchend", onRelease);
+            _removeListener(touchEventTarget, "touchmove", onMove);
+          }
+          _removeListener(ownerDoc, "mouseup", onRelease);
+          _removeListener(ownerDoc, "mousemove", onMove);
+        }
+        _removeScrollListener(target, updateScroll);
+        enabled = false;
+        if (InertiaPlugin && type2 !== "soft") {
+          InertiaPlugin.untrack(scrollProxy || target, xyMode ? "x,y" : rotationMode ? "rotation" : "top,left");
+          self.tween && self.tween.kill();
+        }
+        scrollProxy && scrollProxy.disable();
+        _removeFromRenderQueue(render3);
+        self.isDragging = self.isPressed = isClicking = false;
+        dragging && _dispatchEvent(self, "dragend", "onDragEnd");
+        return self;
+      };
+      _this2.enabled = function(value, type2) {
+        return arguments.length ? value ? self.enable(type2) : self.disable(type2) : enabled;
+      };
+      _this2.kill = function() {
+        self.isThrowing = false;
+        self.tween && self.tween.kill();
+        self.disable();
+        gsap2.set(triggers, {
+          clearProps: "userSelect"
+        });
+        delete _lookup[target._gsDragID];
+        return self;
+      };
+      _this2.revert = function() {
+        this.kill();
+        this.styles && this.styles.revert();
+      };
+      if (~type.indexOf("scroll")) {
+        scrollProxy = _this2.scrollProxy = new ScrollProxy(target, _extend({
+          onKill: function onKill() {
+            self.isPressed && onRelease(null);
+          }
+        }, vars));
+        target.style.overflowY = allowY && !_isTouchDevice ? "auto" : "hidden";
+        target.style.overflowX = allowX && !_isTouchDevice ? "auto" : "hidden";
+        target = scrollProxy.content;
+      }
+      if (rotationMode) {
+        killProps.rotation = 1;
+      } else {
+        if (allowX) {
+          killProps[xProp] = 1;
+        }
+        if (allowY) {
+          killProps[yProp] = 1;
+        }
+      }
+      gsCache.force3D = "force3D" in vars ? vars.force3D : true;
+      _context2(_assertThisInitialized2(_this2));
+      _this2.enable();
+      return _this2;
+    }
+    Draggable2.register = function register(core) {
+      gsap2 = core;
+      _initCore3();
+    };
+    Draggable2.create = function create(targets, vars) {
+      _coreInitted2 || _initCore3(true);
+      return _toArray(targets).map(function(target) {
+        return new Draggable2(target, vars);
+      });
+    };
+    Draggable2.get = function get(target) {
+      return _lookup[(_toArray(target)[0] || {})._gsDragID];
+    };
+    Draggable2.timeSinceDrag = function timeSinceDrag() {
+      return (_getTime() - _lastDragTime) / 1e3;
+    };
+    Draggable2.hitTest = function hitTest(obj1, obj2, threshold) {
+      if (obj1 === obj2) {
+        return false;
+      }
+      var r1 = _parseRect(obj1), r2 = _parseRect(obj2), top = r1.top, left = r1.left, right = r1.right, bottom = r1.bottom, width = r1.width, height = r1.height, isOutside = r2.left > right || r2.right < left || r2.top > bottom || r2.bottom < top, overlap, area, isRatio;
+      if (isOutside || !threshold) {
+        return !isOutside;
+      }
+      isRatio = (threshold + "").indexOf("%") !== -1;
+      threshold = parseFloat(threshold) || 0;
+      overlap = {
+        left: Math.max(left, r2.left),
+        top: Math.max(top, r2.top)
+      };
+      overlap.width = Math.min(right, r2.right) - overlap.left;
+      overlap.height = Math.min(bottom, r2.bottom) - overlap.top;
+      if (overlap.width < 0 || overlap.height < 0) {
+        return false;
+      }
+      if (isRatio) {
+        threshold *= 0.01;
+        area = overlap.width * overlap.height;
+        return area >= width * height * threshold || area >= r2.width * r2.height * threshold;
+      }
+      return overlap.width > threshold && overlap.height > threshold;
+    };
+    return Draggable2;
+  }(EventDispatcher);
+  _setDefaults3(Draggable.prototype, {
+    pointerX: 0,
+    pointerY: 0,
+    startX: 0,
+    startY: 0,
+    deltaX: 0,
+    deltaY: 0,
+    isDragging: false,
+    isPressed: false
+  });
+  Draggable.zIndex = 1e3;
+  Draggable.version = "3.12.2";
+  _getGSAP() && gsap2.registerPlugin(Draggable);
+
   // node_modules/gsap/Observer.js
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -4246,28 +6420,28 @@
       _defineProperties(Constructor, staticProps);
     return Constructor;
   }
-  var gsap2;
-  var _coreInitted2;
+  var gsap3;
+  var _coreInitted3;
   var _clamp3;
-  var _win3;
-  var _doc3;
+  var _win5;
+  var _doc5;
   var _docEl;
-  var _body;
+  var _body3;
   var _isTouch;
   var _pointerType;
   var ScrollTrigger;
   var _root;
   var _normalizer;
   var _eventTypes;
-  var _context2;
-  var _getGSAP = function _getGSAP2() {
-    return gsap2 || typeof window !== "undefined" && (gsap2 = window.gsap) && gsap2.registerPlugin && gsap2;
+  var _context3;
+  var _getGSAP3 = function _getGSAP4() {
+    return gsap3 || typeof window !== "undefined" && (gsap3 = window.gsap) && gsap3.registerPlugin && gsap3;
   };
   var _startup = 1;
   var _observers = [];
   var _scrollers = [];
   var _proxies = [];
-  var _getTime = Date.now;
+  var _getTime2 = Date.now;
   var _bridge = function _bridge2(name, value) {
     return value;
   };
@@ -4287,13 +6461,13 @@
   var _isViewport = function _isViewport2(el) {
     return !!~_root.indexOf(el);
   };
-  var _addListener = function _addListener2(element, type, func, nonPassive, capture) {
+  var _addListener3 = function _addListener4(element, type, func, nonPassive, capture) {
     return element.addEventListener(type, func, {
       passive: !nonPassive,
       capture: !!capture
     });
   };
-  var _removeListener = function _removeListener2(element, type, func, capture) {
+  var _removeListener3 = function _removeListener4(element, type, func, capture) {
     return element.removeEventListener(type, func, !!capture);
   };
   var _scrollLeft = "scrollLeft";
@@ -4304,7 +6478,7 @@
   var _scrollCacheFunc = function _scrollCacheFunc2(f, doNotCache) {
     var cachingFunc = function cachingFunc2(value) {
       if (value || value === 0) {
-        _startup && (_win3.history.scrollRestoration = "manual");
+        _startup && (_win5.history.scrollRestoration = "manual");
         var isNormalizing = _normalizer && _normalizer.isPressed;
         value = cachingFunc2.v = Math.round(value) || (_normalizer && _normalizer.iOS ? 1 : 0);
         f(value);
@@ -4329,7 +6503,7 @@
     d2: "Width",
     a: "x",
     sc: _scrollCacheFunc(function(value) {
-      return arguments.length ? _win3.scrollTo(value, _vertical.sc()) : _win3.pageXOffset || _doc3[_scrollLeft] || _docEl[_scrollLeft] || _body[_scrollLeft] || 0;
+      return arguments.length ? _win5.scrollTo(value, _vertical.sc()) : _win5.pageXOffset || _doc5[_scrollLeft] || _docEl[_scrollLeft] || _body3[_scrollLeft] || 0;
     })
   };
   var _vertical = {
@@ -4343,28 +6517,28 @@
     a: "y",
     op: _horizontal,
     sc: _scrollCacheFunc(function(value) {
-      return arguments.length ? _win3.scrollTo(_horizontal.sc(), value) : _win3.pageYOffset || _doc3[_scrollTop] || _docEl[_scrollTop] || _body[_scrollTop] || 0;
+      return arguments.length ? _win5.scrollTo(_horizontal.sc(), value) : _win5.pageYOffset || _doc5[_scrollTop] || _docEl[_scrollTop] || _body3[_scrollTop] || 0;
     })
   };
   var _getTarget = function _getTarget2(t, self) {
-    return (self && self._ctx && self._ctx.selector || gsap2.utils.toArray)(t)[0] || (typeof t === "string" && gsap2.config().nullTargetWarn !== false ? console.warn("Element not found:", t) : null);
+    return (self && self._ctx && self._ctx.selector || gsap3.utils.toArray)(t)[0] || (typeof t === "string" && gsap3.config().nullTargetWarn !== false ? console.warn("Element not found:", t) : null);
   };
   var _getScrollFunc = function _getScrollFunc2(element, _ref) {
     var s = _ref.s, sc = _ref.sc;
-    _isViewport(element) && (element = _doc3.scrollingElement || _docEl);
+    _isViewport(element) && (element = _doc5.scrollingElement || _docEl);
     var i = _scrollers.indexOf(element), offset = sc === _vertical.sc ? 1 : 2;
     !~i && (i = _scrollers.push(element) - 1);
-    _scrollers[i + offset] || _addListener(element, "scroll", _onScroll);
+    _scrollers[i + offset] || _addListener3(element, "scroll", _onScroll);
     var prev = _scrollers[i + offset], func = prev || (_scrollers[i + offset] = _scrollCacheFunc(_getProxyProp(element, s), true) || (_isViewport(element) ? sc : _scrollCacheFunc(function(value) {
       return arguments.length ? element[s] = value : element[s];
     })));
     func.target = element;
-    prev || (func.smooth = gsap2.getProperty(element, "scrollBehavior") === "smooth");
+    prev || (func.smooth = gsap3.getProperty(element, "scrollBehavior") === "smooth");
     return func;
   };
   var _getVelocityProp = function _getVelocityProp2(value, minTimeRefresh, useDelta) {
-    var v1 = value, v2 = value, t1 = _getTime(), t2 = t1, min = minTimeRefresh || 50, dropToZeroTime = Math.max(500, min * 3), update = function update2(value2, force) {
-      var t = _getTime();
+    var v1 = value, v2 = value, t1 = _getTime2(), t2 = t1, min = minTimeRefresh || 50, dropToZeroTime = Math.max(500, min * 3), update = function update2(value2, force) {
+      var t = _getTime2();
       if (force || t - t1 > min) {
         v2 = v1;
         v1 = value2;
@@ -4379,7 +6553,7 @@
       v2 = v1 = useDelta ? 0 : v1;
       t2 = t1 = 0;
     }, getVelocity = function getVelocity2(latestValue) {
-      var tOld = t2, vOld = v2, t = _getTime();
+      var tOld = t2, vOld = v2, t = _getTime2();
       (latestValue || latestValue === 0) && latestValue !== v1 && update(latestValue);
       return t1 === t2 || t - t2 > dropToZeroTime ? 0 : (v1 + (useDelta ? vOld : -vOld)) / ((useDelta ? t : t1) - tOld) * 1e3;
     };
@@ -4398,30 +6572,30 @@
     return Math.abs(max) >= Math.abs(min) ? max : min;
   };
   var _setScrollTrigger = function _setScrollTrigger2() {
-    ScrollTrigger = gsap2.core.globals().ScrollTrigger;
+    ScrollTrigger = gsap3.core.globals().ScrollTrigger;
     ScrollTrigger && ScrollTrigger.core && _integrate();
   };
-  var _initCore3 = function _initCore4(core) {
-    gsap2 = core || _getGSAP();
-    if (gsap2 && typeof document !== "undefined" && document.body) {
-      _win3 = window;
-      _doc3 = document;
-      _docEl = _doc3.documentElement;
-      _body = _doc3.body;
-      _root = [_win3, _doc3, _docEl, _body];
-      _clamp3 = gsap2.utils.clamp;
-      _context2 = gsap2.core.context || function() {
+  var _initCore5 = function _initCore6(core) {
+    gsap3 = core || _getGSAP3();
+    if (gsap3 && typeof document !== "undefined" && document.body) {
+      _win5 = window;
+      _doc5 = document;
+      _docEl = _doc5.documentElement;
+      _body3 = _doc5.body;
+      _root = [_win5, _doc5, _docEl, _body3];
+      _clamp3 = gsap3.utils.clamp;
+      _context3 = gsap3.core.context || function() {
       };
-      _pointerType = "onpointerenter" in _body ? "pointer" : "mouse";
-      _isTouch = Observer.isTouch = _win3.matchMedia && _win3.matchMedia("(hover: none), (pointer: coarse)").matches ? 1 : "ontouchstart" in _win3 || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0 ? 2 : 0;
+      _pointerType = "onpointerenter" in _body3 ? "pointer" : "mouse";
+      _isTouch = Observer.isTouch = _win5.matchMedia && _win5.matchMedia("(hover: none), (pointer: coarse)").matches ? 1 : "ontouchstart" in _win5 || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0 ? 2 : 0;
       _eventTypes = Observer.eventTypes = ("ontouchstart" in _docEl ? "touchstart,touchmove,touchcancel,touchend" : !("onpointerdown" in _docEl) ? "mousedown,mousemove,mouseup,mouseup" : "pointerdown,pointermove,pointercancel,pointerup").split(",");
       setTimeout(function() {
         return _startup = 0;
       }, 500);
       _setScrollTrigger();
-      _coreInitted2 = 1;
+      _coreInitted3 = 1;
     }
-    return _coreInitted2;
+    return _coreInitted3;
   };
   _horizontal.op = _vertical;
   _scrollers.cache = 0;
@@ -4431,21 +6605,21 @@
     }
     var _proto = Observer2.prototype;
     _proto.init = function init4(vars) {
-      _coreInitted2 || _initCore3(gsap2) || console.warn("Please gsap.registerPlugin(Observer)");
+      _coreInitted3 || _initCore5(gsap3) || console.warn("Please gsap.registerPlugin(Observer)");
       ScrollTrigger || _setScrollTrigger();
       var tolerance = vars.tolerance, dragMinimum = vars.dragMinimum, type = vars.type, target = vars.target, lineHeight = vars.lineHeight, debounce = vars.debounce, preventDefault = vars.preventDefault, onStop = vars.onStop, onStopDelay = vars.onStopDelay, ignore = vars.ignore, wheelSpeed = vars.wheelSpeed, event = vars.event, onDragStart = vars.onDragStart, onDragEnd = vars.onDragEnd, onDrag = vars.onDrag, onPress = vars.onPress, onRelease = vars.onRelease, onRight = vars.onRight, onLeft = vars.onLeft, onUp = vars.onUp, onDown = vars.onDown, onChangeX = vars.onChangeX, onChangeY = vars.onChangeY, onChange = vars.onChange, onToggleX = vars.onToggleX, onToggleY = vars.onToggleY, onHover = vars.onHover, onHoverEnd = vars.onHoverEnd, onMove = vars.onMove, ignoreCheck = vars.ignoreCheck, isNormalizer = vars.isNormalizer, onGestureStart = vars.onGestureStart, onGestureEnd = vars.onGestureEnd, onWheel = vars.onWheel, onEnable = vars.onEnable, onDisable = vars.onDisable, onClick = vars.onClick, scrollSpeed = vars.scrollSpeed, capture = vars.capture, allowClicks = vars.allowClicks, lockAxis = vars.lockAxis, onLockAxis = vars.onLockAxis;
       this.target = target = _getTarget(target) || _docEl;
       this.vars = vars;
-      ignore && (ignore = gsap2.utils.toArray(ignore));
+      ignore && (ignore = gsap3.utils.toArray(ignore));
       tolerance = tolerance || 1e-9;
       dragMinimum = dragMinimum || 0;
       wheelSpeed = wheelSpeed || 1;
       scrollSpeed = scrollSpeed || 1;
       type = type || "wheel,touch,pointer";
       debounce = debounce !== false;
-      lineHeight || (lineHeight = parseFloat(_win3.getComputedStyle(_body).lineHeight) || 22);
-      var id, onStopDelayedCall, dragged, moved, wheeled, locked, axis, self = this, prevDeltaX = 0, prevDeltaY = 0, scrollFuncX = _getScrollFunc(target, _horizontal), scrollFuncY = _getScrollFunc(target, _vertical), scrollX = scrollFuncX(), scrollY = scrollFuncY(), limitToTouch = ~type.indexOf("touch") && !~type.indexOf("pointer") && _eventTypes[0] === "pointerdown", isViewport = _isViewport(target), ownerDoc = target.ownerDocument || _doc3, deltaX = [0, 0, 0], deltaY = [0, 0, 0], onClickTime = 0, clickCapture = function clickCapture2() {
-        return onClickTime = _getTime();
+      lineHeight || (lineHeight = parseFloat(_win5.getComputedStyle(_body3).lineHeight) || 22);
+      var id, onStopDelayedCall, dragged, moved, wheeled, locked, axis, self = this, prevDeltaX = 0, prevDeltaY = 0, scrollFuncX = _getScrollFunc(target, _horizontal), scrollFuncY = _getScrollFunc(target, _vertical), scrollX = scrollFuncX(), scrollY = scrollFuncY(), limitToTouch = ~type.indexOf("touch") && !~type.indexOf("pointer") && _eventTypes[0] === "pointerdown", isViewport = _isViewport(target), ownerDoc = target.ownerDocument || _doc5, deltaX = [0, 0, 0], deltaY = [0, 0, 0], onClickTime = 0, clickCapture = function clickCapture2() {
+        return onClickTime = _getTime2();
       }, _ignoreCheck = function _ignoreCheck2(e, isPointerOrTouch) {
         return (self.event = e) && ignore && ~ignore.indexOf(e.target) || isPointerOrTouch && limitToTouch && e.pointerType !== "touch" || ignoreCheck && ignoreCheck(e, isPointerOrTouch);
       }, onStopFunc = function onStopFunc2() {
@@ -4533,26 +6707,26 @@
         self.startY = self.y = e.clientY;
         self._vx.reset();
         self._vy.reset();
-        _addListener(isNormalizer ? target : ownerDoc, _eventTypes[1], _onDrag, preventDefault, true);
+        _addListener3(isNormalizer ? target : ownerDoc, _eventTypes[1], _onDrag, preventDefault, true);
         self.deltaX = self.deltaY = 0;
         onPress && onPress(self);
       }, _onRelease = self.onRelease = function(e) {
         if (_ignoreCheck(e, 1)) {
           return;
         }
-        _removeListener(isNormalizer ? target : ownerDoc, _eventTypes[1], _onDrag, true);
+        _removeListener3(isNormalizer ? target : ownerDoc, _eventTypes[1], _onDrag, true);
         var isTrackingDrag = !isNaN(self.y - self.startY), wasDragging = self.isDragging && (Math.abs(self.x - self.startX) > 3 || Math.abs(self.y - self.startY) > 3), eventData = _getEvent(e);
         if (!wasDragging && isTrackingDrag) {
           self._vx.reset();
           self._vy.reset();
           if (preventDefault && allowClicks) {
-            gsap2.delayedCall(0.08, function() {
-              if (_getTime() - onClickTime > 300 && !e.defaultPrevented) {
+            gsap3.delayedCall(0.08, function() {
+              if (_getTime2() - onClickTime > 300 && !e.defaultPrevented) {
                 if (e.target.click) {
                   e.target.click();
                 } else if (ownerDoc.createEvent) {
                   var syntheticEvent = ownerDoc.createEvent("MouseEvents");
-                  syntheticEvent.initMouseEvent("click", true, true, _win3, 1, eventData.screenX, eventData.screenY, eventData.clientX, eventData.clientY, false, false, false, false, 0, null);
+                  syntheticEvent.initMouseEvent("click", true, true, _win5, 1, eventData.screenX, eventData.screenY, eventData.clientX, eventData.clientY, false, false, false, false, 0, null);
                   e.target.dispatchEvent(syntheticEvent);
                 }
               }
@@ -4582,7 +6756,7 @@
         }
         e = _getEvent(e, preventDefault);
         onWheel && (wheeled = true);
-        var multiplier = (e.deltaMode === 1 ? lineHeight : e.deltaMode === 2 ? _win3.innerHeight : 1) * wheelSpeed;
+        var multiplier = (e.deltaMode === 1 ? lineHeight : e.deltaMode === 2 ? _win5.innerHeight : 1) * wheelSpeed;
         onDelta(e.deltaX * multiplier, e.deltaY * multiplier, 0);
         onStop && !isNormalizer && onStopDelayedCall.restart(true);
       }, _onMove = function _onMove2(e) {
@@ -4603,30 +6777,30 @@
       }, _onClick = function _onClick2(e) {
         return _ignoreCheck(e) || _getEvent(e, preventDefault) && onClick(self);
       };
-      onStopDelayedCall = self._dc = gsap2.delayedCall(onStopDelay || 0.25, onStopFunc).pause();
+      onStopDelayedCall = self._dc = gsap3.delayedCall(onStopDelay || 0.25, onStopFunc).pause();
       self.deltaX = self.deltaY = 0;
       self._vx = _getVelocityProp(0, 50, true);
       self._vy = _getVelocityProp(0, 50, true);
       self.scrollX = scrollFuncX;
       self.scrollY = scrollFuncY;
       self.isDragging = self.isGesturing = self.isPressed = false;
-      _context2(this);
+      _context3(this);
       self.enable = function(e) {
         if (!self.isEnabled) {
-          _addListener(isViewport ? ownerDoc : target, "scroll", _onScroll);
-          type.indexOf("scroll") >= 0 && _addListener(isViewport ? ownerDoc : target, "scroll", onScroll, preventDefault, capture);
-          type.indexOf("wheel") >= 0 && _addListener(target, "wheel", _onWheel, preventDefault, capture);
+          _addListener3(isViewport ? ownerDoc : target, "scroll", _onScroll);
+          type.indexOf("scroll") >= 0 && _addListener3(isViewport ? ownerDoc : target, "scroll", onScroll, preventDefault, capture);
+          type.indexOf("wheel") >= 0 && _addListener3(target, "wheel", _onWheel, preventDefault, capture);
           if (type.indexOf("touch") >= 0 && _isTouch || type.indexOf("pointer") >= 0) {
-            _addListener(target, _eventTypes[0], _onPress, preventDefault, capture);
-            _addListener(ownerDoc, _eventTypes[2], _onRelease);
-            _addListener(ownerDoc, _eventTypes[3], _onRelease);
-            allowClicks && _addListener(target, "click", clickCapture, false, true);
-            onClick && _addListener(target, "click", _onClick);
-            onGestureStart && _addListener(ownerDoc, "gesturestart", _onGestureStart);
-            onGestureEnd && _addListener(ownerDoc, "gestureend", _onGestureEnd);
-            onHover && _addListener(target, _pointerType + "enter", _onHover);
-            onHoverEnd && _addListener(target, _pointerType + "leave", _onHoverEnd);
-            onMove && _addListener(target, _pointerType + "move", _onMove);
+            _addListener3(target, _eventTypes[0], _onPress, preventDefault, capture);
+            _addListener3(ownerDoc, _eventTypes[2], _onRelease);
+            _addListener3(ownerDoc, _eventTypes[3], _onRelease);
+            allowClicks && _addListener3(target, "click", clickCapture, false, true);
+            onClick && _addListener3(target, "click", _onClick);
+            onGestureStart && _addListener3(ownerDoc, "gesturestart", _onGestureStart);
+            onGestureEnd && _addListener3(ownerDoc, "gestureend", _onGestureEnd);
+            onHover && _addListener3(target, _pointerType + "enter", _onHover);
+            onHoverEnd && _addListener3(target, _pointerType + "leave", _onHoverEnd);
+            onMove && _addListener3(target, _pointerType + "move", _onMove);
           }
           self.isEnabled = true;
           e && e.type && _onPress(e);
@@ -4638,24 +6812,24 @@
         if (self.isEnabled) {
           _observers.filter(function(o) {
             return o !== self && _isViewport(o.target);
-          }).length || _removeListener(isViewport ? ownerDoc : target, "scroll", _onScroll);
+          }).length || _removeListener3(isViewport ? ownerDoc : target, "scroll", _onScroll);
           if (self.isPressed) {
             self._vx.reset();
             self._vy.reset();
-            _removeListener(isNormalizer ? target : ownerDoc, _eventTypes[1], _onDrag, true);
+            _removeListener3(isNormalizer ? target : ownerDoc, _eventTypes[1], _onDrag, true);
           }
-          _removeListener(isViewport ? ownerDoc : target, "scroll", onScroll, capture);
-          _removeListener(target, "wheel", _onWheel, capture);
-          _removeListener(target, _eventTypes[0], _onPress, capture);
-          _removeListener(ownerDoc, _eventTypes[2], _onRelease);
-          _removeListener(ownerDoc, _eventTypes[3], _onRelease);
-          _removeListener(target, "click", clickCapture, true);
-          _removeListener(target, "click", _onClick);
-          _removeListener(ownerDoc, "gesturestart", _onGestureStart);
-          _removeListener(ownerDoc, "gestureend", _onGestureEnd);
-          _removeListener(target, _pointerType + "enter", _onHover);
-          _removeListener(target, _pointerType + "leave", _onHoverEnd);
-          _removeListener(target, _pointerType + "move", _onMove);
+          _removeListener3(isViewport ? ownerDoc : target, "scroll", onScroll, capture);
+          _removeListener3(target, "wheel", _onWheel, capture);
+          _removeListener3(target, _eventTypes[0], _onPress, capture);
+          _removeListener3(ownerDoc, _eventTypes[2], _onRelease);
+          _removeListener3(ownerDoc, _eventTypes[3], _onRelease);
+          _removeListener3(target, "click", clickCapture, true);
+          _removeListener3(target, "click", _onClick);
+          _removeListener3(ownerDoc, "gesturestart", _onGestureStart);
+          _removeListener3(ownerDoc, "gestureend", _onGestureEnd);
+          _removeListener3(target, _pointerType + "enter", _onHover);
+          _removeListener3(target, _pointerType + "leave", _onHoverEnd);
+          _removeListener3(target, _pointerType + "move", _onMove);
           self.isEnabled = self.isPressed = self.isDragging = false;
           onDisable && onDisable(self);
         }
@@ -4687,7 +6861,7 @@
   Observer.create = function(vars) {
     return new Observer(vars);
   };
-  Observer.register = _initCore3;
+  Observer.register = _initCore5;
   Observer.getAll = function() {
     return _observers.slice();
   };
@@ -4696,24 +6870,24 @@
       return o.vars.id === id;
     })[0];
   };
-  _getGSAP() && gsap2.registerPlugin(Observer);
+  _getGSAP3() && gsap3.registerPlugin(Observer);
 
   // node_modules/gsap/ScrollTrigger.js
-  var gsap3;
-  var _coreInitted3;
-  var _win4;
-  var _doc4;
+  var gsap4;
+  var _coreInitted4;
+  var _win6;
+  var _doc6;
   var _docEl2;
-  var _body2;
+  var _body4;
   var _root2;
   var _resizeDelay;
-  var _toArray;
+  var _toArray2;
   var _clamp4;
   var _time2;
   var _syncInterval;
   var _refreshing;
   var _pointerIsDown;
-  var _transformProp2;
+  var _transformProp4;
   var _i;
   var _prevWidth;
   var _prevHeight;
@@ -4726,14 +6900,14 @@
   var _baseScreenHeight;
   var _baseScreenWidth;
   var _fixIOSBug;
-  var _context3;
+  var _context4;
   var _scrollRestoration;
   var _div100vh;
   var _100vh;
   var _limitCallbacks;
   var _startup2 = 1;
-  var _getTime2 = Date.now;
-  var _time1 = _getTime2();
+  var _getTime3 = Date.now;
+  var _time1 = _getTime3();
   var _lastScrollTime = 0;
   var _enabled = 0;
   var _parseClamp = function _parseClamp2(value, type, self) {
@@ -4756,28 +6930,28 @@
   var _passThrough3 = function _passThrough4(v) {
     return v;
   };
-  var _round3 = function _round4(value) {
+  var _round5 = function _round6(value) {
     return Math.round(value * 1e5) / 1e5 || 0;
   };
-  var _windowExists5 = function _windowExists6() {
+  var _windowExists7 = function _windowExists8() {
     return typeof window !== "undefined";
   };
-  var _getGSAP3 = function _getGSAP4() {
-    return gsap3 || _windowExists5() && (gsap3 = window.gsap) && gsap3.registerPlugin && gsap3;
+  var _getGSAP5 = function _getGSAP6() {
+    return gsap4 || _windowExists7() && (gsap4 = window.gsap) && gsap4.registerPlugin && gsap4;
   };
   var _isViewport3 = function _isViewport4(e) {
     return !!~_root2.indexOf(e);
   };
   var _getViewportDimension = function _getViewportDimension2(dimensionProperty) {
-    return (dimensionProperty === "Height" ? _100vh : _win4["inner" + dimensionProperty]) || _docEl2["client" + dimensionProperty] || _body2["client" + dimensionProperty];
+    return (dimensionProperty === "Height" ? _100vh : _win6["inner" + dimensionProperty]) || _docEl2["client" + dimensionProperty] || _body4["client" + dimensionProperty];
   };
   var _getBoundsFunc = function _getBoundsFunc2(element) {
     return _getProxyProp(element, "getBoundingClientRect") || (_isViewport3(element) ? function() {
-      _winOffsets.width = _win4.innerWidth;
+      _winOffsets.width = _win6.innerWidth;
       _winOffsets.height = _100vh;
       return _winOffsets;
     } : function() {
-      return _getBounds(element);
+      return _getBounds3(element);
     });
   };
   var _getSizeFunc = function _getSizeFunc2(scroller, isViewport, _ref) {
@@ -4795,7 +6969,7 @@
   };
   var _maxScroll = function _maxScroll2(element, _ref2) {
     var s = _ref2.s, d2 = _ref2.d2, d = _ref2.d, a = _ref2.a;
-    return Math.max(0, (s = "scroll" + d2) && (a = _getProxyProp(element, s)) ? a() - _getBoundsFunc(element)()[d] : _isViewport3(element) ? (_docEl2[s] || _body2[s]) - _getViewportDimension(d2) : element[s] - element["offset" + d2]);
+    return Math.max(0, (s = "scroll" + d2) && (a = _getProxyProp(element, s)) ? a() - _getBoundsFunc(element)()[d] : _isViewport3(element) ? (_docEl2[s] || _body4[s]) - _getViewportDimension(d2) : element[s] - element["offset" + d2]);
   };
   var _iterateAutoRefresh = function _iterateAutoRefresh2(func, events) {
     for (var i = 0; i < _autoRefresh.length; i += 3) {
@@ -4805,13 +6979,13 @@
   var _isString3 = function _isString4(value) {
     return typeof value === "string";
   };
-  var _isFunction3 = function _isFunction4(value) {
+  var _isFunction5 = function _isFunction6(value) {
     return typeof value === "function";
   };
   var _isNumber3 = function _isNumber4(value) {
     return typeof value === "number";
   };
-  var _isObject3 = function _isObject4(value) {
+  var _isObject5 = function _isObject6(value) {
     return typeof value === "object";
   };
   var _endAnimation = function _endAnimation2(animation, reversed, pause) {
@@ -4839,21 +7013,21 @@
   var _Width = "Width";
   var _Height = "Height";
   var _px = "px";
-  var _getComputedStyle = function _getComputedStyle2(element) {
-    return _win4.getComputedStyle(element);
+  var _getComputedStyle3 = function _getComputedStyle4(element) {
+    return _win6.getComputedStyle(element);
   };
   var _makePositionable = function _makePositionable2(element) {
-    var position = _getComputedStyle(element).position;
+    var position = _getComputedStyle3(element).position;
     element.style.position = position === "absolute" || position === "fixed" ? position : "relative";
   };
-  var _setDefaults3 = function _setDefaults4(obj, defaults2) {
+  var _setDefaults5 = function _setDefaults6(obj, defaults2) {
     for (var p in defaults2) {
       p in obj || (obj[p] = defaults2[p]);
     }
     return obj;
   };
-  var _getBounds = function _getBounds2(element, withoutTransforms) {
-    var tween = withoutTransforms && _getComputedStyle(element)[_transformProp2] !== "matrix(1, 0, 0, 1, 0, 0)" && gsap3.to(element, {
+  var _getBounds3 = function _getBounds4(element, withoutTransforms) {
+    var tween = withoutTransforms && _getComputedStyle3(element)[_transformProp4] !== "matrix(1, 0, 0, 1, 0, 0)" && gsap4.to(element, {
       x: 0,
       y: 0,
       xPercent: 0,
@@ -4881,11 +7055,11 @@
   };
   var _getClosestLabel = function _getClosestLabel2(animation) {
     return function(value) {
-      return gsap3.utils.snap(_getLabelRatioArray(animation), value);
+      return gsap4.utils.snap(_getLabelRatioArray(animation), value);
     };
   };
   var _snapDirectional = function _snapDirectional2(snapIncrementOrArray) {
-    var snap3 = gsap3.utils.snap(snapIncrementOrArray), a = Array.isArray(snapIncrementOrArray) && snapIncrementOrArray.slice(0).sort(function(a2, b) {
+    var snap3 = gsap4.utils.snap(snapIncrementOrArray), a = Array.isArray(snapIncrementOrArray) && snapIncrementOrArray.slice(0).sort(function(a2, b) {
       return a2 - b;
     });
     return a ? function(value, direction, threshold) {
@@ -4932,13 +7106,13 @@
       return func(element, type, callback);
     });
   };
-  var _addListener3 = function _addListener4(element, type, func, nonPassive, capture) {
+  var _addListener5 = function _addListener6(element, type, func, nonPassive, capture) {
     return element.addEventListener(type, func, {
       passive: !nonPassive,
       capture: !!capture
     });
   };
-  var _removeListener3 = function _removeListener4(element, type, func, capture) {
+  var _removeListener5 = function _removeListener6(element, type, func, capture) {
     return element.removeEventListener(type, func, !!capture);
   };
   var _wheelListener = function _wheelListener2(func, el, scrollFunc) {
@@ -4979,7 +7153,7 @@
   };
   var _createMarker = function _createMarker2(type, name, container, direction, _ref4, offset, matchWidthEl, containerAnimation) {
     var startColor = _ref4.startColor, endColor = _ref4.endColor, fontSize = _ref4.fontSize, indent = _ref4.indent, fontWeight = _ref4.fontWeight;
-    var e = _doc4.createElement("div"), useFixedPosition = _isViewport3(container) || _getProxyProp(container, "pinType") === "fixed", isScroller = type.indexOf("scroller") !== -1, parent = useFixedPosition ? _body2 : container, isStart = type.indexOf("start") !== -1, color = isStart ? startColor : endColor, css = "border-color:" + color + ";font-size:" + fontSize + ";color:" + color + ";font-weight:" + fontWeight + ";pointer-events:none;white-space:nowrap;font-family:sans-serif,Arial;z-index:1000;padding:4px 8px;border-width:0;border-style:solid;";
+    var e = _doc6.createElement("div"), useFixedPosition = _isViewport3(container) || _getProxyProp(container, "pinType") === "fixed", isScroller = type.indexOf("scroller") !== -1, parent = useFixedPosition ? _body4 : container, isStart = type.indexOf("start") !== -1, color = isStart ? startColor : endColor, css = "border-color:" + color + ";font-size:" + fontSize + ";color:" + color + ";font-weight:" + fontWeight + ";pointer-events:none;white-space:nowrap;font-family:sans-serif,Arial;z-index:1000;padding:4px 8px;border-width:0;border-style:solid;";
     css += "position:" + ((isScroller || containerAnimation) && useFixedPosition ? "fixed;" : "absolute;");
     (isScroller || containerAnimation || !useFixedPosition) && (css += (direction === _vertical ? _right : _bottom) + ":" + (offset + parseFloat(indent)) + "px;");
     matchWidthEl && (css += "box-sizing:border-box;text-align:left;width:" + matchWidthEl.offsetWidth + "px;");
@@ -5002,16 +7176,16 @@
     vars["border" + side + _Width] = 1;
     vars["border" + oppositeSide + _Width] = 0;
     vars[direction.p] = start + "px";
-    gsap3.set(marker, vars);
+    gsap4.set(marker, vars);
   };
   var _triggers = [];
   var _ids = {};
   var _rafID;
   var _sync = function _sync2() {
-    return _getTime2() - _lastScrollTime > 34 && (_rafID || (_rafID = requestAnimationFrame(_updateAll)));
+    return _getTime3() - _lastScrollTime > 34 && (_rafID || (_rafID = requestAnimationFrame(_updateAll)));
   };
   var _onScroll3 = function _onScroll4() {
-    if (!_normalizer2 || !_normalizer2.isPressed || _normalizer2.startX > _body2.clientWidth) {
+    if (!_normalizer2 || !_normalizer2.isPressed || _normalizer2.startX > _body4.clientWidth) {
       _scrollers.cache++;
       if (_normalizer2) {
         _rafID || (_rafID = requestAnimationFrame(_updateAll));
@@ -5019,21 +7193,21 @@
         _updateAll();
       }
       _lastScrollTime || _dispatch3("scrollStart");
-      _lastScrollTime = _getTime2();
+      _lastScrollTime = _getTime3();
     }
   };
   var _setBaseDimensions = function _setBaseDimensions2() {
-    _baseScreenWidth = _win4.innerWidth;
-    _baseScreenHeight = _win4.innerHeight;
+    _baseScreenWidth = _win6.innerWidth;
+    _baseScreenHeight = _win6.innerHeight;
   };
   var _onResize = function _onResize2() {
     _scrollers.cache++;
-    !_refreshing && !_ignoreResize && !_doc4.fullscreenElement && !_doc4.webkitFullscreenElement && (!_ignoreMobileResize || _baseScreenWidth !== _win4.innerWidth || Math.abs(_win4.innerHeight - _baseScreenHeight) > _win4.innerHeight * 0.25) && _resizeDelay.restart(true);
+    !_refreshing && !_ignoreResize && !_doc6.fullscreenElement && !_doc6.webkitFullscreenElement && (!_ignoreMobileResize || _baseScreenWidth !== _win6.innerWidth || Math.abs(_win6.innerHeight - _baseScreenHeight) > _win6.innerHeight * 0.25) && _resizeDelay.restart(true);
   };
   var _listeners2 = {};
   var _emptyArray2 = [];
   var _softRefresh = function _softRefresh2() {
-    return _removeListener3(ScrollTrigger2, "scrollEnd", _softRefresh2) || _refreshAll(true);
+    return _removeListener5(ScrollTrigger2, "scrollEnd", _softRefresh2) || _refreshAll(true);
   };
   var _dispatch3 = function _dispatch4(type) {
     return _listeners2[type] && _listeners2[type].map(function(f) {
@@ -5068,9 +7242,9 @@
   var _clearScrollMemory = function _clearScrollMemory2(scrollRestoration, force) {
     _scrollers.cache++;
     (force || !_refreshingAll) && _scrollers.forEach(function(obj) {
-      return _isFunction3(obj) && obj.cacheID++ && (obj.rec = 0);
+      return _isFunction5(obj) && obj.cacheID++ && (obj.rec = 0);
     });
-    _isString3(scrollRestoration) && (_win4.history.scrollRestoration = _scrollRestoration = scrollRestoration);
+    _isString3(scrollRestoration) && (_win6.history.scrollRestoration = _scrollRestoration = scrollRestoration);
   };
   var _refreshingAll;
   var _refreshID = 0;
@@ -5084,25 +7258,25 @@
     }
   };
   var _refresh100vh = function _refresh100vh2() {
-    _body2.appendChild(_div100vh);
-    _100vh = _div100vh.offsetHeight || _win4.innerHeight;
-    _body2.removeChild(_div100vh);
+    _body4.appendChild(_div100vh);
+    _100vh = _div100vh.offsetHeight || _win6.innerHeight;
+    _body4.removeChild(_div100vh);
   };
   var _refreshAll = function _refreshAll2(force, skipRevert) {
     if (_lastScrollTime && !force) {
-      _addListener3(ScrollTrigger2, "scrollEnd", _softRefresh);
+      _addListener5(ScrollTrigger2, "scrollEnd", _softRefresh);
       return;
     }
     _refresh100vh();
     _refreshingAll = ScrollTrigger2.isRefreshing = true;
     _scrollers.forEach(function(obj) {
-      return _isFunction3(obj) && ++obj.cacheID && (obj.rec = obj());
+      return _isFunction5(obj) && ++obj.cacheID && (obj.rec = obj());
     });
     var refreshInits = _dispatch3("refreshInit");
     _sort && ScrollTrigger2.sort();
     skipRevert || _revertAll();
     _scrollers.forEach(function(obj) {
-      if (_isFunction3(obj)) {
+      if (_isFunction5(obj)) {
         obj.smooth && (obj.target.style.scrollBehavior = "auto");
         obj(0);
       }
@@ -5126,7 +7300,7 @@
       return result && result.render && result.render(-1);
     });
     _scrollers.forEach(function(obj) {
-      if (_isFunction3(obj)) {
+      if (_isFunction5(obj)) {
         obj.smooth && requestAnimationFrame(function() {
           return obj.target.style.scrollBehavior = "smooth";
         });
@@ -5139,7 +7313,7 @@
     _refreshingAll = 2;
     _updateAll(2);
     _triggers.forEach(function(t) {
-      return _isFunction3(t.vars.onRefresh) && t.vars.onRefresh(t);
+      return _isFunction5(t.vars.onRefresh) && t.vars.onRefresh(t);
     });
     _refreshingAll = ScrollTrigger2.isRefreshing = false;
     _dispatch3("refresh");
@@ -5151,7 +7325,7 @@
     if (!_refreshingAll || force === 2) {
       ScrollTrigger2.isUpdating = true;
       _primary && _primary.update(0);
-      var l = _triggers.length, time = _getTime2(), recordVelocity = time - _time1 >= 50, scroll = l && _triggers[0].scroll();
+      var l = _triggers.length, time = _getTime3(), recordVelocity = time - _time1 >= 50, scroll = l && _triggers[0].scroll();
       _direction = _lastScroll > scroll ? -1 : 1;
       _refreshingAll || (_lastScroll = scroll);
       if (recordVelocity) {
@@ -5224,7 +7398,7 @@
   var _setState = function _setState2(state) {
     if (state) {
       var style = state.t.style, l = state.length, i = 0, p, value;
-      (state.t._gsap || gsap3.core.getCache(state.t)).uncache = 1;
+      (state.t._gsap || gsap4.core.getCache(state.t)).uncache = 1;
       for (; i < l; i += 2) {
         value = state[i + 1];
         p = state[i];
@@ -5258,7 +7432,7 @@
     top: 0
   };
   var _parsePosition3 = function _parsePosition4(value, trigger, scrollerSize, direction, scroll, marker, markerScroller, self, scrollerBounds, borderWidth, useFixedPosition, scrollerMax, containerAnimation, clampZeroProp) {
-    _isFunction3(value) && (value = value(self));
+    _isFunction5(value) && (value = value(self));
     if (_isString3(value) && value.substr(0, 3) === "max") {
       value = scrollerMax + (value.charAt(4) === "=" ? _offsetToPx("0" + value.substr(3), scrollerSize) : 0);
     }
@@ -5266,14 +7440,14 @@
     containerAnimation && containerAnimation.seek(0);
     isNaN(value) || (value = +value);
     if (!_isNumber3(value)) {
-      _isFunction3(trigger) && (trigger = trigger(self));
+      _isFunction5(trigger) && (trigger = trigger(self));
       var offsets = (value || "0").split(" "), bounds, localOffset, globalOffset, display;
-      element = _getTarget(trigger, self) || _body2;
-      bounds = _getBounds(element) || {};
-      if ((!bounds || !bounds.left && !bounds.top) && _getComputedStyle(element).display === "none") {
+      element = _getTarget(trigger, self) || _body4;
+      bounds = _getBounds3(element) || {};
+      if ((!bounds || !bounds.left && !bounds.top) && _getComputedStyle3(element).display === "none") {
         display = element.style.display;
         element.style.display = "block";
-        bounds = _getBounds(element);
+        bounds = _getBounds3(element);
         display ? element.style.display = display : element.style.removeProperty("display");
       }
       localOffset = _offsetToPx(offsets[0], bounds[direction.d]);
@@ -5282,7 +7456,7 @@
       markerScroller && _positionMarker(markerScroller, globalOffset, direction, scrollerSize - globalOffset < 20 || markerScroller._isStart && globalOffset > 20);
       scrollerSize -= scrollerSize - globalOffset;
     } else {
-      containerAnimation && (value = gsap3.utils.mapRange(containerAnimation.scrollTrigger.start, containerAnimation.scrollTrigger.end, 0, scrollerMax, value));
+      containerAnimation && (value = gsap4.utils.mapRange(containerAnimation.scrollTrigger.start, containerAnimation.scrollTrigger.end, 0, scrollerMax, value));
       markerScroller && _positionMarker(markerScroller, scrollerSize, direction, true);
     }
     if (clampZeroProp) {
@@ -5292,16 +7466,16 @@
     if (marker) {
       var position = value + scrollerSize, isStart = marker._isStart;
       p1 = "scroll" + direction.d2;
-      _positionMarker(marker, position, direction, isStart && position > 20 || !isStart && (useFixedPosition ? Math.max(_body2[p1], _docEl2[p1]) : marker.parentNode[p1]) <= position + 1);
+      _positionMarker(marker, position, direction, isStart && position > 20 || !isStart && (useFixedPosition ? Math.max(_body4[p1], _docEl2[p1]) : marker.parentNode[p1]) <= position + 1);
       if (useFixedPosition) {
-        scrollerBounds = _getBounds(markerScroller);
+        scrollerBounds = _getBounds3(markerScroller);
         useFixedPosition && (marker.style[direction.op.p] = scrollerBounds[direction.op.p] - direction.op.m - marker._offset + _px);
       }
     }
     if (containerAnimation && element) {
-      p1 = _getBounds(element);
+      p1 = _getBounds3(element);
       containerAnimation.seek(scrollerMax);
-      p2 = _getBounds(element);
+      p2 = _getBounds3(element);
       containerAnimation._caScrollDist = p1[direction.p] - p2[direction.p];
       value = value / containerAnimation._caScrollDist * scrollerMax;
     }
@@ -5312,9 +7486,9 @@
   var _reparent = function _reparent2(element, parent, top, left) {
     if (element.parentNode !== parent) {
       var style = element.style, p, cs;
-      if (parent === _body2) {
+      if (parent === _body4) {
         element._stOrig = style.cssText;
-        cs = _getComputedStyle(element);
+        cs = _getComputedStyle3(element);
         for (p in cs) {
           if (!+p && !_prefixExp.test(p) && cs[p] && typeof style[p] === "string" && p !== "0") {
             style[p] = cs[p];
@@ -5325,7 +7499,7 @@
       } else {
         style.cssText = element._stOrig;
       }
-      gsap3.core.getCache(element).uncache = 1;
+      gsap4.core.getCache(element).uncache = 1;
       parent.appendChild(element);
     }
   };
@@ -5345,7 +7519,7 @@
   var _shiftMarker = function _shiftMarker2(marker, direction, value) {
     var vars = {};
     vars[direction.p] = "+=" + value;
-    gsap3.set(marker, vars);
+    gsap4.set(marker, vars);
   };
   var _getTweenCreator = function _getTweenCreator2(scroller, direction) {
     var getScroll = _getScrollFunc(scroller, direction), prop = "_scroll" + direction.p2, getTween = function getTween2(scrollTo, vars, initialValue, change1, change2) {
@@ -5371,21 +7545,21 @@
         getTween2.tween = 0;
         onComplete && onComplete.call(tween);
       };
-      tween = getTween2.tween = gsap3.to(scroller, vars);
+      tween = getTween2.tween = gsap4.to(scroller, vars);
       return tween;
     };
     scroller[prop] = getScroll;
     getScroll.wheelHandler = function() {
       return getTween.tween && getTween.tween.kill() && (getTween.tween = 0);
     };
-    _addListener3(scroller, "wheel", getScroll.wheelHandler);
-    ScrollTrigger2.isTouch && _addListener3(scroller, "touchmove", getScroll.wheelHandler);
+    _addListener5(scroller, "wheel", getScroll.wheelHandler);
+    ScrollTrigger2.isTouch && _addListener5(scroller, "touchmove", getScroll.wheelHandler);
     return getTween;
   };
   var ScrollTrigger2 = /* @__PURE__ */ function() {
     function ScrollTrigger3(vars, animation) {
-      _coreInitted3 || ScrollTrigger3.register(gsap3) || console.warn("Please gsap.registerPlugin(ScrollTrigger)");
-      _context3(this);
+      _coreInitted4 || ScrollTrigger3.register(gsap4) || console.warn("Please gsap.registerPlugin(ScrollTrigger)");
+      _context4(this);
       this.init(vars, animation);
     }
     var _proto = ScrollTrigger3.prototype;
@@ -5396,10 +7570,10 @@
         this.update = this.refresh = this.kill = _passThrough3;
         return;
       }
-      vars = _setDefaults3(_isString3(vars) || _isNumber3(vars) || vars.nodeType ? {
+      vars = _setDefaults5(_isString3(vars) || _isNumber3(vars) || vars.nodeType ? {
         trigger: vars
       } : vars, _defaults2);
-      var _vars = vars, onUpdate = _vars.onUpdate, toggleClass = _vars.toggleClass, id = _vars.id, onToggle = _vars.onToggle, onRefresh = _vars.onRefresh, scrub = _vars.scrub, trigger = _vars.trigger, pin = _vars.pin, pinSpacing = _vars.pinSpacing, invalidateOnRefresh = _vars.invalidateOnRefresh, anticipatePin = _vars.anticipatePin, onScrubComplete = _vars.onScrubComplete, onSnapComplete = _vars.onSnapComplete, once = _vars.once, snap3 = _vars.snap, pinReparent = _vars.pinReparent, pinSpacer = _vars.pinSpacer, containerAnimation = _vars.containerAnimation, fastScrollEnd = _vars.fastScrollEnd, preventOverlaps = _vars.preventOverlaps, direction = vars.horizontal || vars.containerAnimation && vars.horizontal !== false ? _horizontal : _vertical, isToggle = !scrub && scrub !== 0, scroller = _getTarget(vars.scroller || _win4), scrollerCache = gsap3.core.getCache(scroller), isViewport = _isViewport3(scroller), useFixedPosition = ("pinType" in vars ? vars.pinType : _getProxyProp(scroller, "pinType") || isViewport && "fixed") === "fixed", callbacks = [vars.onEnter, vars.onLeave, vars.onEnterBack, vars.onLeaveBack], toggleActions = isToggle && vars.toggleActions.split(" "), markers = "markers" in vars ? vars.markers : _defaults2.markers, borderWidth = isViewport ? 0 : parseFloat(_getComputedStyle(scroller)["border" + direction.p2 + _Width]) || 0, self = this, onRefreshInit = vars.onRefreshInit && function() {
+      var _vars = vars, onUpdate = _vars.onUpdate, toggleClass = _vars.toggleClass, id = _vars.id, onToggle = _vars.onToggle, onRefresh = _vars.onRefresh, scrub = _vars.scrub, trigger = _vars.trigger, pin = _vars.pin, pinSpacing = _vars.pinSpacing, invalidateOnRefresh = _vars.invalidateOnRefresh, anticipatePin = _vars.anticipatePin, onScrubComplete = _vars.onScrubComplete, onSnapComplete = _vars.onSnapComplete, once = _vars.once, snap3 = _vars.snap, pinReparent = _vars.pinReparent, pinSpacer = _vars.pinSpacer, containerAnimation = _vars.containerAnimation, fastScrollEnd = _vars.fastScrollEnd, preventOverlaps = _vars.preventOverlaps, direction = vars.horizontal || vars.containerAnimation && vars.horizontal !== false ? _horizontal : _vertical, isToggle = !scrub && scrub !== 0, scroller = _getTarget(vars.scroller || _win6), scrollerCache = gsap4.core.getCache(scroller), isViewport = _isViewport3(scroller), useFixedPosition = ("pinType" in vars ? vars.pinType : _getProxyProp(scroller, "pinType") || isViewport && "fixed") === "fixed", callbacks = [vars.onEnter, vars.onLeave, vars.onEnterBack, vars.onLeaveBack], toggleActions = isToggle && vars.toggleActions.split(" "), markers = "markers" in vars ? vars.markers : _defaults2.markers, borderWidth = isViewport ? 0 : parseFloat(_getComputedStyle3(scroller)["border" + direction.p2 + _Width]) || 0, self = this, onRefreshInit = vars.onRefreshInit && function() {
         return vars.onRefreshInit(self);
       }, getScrollerSize = _getSizeFunc(scroller, isViewport, direction), getScrollerOffsets = _getOffsetsFunc(scroller, isViewport), lastSnap = 0, lastRefresh = 0, prevProgress = 0, scrollFunc = _getScrollFunc(scroller, direction), tweenTo, pinCache, snapFunc, scroll1, scroll2, start, end, markerStart, markerEnd, markerStartTrigger, markerEndTrigger, markerVars, executingOnRefresh, change, pinOriginalState, pinActiveState, pinState, spacer, offset, pinGetter, pinSetter, pinStart, pinChange, spacingStart, spacerState, markerStartSetter, pinMoves, markerEndSetter, cs, snap1, snap22, scrubTween, scrubSmooth, snapDurClamp, snapDelayedCall, prevScroll, prevAnimProgress, caMarkerSetter, customRevertReturn;
       self._startClamp = self._endClamp = false;
@@ -5425,7 +7599,7 @@
           scrubTween && scrubTween.progress(1).kill();
           scrubTween = 0;
         } else {
-          scrubTween ? scrubTween.duration(value) : scrubTween = gsap3.to(animation, {
+          scrubTween ? scrubTween.duration(value) : scrubTween = gsap4.to(animation, {
             ease: "expo",
             totalProgress: "+=0",
             duration: scrubSmooth,
@@ -5446,29 +7620,29 @@
         id || (id = animation.vars.id);
       }
       if (snap3) {
-        if (!_isObject3(snap3) || snap3.push) {
+        if (!_isObject5(snap3) || snap3.push) {
           snap3 = {
             snapTo: snap3
           };
         }
-        "scrollBehavior" in _body2.style && gsap3.set(isViewport ? [_body2, _docEl2] : scroller, {
+        "scrollBehavior" in _body4.style && gsap4.set(isViewport ? [_body4, _docEl2] : scroller, {
           scrollBehavior: "auto"
         });
         _scrollers.forEach(function(o) {
-          return _isFunction3(o) && o.target === (isViewport ? _doc4.scrollingElement || _docEl2 : scroller) && (o.smooth = false);
+          return _isFunction5(o) && o.target === (isViewport ? _doc6.scrollingElement || _docEl2 : scroller) && (o.smooth = false);
         });
-        snapFunc = _isFunction3(snap3.snapTo) ? snap3.snapTo : snap3.snapTo === "labels" ? _getClosestLabel(animation) : snap3.snapTo === "labelsDirectional" ? _getLabelAtDirection(animation) : snap3.directional !== false ? function(value, st) {
-          return _snapDirectional(snap3.snapTo)(value, _getTime2() - lastRefresh < 500 ? 0 : st.direction);
-        } : gsap3.utils.snap(snap3.snapTo);
+        snapFunc = _isFunction5(snap3.snapTo) ? snap3.snapTo : snap3.snapTo === "labels" ? _getClosestLabel(animation) : snap3.snapTo === "labelsDirectional" ? _getLabelAtDirection(animation) : snap3.directional !== false ? function(value, st) {
+          return _snapDirectional(snap3.snapTo)(value, _getTime3() - lastRefresh < 500 ? 0 : st.direction);
+        } : gsap4.utils.snap(snap3.snapTo);
         snapDurClamp = snap3.duration || {
           min: 0.1,
           max: 2
         };
-        snapDurClamp = _isObject3(snapDurClamp) ? _clamp4(snapDurClamp.min, snapDurClamp.max) : _clamp4(snapDurClamp, snapDurClamp);
-        snapDelayedCall = gsap3.delayedCall(snap3.delay || scrubSmooth / 2 || 0.1, function() {
-          var scroll = scrollFunc(), refreshedRecently = _getTime2() - lastRefresh < 500, tween = tweenTo.tween;
+        snapDurClamp = _isObject5(snapDurClamp) ? _clamp4(snapDurClamp.min, snapDurClamp.max) : _clamp4(snapDurClamp, snapDurClamp);
+        snapDelayedCall = gsap4.delayedCall(snap3.delay || scrubSmooth / 2 || 0.1, function() {
+          var scroll = scrollFunc(), refreshedRecently = _getTime3() - lastRefresh < 500, tween = tweenTo.tween;
           if ((refreshedRecently || Math.abs(self.getVelocity()) < 10) && !tween && !_pointerIsDown && lastSnap !== scroll) {
-            var progress = (scroll - start) / change, totalProgress = animation && !isToggle ? animation.totalProgress() : progress, velocity = refreshedRecently ? 0 : (totalProgress - snap22) / (_getTime2() - _time2) * 1e3 || 0, change1 = gsap3.utils.clamp(-progress, 1 - progress, _abs(velocity / 2) * velocity / 0.185), naturalEnd = progress + (snap3.inertia === false ? 0 : change1), endValue = _clamp4(0, 1, snapFunc(naturalEnd, self)), endScroll = Math.round(start + endValue * change), _snap = snap3, onStart = _snap.onStart, _onInterrupt = _snap.onInterrupt, _onComplete = _snap.onComplete;
+            var progress = (scroll - start) / change, totalProgress = animation && !isToggle ? animation.totalProgress() : progress, velocity = refreshedRecently ? 0 : (totalProgress - snap22) / (_getTime3() - _time2) * 1e3 || 0, change1 = gsap4.utils.clamp(-progress, 1 - progress, _abs(velocity / 2) * velocity / 0.185), naturalEnd = progress + (snap3.inertia === false ? 0 : change1), endValue = _clamp4(0, 1, snapFunc(naturalEnd, self)), endScroll = Math.round(start + endValue * change), _snap = snap3, onStart = _snap.onStart, _onInterrupt = _snap.onInterrupt, _onComplete = _snap.onComplete;
             if (scroll <= end && scroll >= start && endScroll !== scroll) {
               if (tween && !tween._initted && tween.data <= _abs(endScroll - scroll)) {
                 return;
@@ -5509,9 +7683,9 @@
         className: toggleClass
       });
       if (pin) {
-        pinSpacing === false || pinSpacing === _margin || (pinSpacing = !pinSpacing && pin.parentNode && pin.parentNode.style && _getComputedStyle(pin.parentNode).display === "flex" ? false : _padding);
+        pinSpacing === false || pinSpacing === _margin || (pinSpacing = !pinSpacing && pin.parentNode && pin.parentNode.style && _getComputedStyle3(pin.parentNode).display === "flex" ? false : _padding);
         self.pin = pin;
-        pinCache = gsap3.core.getCache(pin);
+        pinCache = gsap4.core.getCache(pin);
         if (!pinCache.spacer) {
           if (pinSpacer) {
             pinSpacer = _getTarget(pinSpacer);
@@ -5519,40 +7693,40 @@
             pinCache.spacerIsNative = !!pinSpacer;
             pinSpacer && (pinCache.spacerState = _getState(pinSpacer));
           }
-          pinCache.spacer = spacer = pinSpacer || _doc4.createElement("div");
+          pinCache.spacer = spacer = pinSpacer || _doc6.createElement("div");
           spacer.classList.add("pin-spacer");
           id && spacer.classList.add("pin-spacer-" + id);
           pinCache.pinState = pinOriginalState = _getState(pin);
         } else {
           pinOriginalState = pinCache.pinState;
         }
-        vars.force3D !== false && gsap3.set(pin, {
+        vars.force3D !== false && gsap4.set(pin, {
           force3D: true
         });
         self.spacer = spacer = pinCache.spacer;
-        cs = _getComputedStyle(pin);
+        cs = _getComputedStyle3(pin);
         spacingStart = cs[pinSpacing + direction.os2];
-        pinGetter = gsap3.getProperty(pin);
-        pinSetter = gsap3.quickSetter(pin, direction.a, _px);
+        pinGetter = gsap4.getProperty(pin);
+        pinSetter = gsap4.quickSetter(pin, direction.a, _px);
         _swapPinIn(pin, spacer, cs);
         pinState = _getState(pin);
       }
       if (markers) {
-        markerVars = _isObject3(markers) ? _setDefaults3(markers, _markerDefaults) : _markerDefaults;
+        markerVars = _isObject5(markers) ? _setDefaults5(markers, _markerDefaults) : _markerDefaults;
         markerStartTrigger = _createMarker("scroller-start", id, scroller, direction, markerVars, 0);
         markerEndTrigger = _createMarker("scroller-end", id, scroller, direction, markerVars, 0, markerStartTrigger);
         offset = markerStartTrigger["offset" + direction.op.d2];
         var content = _getTarget(_getProxyProp(scroller, "content") || scroller);
         markerStart = this.markerStart = _createMarker("start", id, content, direction, markerVars, offset, 0, containerAnimation);
         markerEnd = this.markerEnd = _createMarker("end", id, content, direction, markerVars, offset, 0, containerAnimation);
-        containerAnimation && (caMarkerSetter = gsap3.quickSetter([markerStart, markerEnd], direction.a, _px));
+        containerAnimation && (caMarkerSetter = gsap4.quickSetter([markerStart, markerEnd], direction.a, _px));
         if (!useFixedPosition && !(_proxies.length && _getProxyProp(scroller, "fixedMarkers") === true)) {
-          _makePositionable(isViewport ? _body2 : scroller);
-          gsap3.set([markerStartTrigger, markerEndTrigger], {
+          _makePositionable(isViewport ? _body4 : scroller);
+          gsap4.set([markerStartTrigger, markerEndTrigger], {
             force3D: true
           });
-          markerStartSetter = gsap3.quickSetter(markerStartTrigger, direction.a, _px);
-          markerEndSetter = gsap3.quickSetter(markerEndTrigger, direction.a, _px);
+          markerStartSetter = gsap4.quickSetter(markerStartTrigger, direction.a, _px);
+          markerEndSetter = gsap4.quickSetter(markerEndTrigger, direction.a, _px);
         }
       }
       if (containerAnimation) {
@@ -5590,7 +7764,7 @@
             if (r) {
               _swapPinOut(pin, spacer, pinOriginalState);
             } else {
-              _swapPinIn(pin, spacer, _getComputedStyle(pin), spacerState);
+              _swapPinIn(pin, spacer, _getComputedStyle3(pin), spacerState);
             }
           }
           r || self.update(r);
@@ -5603,7 +7777,7 @@
           return;
         }
         if (pin && soft && _lastScrollTime) {
-          _addListener3(ScrollTrigger3, "scrollEnd", _softRefresh);
+          _addListener5(ScrollTrigger3, "scrollEnd", _softRefresh);
           return;
         }
         !_refreshingAll && onRefreshInit && onRefreshInit(self);
@@ -5618,10 +7792,10 @@
         }).invalidate();
         self.isReverted || self.revert(true, true);
         self._subPinOffset = false;
-        var size = getScrollerSize(), scrollerBounds = getScrollerOffsets(), max = containerAnimation ? containerAnimation.duration() : _maxScroll(scroller, direction), isFirstRefresh = change <= 0.01, offset2 = 0, otherPinOffset = pinOffset || 0, parsedEnd = _isObject3(position) ? position.end : vars.end, parsedEndTrigger = vars.endTrigger || trigger, parsedStart = _isObject3(position) ? position.start : vars.start || (vars.start === 0 || !trigger ? 0 : pin ? "0 0" : "0 100%"), pinnedContainer = self.pinnedContainer = vars.pinnedContainer && _getTarget(vars.pinnedContainer, self), triggerIndex = trigger && Math.max(0, _triggers.indexOf(self)) || 0, i = triggerIndex, cs2, bounds, scroll, isVertical, override, curTrigger, curPin, oppositeScroll, initted, revertedPins, forcedOverflow, markerStartOffset, markerEndOffset;
-        if (markers && _isObject3(position)) {
-          markerStartOffset = gsap3.getProperty(markerStartTrigger, direction.p);
-          markerEndOffset = gsap3.getProperty(markerEndTrigger, direction.p);
+        var size = getScrollerSize(), scrollerBounds = getScrollerOffsets(), max = containerAnimation ? containerAnimation.duration() : _maxScroll(scroller, direction), isFirstRefresh = change <= 0.01, offset2 = 0, otherPinOffset = pinOffset || 0, parsedEnd = _isObject5(position) ? position.end : vars.end, parsedEndTrigger = vars.endTrigger || trigger, parsedStart = _isObject5(position) ? position.start : vars.start || (vars.start === 0 || !trigger ? 0 : pin ? "0 0" : "0 100%"), pinnedContainer = self.pinnedContainer = vars.pinnedContainer && _getTarget(vars.pinnedContainer, self), triggerIndex = trigger && Math.max(0, _triggers.indexOf(self)) || 0, i = triggerIndex, cs2, bounds, scroll, isVertical, override, curTrigger, curPin, oppositeScroll, initted, revertedPins, forcedOverflow, markerStartOffset, markerEndOffset;
+        if (markers && _isObject5(position)) {
+          markerStartOffset = gsap4.getProperty(markerStartTrigger, direction.p);
+          markerEndOffset = gsap4.getProperty(markerEndTrigger, direction.p);
         }
         while (i--) {
           curTrigger = _triggers[i];
@@ -5637,16 +7811,16 @@
             i--;
           }
         }
-        _isFunction3(parsedStart) && (parsedStart = parsedStart(self));
+        _isFunction5(parsedStart) && (parsedStart = parsedStart(self));
         parsedStart = _parseClamp(parsedStart, "start", self);
         start = _parsePosition3(parsedStart, trigger, size, direction, scrollFunc(), markerStart, markerStartTrigger, self, scrollerBounds, borderWidth, useFixedPosition, max, containerAnimation, self._startClamp && "_startClamp") || (pin ? -1e-3 : 0);
-        _isFunction3(parsedEnd) && (parsedEnd = parsedEnd(self));
+        _isFunction5(parsedEnd) && (parsedEnd = parsedEnd(self));
         if (_isString3(parsedEnd) && !parsedEnd.indexOf("+=")) {
           if (~parsedEnd.indexOf(" ")) {
             parsedEnd = (_isString3(parsedStart) ? parsedStart.split(" ")[0] : "") + parsedEnd;
           } else {
             offset2 = _offsetToPx(parsedEnd.substr(2), size);
-            parsedEnd = _isString3(parsedStart) ? parsedStart : (containerAnimation ? gsap3.utils.mapRange(0, containerAnimation.duration(), containerAnimation.scrollTrigger.start, containerAnimation.scrollTrigger.end, start) : start) + offset2;
+            parsedEnd = _isString3(parsedStart) ? parsedStart : (containerAnimation ? gsap4.utils.mapRange(0, containerAnimation.duration(), containerAnimation.scrollTrigger.start, containerAnimation.scrollTrigger.end, start) : start) + offset2;
             parsedEndTrigger = trigger;
           }
         }
@@ -5674,33 +7848,33 @@
         }
         change = end - start || (start -= 0.01) && 1e-3;
         if (isFirstRefresh) {
-          prevProgress = gsap3.utils.clamp(0, 1, gsap3.utils.normalize(start, end, prevScroll));
+          prevProgress = gsap4.utils.clamp(0, 1, gsap4.utils.normalize(start, end, prevScroll));
         }
         self._pinPush = otherPinOffset;
         if (markerStart && offset2) {
           cs2 = {};
           cs2[direction.a] = "+=" + offset2;
           pinnedContainer && (cs2[direction.p] = "-=" + scrollFunc());
-          gsap3.set([markerStart, markerEnd], cs2);
+          gsap4.set([markerStart, markerEnd], cs2);
         }
         if (pin) {
-          cs2 = _getComputedStyle(pin);
+          cs2 = _getComputedStyle3(pin);
           isVertical = direction === _vertical;
           scroll = scrollFunc();
           pinStart = parseFloat(pinGetter(direction.a)) + otherPinOffset;
           if (!max && end > 1) {
-            forcedOverflow = (isViewport ? _doc4.scrollingElement || _docEl2 : scroller).style;
+            forcedOverflow = (isViewport ? _doc6.scrollingElement || _docEl2 : scroller).style;
             forcedOverflow = {
               style: forcedOverflow,
               value: forcedOverflow["overflow" + direction.a.toUpperCase()]
             };
-            if (isViewport && _getComputedStyle(_body2)["overflow" + direction.a.toUpperCase()] !== "scroll") {
+            if (isViewport && _getComputedStyle3(_body4)["overflow" + direction.a.toUpperCase()] !== "scroll") {
               forcedOverflow.style["overflow" + direction.a.toUpperCase()] = "scroll";
             }
           }
           _swapPinIn(pin, spacer, cs2);
           pinState = _getState(pin);
-          bounds = _getBounds(pin, true);
+          bounds = _getBounds3(pin, true);
           oppositeScroll = useFixedPosition && _getScrollFunc(scroller, isVertical ? _horizontal : _vertical)();
           if (pinSpacing) {
             spacerState = [pinSpacing + direction.os2, change + otherPinOffset + _px];
@@ -5752,7 +7926,7 @@
           forcedOverflow && (forcedOverflow.value ? forcedOverflow.style["overflow" + direction.a.toUpperCase()] = forcedOverflow.value : forcedOverflow.style.removeProperty("overflow-" + direction.a));
         } else if (trigger && scrollFunc() && !containerAnimation) {
           bounds = trigger.parentNode;
-          while (bounds && bounds !== _body2) {
+          while (bounds && bounds !== _body4) {
             if (bounds._pinOffset) {
               start -= bounds._pinOffset;
               end -= bounds._pinOffset;
@@ -5771,7 +7945,7 @@
           self.scroll.rec = 0;
         }
         self.revert(false, true);
-        lastRefresh = _getTime2();
+        lastRefresh = _getTime3();
         if (snapDelayedCall) {
           lastSnap = -1;
           snapDelayedCall.restart(true);
@@ -5779,14 +7953,14 @@
         _refreshing = 0;
         animation && isToggle && (animation._initted || prevAnimProgress) && animation.progress() !== prevAnimProgress && animation.progress(prevAnimProgress || 0, true).render(animation.time(), true, true);
         if (isFirstRefresh || prevProgress !== self.progress || containerAnimation) {
-          animation && !isToggle && animation.totalProgress(containerAnimation && start < -1e-3 && !prevProgress ? gsap3.utils.normalize(start, end, 0) : prevProgress, true);
+          animation && !isToggle && animation.totalProgress(containerAnimation && start < -1e-3 && !prevProgress ? gsap4.utils.normalize(start, end, 0) : prevProgress, true);
           self.progress = isFirstRefresh || (scroll1 - start) / change === prevProgress ? 0 : prevProgress;
         }
         pin && pinSpacing && (spacer._pinOffset = Math.round(self.progress * pinChange));
         scrubTween && scrubTween.invalidate();
         if (!isNaN(markerStartOffset)) {
-          markerStartOffset -= gsap3.getProperty(markerStartTrigger, direction.p);
-          markerEndOffset -= gsap3.getProperty(markerEndTrigger, direction.p);
+          markerStartOffset -= gsap4.getProperty(markerStartTrigger, direction.p);
+          markerEndOffset -= gsap4.getProperty(markerEndTrigger, direction.p);
           _shiftMarker(markerStartTrigger, direction, markerStartOffset);
           _shiftMarker(markerStart, direction, markerStartOffset - (pinOffset || 0));
           _shiftMarker(markerEndTrigger, direction, markerEndOffset);
@@ -5800,7 +7974,7 @@
         }
       };
       self.getVelocity = function() {
-        return (scrollFunc() - scroll2) / (_getTime2() - _time2) * 1e3 || 0;
+        return (scrollFunc() - scroll2) / (_getTime3() - _time2) * 1e3 || 0;
       };
       self.endAnimation = function() {
         _endAnimation(self.callbackAnimation);
@@ -5832,7 +8006,7 @@
             snap1 = animation && !isToggle ? animation.totalProgress() : clipped;
           }
         }
-        anticipatePin && !clipped && pin && !_refreshing && !_startup2 && _lastScrollTime && start < scroll + (scroll - scroll2) / (_getTime2() - _time2) * anticipatePin && (clipped = 1e-4);
+        anticipatePin && !clipped && pin && !_refreshing && !_startup2 && _lastScrollTime && start < scroll + (scroll - scroll2) / (_getTime3() - _time2) * anticipatePin && (clipped = 1e-4);
         if (clipped !== prevProgress2 && self.enabled) {
           isActive = self.isActive = !!clipped && clipped < 1;
           wasActive = !!prevProgress2 && prevProgress2 < 1;
@@ -5847,7 +8021,7 @@
               isTakingAction = animation && (action === "complete" || action === "reset" || action in animation);
             }
           }
-          preventOverlaps && (toggled || isTakingAction) && (isTakingAction || scrub || !animation) && (_isFunction3(preventOverlaps) ? preventOverlaps(self) : self.getTrailing(preventOverlaps).forEach(function(t) {
+          preventOverlaps && (toggled || isTakingAction) && (isTakingAction || scrub || !animation) && (_isFunction5(preventOverlaps) ? preventOverlaps(self) : self.getTrailing(preventOverlaps).forEach(function(t) {
             return t.endAnimation();
           }));
           if (!isToggle) {
@@ -5866,13 +8040,13 @@
           if (pin) {
             reset && pinSpacing && (spacer.style[pinSpacing + direction.os2] = spacingStart);
             if (!useFixedPosition) {
-              pinSetter(_round3(pinStart + pinChange * clipped));
+              pinSetter(_round5(pinStart + pinChange * clipped));
             } else if (stateChanged) {
               isAtMax = !reset && clipped > prevProgress2 && end + 1 > scroll && scroll + 1 >= _maxScroll(scroller, direction);
               if (pinReparent) {
                 if (!reset && (isActive || isAtMax)) {
-                  var bounds = _getBounds(pin, true), _offset = scroll - start;
-                  _reparent(pin, _body2, bounds.top + (direction === _vertical ? _offset : 0) + _px, bounds.left + (direction === _vertical ? 0 : _offset) + _px);
+                  var bounds = _getBounds3(pin, true), _offset = scroll - start;
+                  _reparent(pin, _body4, bounds.top + (direction === _vertical ? _offset : 0) + _px, bounds.left + (direction === _vertical ? 0 : _offset) + _px);
                 } else {
                   _reparent(pin, spacer);
                 }
@@ -5882,7 +8056,7 @@
             }
           }
           snap3 && !tweenTo.tween && !_refreshing && !_startup2 && snapDelayedCall.restart(true);
-          toggleClass && (toggled || once && clipped && (clipped < 1 || !_limitCallbacks)) && _toArray(toggleClass.targets).forEach(function(el) {
+          toggleClass && (toggled || once && clipped && (clipped < 1 || !_limitCallbacks)) && _toArray2(toggleClass.targets).forEach(function(el) {
             return el.classList[isActive || once ? "add" : "remove"](toggleClass.className);
           });
           onUpdate && !isToggle && !reset && onUpdate(self);
@@ -5928,9 +8102,9 @@
       self.enable = function(reset, refresh) {
         if (!self.enabled) {
           self.enabled = true;
-          _addListener3(scroller, "resize", _onResize);
-          isViewport || _addListener3(scroller, "scroll", _onScroll3);
-          onRefreshInit && _addListener3(ScrollTrigger3, "refreshInit", onRefreshInit);
+          _addListener5(scroller, "resize", _onResize);
+          isViewport || _addListener5(scroller, "scroll", _onScroll3);
+          onRefreshInit && _addListener5(ScrollTrigger3, "refreshInit", onRefreshInit);
           if (reset !== false) {
             self.progress = prevProgress = 0;
             scroll1 = scroll2 = lastSnap = scrollFunc();
@@ -5968,7 +8142,7 @@
           allowAnimation || scrubTween && scrubTween.pause();
           prevScroll = 0;
           pinCache && (pinCache.uncache = 1);
-          onRefreshInit && _removeListener3(ScrollTrigger3, "refreshInit", onRefreshInit);
+          onRefreshInit && _removeListener5(ScrollTrigger3, "refreshInit", onRefreshInit);
           if (snapDelayedCall) {
             snapDelayedCall.pause();
             tweenTo.tween && tweenTo.tween.kill() && (tweenTo.tween = 0);
@@ -5980,8 +8154,8 @@
                 return;
               }
             }
-            _removeListener3(scroller, "resize", _onResize);
-            isViewport || _removeListener3(scroller, "scroll", _onScroll3);
+            _removeListener5(scroller, "resize", _onResize);
+            isViewport || _removeListener5(scroller, "scroll", _onScroll3);
           }
         }
       };
@@ -6027,7 +8201,7 @@
           self.update = updateFunc;
           start || end || self.refresh();
         };
-        gsap3.delayedCall(0.01, self.update);
+        gsap4.delayedCall(0.01, self.update);
         change = 0.01;
         start = end = 0;
       } else {
@@ -6036,12 +8210,12 @@
       pin && _queueRefreshAll();
     };
     ScrollTrigger3.register = function register(core) {
-      if (!_coreInitted3) {
-        gsap3 = core || _getGSAP3();
-        _windowExists5() && window.document && ScrollTrigger3.enable();
-        _coreInitted3 = _enabled;
+      if (!_coreInitted4) {
+        gsap4 = core || _getGSAP5();
+        _windowExists7() && window.document && ScrollTrigger3.enable();
+        _coreInitted4 = _enabled;
       }
-      return _coreInitted3;
+      return _coreInitted4;
     };
     ScrollTrigger3.defaults = function defaults2(config3) {
       if (config3) {
@@ -6056,64 +8230,64 @@
       _triggers.forEach(function(trigger) {
         return trigger[kill ? "kill" : "disable"](reset);
       });
-      _removeListener3(_win4, "wheel", _onScroll3);
-      _removeListener3(_doc4, "scroll", _onScroll3);
+      _removeListener5(_win6, "wheel", _onScroll3);
+      _removeListener5(_doc6, "scroll", _onScroll3);
       clearInterval(_syncInterval);
-      _removeListener3(_doc4, "touchcancel", _passThrough3);
-      _removeListener3(_body2, "touchstart", _passThrough3);
-      _multiListener(_removeListener3, _doc4, "pointerdown,touchstart,mousedown", _pointerDownHandler);
-      _multiListener(_removeListener3, _doc4, "pointerup,touchend,mouseup", _pointerUpHandler);
+      _removeListener5(_doc6, "touchcancel", _passThrough3);
+      _removeListener5(_body4, "touchstart", _passThrough3);
+      _multiListener(_removeListener5, _doc6, "pointerdown,touchstart,mousedown", _pointerDownHandler);
+      _multiListener(_removeListener5, _doc6, "pointerup,touchend,mouseup", _pointerUpHandler);
       _resizeDelay.kill();
-      _iterateAutoRefresh(_removeListener3);
+      _iterateAutoRefresh(_removeListener5);
       for (var i = 0; i < _scrollers.length; i += 3) {
-        _wheelListener(_removeListener3, _scrollers[i], _scrollers[i + 1]);
-        _wheelListener(_removeListener3, _scrollers[i], _scrollers[i + 2]);
+        _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 1]);
+        _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 2]);
       }
     };
     ScrollTrigger3.enable = function enable() {
-      _win4 = window;
-      _doc4 = document;
-      _docEl2 = _doc4.documentElement;
-      _body2 = _doc4.body;
-      if (gsap3) {
-        _toArray = gsap3.utils.toArray;
-        _clamp4 = gsap3.utils.clamp;
-        _context3 = gsap3.core.context || _passThrough3;
-        _suppressOverwrites2 = gsap3.core.suppressOverwrites || _passThrough3;
-        _scrollRestoration = _win4.history.scrollRestoration || "auto";
-        _lastScroll = _win4.pageYOffset;
-        gsap3.core.globals("ScrollTrigger", ScrollTrigger3);
-        if (_body2) {
+      _win6 = window;
+      _doc6 = document;
+      _docEl2 = _doc6.documentElement;
+      _body4 = _doc6.body;
+      if (gsap4) {
+        _toArray2 = gsap4.utils.toArray;
+        _clamp4 = gsap4.utils.clamp;
+        _context4 = gsap4.core.context || _passThrough3;
+        _suppressOverwrites2 = gsap4.core.suppressOverwrites || _passThrough3;
+        _scrollRestoration = _win6.history.scrollRestoration || "auto";
+        _lastScroll = _win6.pageYOffset;
+        gsap4.core.globals("ScrollTrigger", ScrollTrigger3);
+        if (_body4) {
           _enabled = 1;
           _div100vh = document.createElement("div");
           _div100vh.style.height = "100vh";
           _div100vh.style.position = "absolute";
           _refresh100vh();
           _rafBugFix();
-          Observer.register(gsap3);
+          Observer.register(gsap4);
           ScrollTrigger3.isTouch = Observer.isTouch;
           _fixIOSBug = Observer.isTouch && /(iPad|iPhone|iPod|Mac)/g.test(navigator.userAgent);
-          _addListener3(_win4, "wheel", _onScroll3);
-          _root2 = [_win4, _doc4, _docEl2, _body2];
-          if (gsap3.matchMedia) {
+          _addListener5(_win6, "wheel", _onScroll3);
+          _root2 = [_win6, _doc6, _docEl2, _body4];
+          if (gsap4.matchMedia) {
             ScrollTrigger3.matchMedia = function(vars) {
-              var mm = gsap3.matchMedia(), p;
+              var mm = gsap4.matchMedia(), p;
               for (p in vars) {
                 mm.add(p, vars[p]);
               }
               return mm;
             };
-            gsap3.addEventListener("matchMediaInit", function() {
+            gsap4.addEventListener("matchMediaInit", function() {
               return _revertAll();
             });
-            gsap3.addEventListener("matchMediaRevert", function() {
+            gsap4.addEventListener("matchMediaRevert", function() {
               return _revertRecorded();
             });
-            gsap3.addEventListener("matchMedia", function() {
+            gsap4.addEventListener("matchMedia", function() {
               _refreshAll(0, 1);
               _dispatch3("matchMedia");
             });
-            gsap3.matchMedia("(orientation: portrait)", function() {
+            gsap4.matchMedia("(orientation: portrait)", function() {
               _setBaseDimensions();
               return _setBaseDimensions;
             });
@@ -6121,46 +8295,46 @@
             console.warn("Requires GSAP 3.11.0 or later");
           }
           _setBaseDimensions();
-          _addListener3(_doc4, "scroll", _onScroll3);
-          var bodyStyle = _body2.style, border = bodyStyle.borderTopStyle, AnimationProto = gsap3.core.Animation.prototype, bounds, i;
+          _addListener5(_doc6, "scroll", _onScroll3);
+          var bodyStyle = _body4.style, border = bodyStyle.borderTopStyle, AnimationProto = gsap4.core.Animation.prototype, bounds, i;
           AnimationProto.revert || Object.defineProperty(AnimationProto, "revert", {
             value: function value() {
               return this.time(-0.01, true);
             }
           });
           bodyStyle.borderTopStyle = "solid";
-          bounds = _getBounds(_body2);
+          bounds = _getBounds3(_body4);
           _vertical.m = Math.round(bounds.top + _vertical.sc()) || 0;
           _horizontal.m = Math.round(bounds.left + _horizontal.sc()) || 0;
           border ? bodyStyle.borderTopStyle = border : bodyStyle.removeProperty("border-top-style");
           _syncInterval = setInterval(_sync, 250);
-          gsap3.delayedCall(0.5, function() {
+          gsap4.delayedCall(0.5, function() {
             return _startup2 = 0;
           });
-          _addListener3(_doc4, "touchcancel", _passThrough3);
-          _addListener3(_body2, "touchstart", _passThrough3);
-          _multiListener(_addListener3, _doc4, "pointerdown,touchstart,mousedown", _pointerDownHandler);
-          _multiListener(_addListener3, _doc4, "pointerup,touchend,mouseup", _pointerUpHandler);
-          _transformProp2 = gsap3.utils.checkPrefix("transform");
-          _stateProps.push(_transformProp2);
-          _coreInitted3 = _getTime2();
-          _resizeDelay = gsap3.delayedCall(0.2, _refreshAll).pause();
-          _autoRefresh = [_doc4, "visibilitychange", function() {
-            var w = _win4.innerWidth, h = _win4.innerHeight;
-            if (_doc4.hidden) {
+          _addListener5(_doc6, "touchcancel", _passThrough3);
+          _addListener5(_body4, "touchstart", _passThrough3);
+          _multiListener(_addListener5, _doc6, "pointerdown,touchstart,mousedown", _pointerDownHandler);
+          _multiListener(_addListener5, _doc6, "pointerup,touchend,mouseup", _pointerUpHandler);
+          _transformProp4 = gsap4.utils.checkPrefix("transform");
+          _stateProps.push(_transformProp4);
+          _coreInitted4 = _getTime3();
+          _resizeDelay = gsap4.delayedCall(0.2, _refreshAll).pause();
+          _autoRefresh = [_doc6, "visibilitychange", function() {
+            var w = _win6.innerWidth, h = _win6.innerHeight;
+            if (_doc6.hidden) {
               _prevWidth = w;
               _prevHeight = h;
             } else if (_prevWidth !== w || _prevHeight !== h) {
               _onResize();
             }
-          }, _doc4, "DOMContentLoaded", _refreshAll, _win4, "load", _refreshAll, _win4, "resize", _onResize];
-          _iterateAutoRefresh(_addListener3);
+          }, _doc6, "DOMContentLoaded", _refreshAll, _win6, "load", _refreshAll, _win6, "resize", _onResize];
+          _iterateAutoRefresh(_addListener5);
           _triggers.forEach(function(trigger) {
             return trigger.enable(0, 1);
           });
           for (i = 0; i < _scrollers.length; i += 3) {
-            _wheelListener(_removeListener3, _scrollers[i], _scrollers[i + 1]);
-            _wheelListener(_removeListener3, _scrollers[i], _scrollers[i + 2]);
+            _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 1]);
+            _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 2]);
           }
         }
       }
@@ -6171,7 +8345,7 @@
       ms && clearInterval(_syncInterval) || (_syncInterval = ms) && setInterval(_sync, ms);
       "ignoreMobileResize" in vars && (_ignoreMobileResize = ScrollTrigger3.isTouch === 1 && vars.ignoreMobileResize);
       if ("autoRefreshEvents" in vars) {
-        _iterateAutoRefresh(_removeListener3) || _iterateAutoRefresh(_addListener3, vars.autoRefreshEvents || "none");
+        _iterateAutoRefresh(_removeListener5) || _iterateAutoRefresh(_addListener5, vars.autoRefreshEvents || "none");
         _ignoreResize = (vars.autoRefreshEvents + "").indexOf("resize") === -1;
       }
     };
@@ -6181,7 +8355,7 @@
         _scrollers.splice(i, isViewport ? 6 : 2);
       }
       if (vars) {
-        isViewport ? _proxies.unshift(_win4, vars, _body2, vars, _docEl2, vars) : _proxies.unshift(t, vars);
+        isViewport ? _proxies.unshift(_win6, vars, _body4, vars, _docEl2, vars) : _proxies.unshift(t, vars);
       }
     };
     ScrollTrigger3.clearMatchMedia = function clearMatchMedia(query) {
@@ -6191,12 +8365,12 @@
     };
     ScrollTrigger3.isInViewport = function isInViewport(element, ratio, horizontal) {
       var bounds = (_isString3(element) ? _getTarget(element) : element).getBoundingClientRect(), offset = bounds[horizontal ? _width : _height] * ratio || 0;
-      return horizontal ? bounds.right - offset > 0 && bounds.left + offset < _win4.innerWidth : bounds.bottom - offset > 0 && bounds.top + offset < _win4.innerHeight;
+      return horizontal ? bounds.right - offset > 0 && bounds.left + offset < _win6.innerWidth : bounds.bottom - offset > 0 && bounds.top + offset < _win6.innerHeight;
     };
     ScrollTrigger3.positionInViewport = function positionInViewport(element, referencePoint, horizontal) {
       _isString3(element) && (element = _getTarget(element));
       var bounds = element.getBoundingClientRect(), size = bounds[horizontal ? _width : _height], offset = referencePoint == null ? size / 2 : referencePoint in _keywords ? _keywords[referencePoint] * size : ~referencePoint.indexOf("%") ? parseFloat(referencePoint) * size / 100 : parseFloat(referencePoint) || 0;
-      return horizontal ? (bounds.left + offset) / _win4.innerWidth : (bounds.top + offset) / _win4.innerHeight;
+      return horizontal ? (bounds.left + offset) / _win6.innerWidth : (bounds.top + offset) / _win6.innerHeight;
     };
     ScrollTrigger3.killAll = function killAll(allowListeners) {
       _triggers.slice(0).forEach(function(t) {
@@ -6214,11 +8388,11 @@
   }();
   ScrollTrigger2.version = "3.12.2";
   ScrollTrigger2.saveStyles = function(targets) {
-    return targets ? _toArray(targets).forEach(function(target) {
+    return targets ? _toArray2(targets).forEach(function(target) {
       if (target && target.style) {
         var i = _savedStyles.indexOf(target);
         i >= 0 && _savedStyles.splice(i, 5);
-        _savedStyles.push(target, target.style.cssText, target.getBBox && target.getAttribute("transform"), gsap3.core.getCache(target), _context3());
+        _savedStyles.push(target, target.style.cssText, target.getBBox && target.getAttribute("transform"), gsap4.core.getCache(target), _context4());
       }
     }) : _savedStyles;
   };
@@ -6229,7 +8403,7 @@
     return new ScrollTrigger2(vars, animation);
   };
   ScrollTrigger2.refresh = function(safe) {
-    return safe ? _onResize() : (_coreInitted3 || ScrollTrigger2.register()) && _refreshAll(true);
+    return safe ? _onResize() : (_coreInitted4 || ScrollTrigger2.register()) && _refreshAll(true);
   };
   ScrollTrigger2.update = function(force) {
     return ++_scrollers.cache && _updateAll(force === true ? 2 : 0);
@@ -6263,7 +8437,7 @@
   };
   ScrollTrigger2.batch = function(targets, vars) {
     var result = [], varsCopy = {}, interval = vars.interval || 0.016, batchMax = vars.batchMax || 1e9, proxyCallback = function proxyCallback2(type, callback) {
-      var elements = [], triggers = [], delay = gsap3.delayedCall(interval, function() {
+      var elements = [], triggers = [], delay = gsap4.delayedCall(interval, function() {
         callback(elements, triggers);
         elements = [];
         triggers = [];
@@ -6276,15 +8450,15 @@
       };
     }, p;
     for (p in vars) {
-      varsCopy[p] = p.substr(0, 2) === "on" && _isFunction3(vars[p]) && p !== "onRefreshInit" ? proxyCallback(p, vars[p]) : vars[p];
+      varsCopy[p] = p.substr(0, 2) === "on" && _isFunction5(vars[p]) && p !== "onRefreshInit" ? proxyCallback(p, vars[p]) : vars[p];
     }
-    if (_isFunction3(batchMax)) {
+    if (_isFunction5(batchMax)) {
       batchMax = batchMax();
-      _addListener3(ScrollTrigger2, "refresh", function() {
+      _addListener5(ScrollTrigger2, "refresh", function() {
         return batchMax = vars.batchMax();
       });
     }
-    _toArray(targets).forEach(function(target) {
+    _toArray2(targets).forEach(function(target) {
       var config3 = {};
       for (p in varsCopy) {
         config3[p] = varsCopy[p];
@@ -6304,7 +8478,7 @@
     } else {
       target.style.touchAction = direction === true ? "auto" : direction ? "pan-" + direction + (Observer.isTouch ? " pinch-zoom" : "") : "none";
     }
-    target === _docEl2 && _allowNativePanning2(_body2, direction);
+    target === _docEl2 && _allowNativePanning2(_body4, direction);
   };
   var _overflow = {
     auto: 1,
@@ -6312,12 +8486,12 @@
   };
   var _nestedScroll = function _nestedScroll2(_ref5) {
     var event = _ref5.event, target = _ref5.target, axis = _ref5.axis;
-    var node = (event.changedTouches ? event.changedTouches[0] : event).target, cache = node._gsap || gsap3.core.getCache(node), time = _getTime2(), cs;
+    var node = (event.changedTouches ? event.changedTouches[0] : event).target, cache = node._gsap || gsap4.core.getCache(node), time = _getTime3(), cs;
     if (!cache._isScrollT || time - cache._isScrollT > 2e3) {
-      while (node && node !== _body2 && (node.scrollHeight <= node.clientHeight && node.scrollWidth <= node.clientWidth || !(_overflow[(cs = _getComputedStyle(node)).overflowY] || _overflow[cs.overflowX]))) {
+      while (node && node !== _body4 && (node.scrollHeight <= node.clientHeight && node.scrollWidth <= node.clientWidth || !(_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]))) {
         node = node.parentNode;
       }
-      cache._isScroll = node && node !== target && !_isViewport3(node) && (_overflow[(cs = _getComputedStyle(node)).overflowY] || _overflow[cs.overflowX]);
+      cache._isScroll = node && node !== target && !_isViewport3(node) && (_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]);
       cache._isScrollT = time;
     }
     if (cache._isScroll || axis === "x") {
@@ -6337,10 +8511,10 @@
       onDrag: nested,
       onScroll: nested,
       onEnable: function onEnable() {
-        return inputs && _addListener3(_doc4, Observer.eventTypes[0], _captureInputs, false, true);
+        return inputs && _addListener5(_doc6, Observer.eventTypes[0], _captureInputs, false, true);
       },
       onDisable: function onDisable() {
-        return _removeListener3(_doc4, Observer.eventTypes[0], _captureInputs, true);
+        return _removeListener5(_doc6, Observer.eventTypes[0], _captureInputs, true);
       }
     });
   };
@@ -6354,12 +8528,12 @@
     }
   };
   var _getScrollNormalizer = function _getScrollNormalizer2(vars) {
-    _isObject3(vars) || (vars = {});
+    _isObject5(vars) || (vars = {});
     vars.preventDefault = vars.isNormalizer = vars.allowClicks = true;
     vars.type || (vars.type = "wheel,touch");
     vars.debounce = !!vars.debounce;
     vars.id = vars.id || "normalizer";
-    var _vars2 = vars, normalizeScrollX = _vars2.normalizeScrollX, momentum = _vars2.momentum, allowNestedScroll = _vars2.allowNestedScroll, onRelease = _vars2.onRelease, self, maxY, target = _getTarget(vars.target) || _docEl2, smoother = gsap3.core.globals().ScrollSmoother, smootherInstance = smoother && smoother.get(), content = _fixIOSBug && (vars.content && _getTarget(vars.content) || smootherInstance && vars.content !== false && !smootherInstance.smooth() && smootherInstance.content()), scrollFuncY = _getScrollFunc(target, _vertical), scrollFuncX = _getScrollFunc(target, _horizontal), scale = 1, initialScale = (Observer.isTouch && _win4.visualViewport ? _win4.visualViewport.scale * _win4.visualViewport.width : _win4.outerWidth) / _win4.innerWidth, wheelRefresh = 0, resolveMomentumDuration = _isFunction3(momentum) ? function() {
+    var _vars2 = vars, normalizeScrollX = _vars2.normalizeScrollX, momentum = _vars2.momentum, allowNestedScroll = _vars2.allowNestedScroll, onRelease = _vars2.onRelease, self, maxY, target = _getTarget(vars.target) || _docEl2, smoother = gsap4.core.globals().ScrollSmoother, smootherInstance = smoother && smoother.get(), content = _fixIOSBug && (vars.content && _getTarget(vars.content) || smootherInstance && vars.content !== false && !smootherInstance.smooth() && smootherInstance.content()), scrollFuncY = _getScrollFunc(target, _vertical), scrollFuncX = _getScrollFunc(target, _horizontal), scale = 1, initialScale = (Observer.isTouch && _win6.visualViewport ? _win6.visualViewport.scale * _win6.visualViewport.width : _win6.outerWidth) / _win6.innerWidth, wheelRefresh = 0, resolveMomentumDuration = _isFunction5(momentum) ? function() {
       return momentum(self);
     } : function() {
       return momentum || 2.8;
@@ -6371,16 +8545,16 @@
       normalizeScrollX && (scrollClampX = _clamp4(0, _maxScroll(target, _horizontal)));
       lastRefreshID = _refreshID;
     }, removeContentOffset = function removeContentOffset2() {
-      content._gsap.y = _round3(parseFloat(content._gsap.y) + scrollFuncY.offset) + "px";
+      content._gsap.y = _round5(parseFloat(content._gsap.y) + scrollFuncY.offset) + "px";
       content.style.transform = "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, " + parseFloat(content._gsap.y) + ", 0, 1)";
       scrollFuncY.offset = scrollFuncY.cacheID = 0;
     }, ignoreDrag = function ignoreDrag2() {
       if (skipTouchMove) {
         requestAnimationFrame(resumeTouchMove);
-        var offset = _round3(self.deltaY / 2), scroll = scrollClampY(scrollFuncY.v - offset);
+        var offset = _round5(self.deltaY / 2), scroll = scrollClampY(scrollFuncY.v - offset);
         if (content && scroll !== scrollFuncY.v + scrollFuncY.offset) {
           scrollFuncY.offset = scroll - scrollFuncY.v;
-          var y = _round3((parseFloat(content && content._gsap.y) || 0) - scrollFuncY.offset);
+          var y = _round5((parseFloat(content && content._gsap.y) || 0) - scrollFuncY.offset);
           content.style.transform = "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, " + y + ", 0, 1)";
           content._gsap.y = y + "px";
           scrollFuncY.cacheID = _scrollers.cache;
@@ -6396,7 +8570,7 @@
         scrollFuncY() > maxY ? tween.progress(1) && scrollFuncY(maxY) : tween.resetTo("scrollY", maxY);
       }
     };
-    content && gsap3.set(content, {
+    content && gsap4.set(content, {
       y: "+=0"
     });
     vars.ignoreCheck = function(e) {
@@ -6405,7 +8579,7 @@
     vars.onPress = function() {
       skipTouchMove = false;
       var prevScale = scale;
-      scale = _round3((_win4.visualViewport && _win4.visualViewport.scale || 1) / initialScale);
+      scale = _round5((_win6.visualViewport && _win6.visualViewport.scale || 1) / initialScale);
       tween.pause();
       prevScale !== scale && _allowNativePanning(target, scale > 1.01 ? true : normalizeScrollX ? false : "x");
       startScrollX = scrollFuncX();
@@ -6432,7 +8606,7 @@
         tween.vars.scrollY = scrollClampY(endScroll);
         tween.invalidate().duration(dur).play(0.01);
         if (_fixIOSBug && tween.vars.scrollY >= maxY || currentScroll >= maxY - 1) {
-          gsap3.to({}, {
+          gsap4.to({}, {
             onUpdate: onResize,
             duration: dur
           });
@@ -6442,9 +8616,9 @@
     };
     vars.onWheel = function() {
       tween._ts && tween.pause();
-      if (_getTime2() - wheelRefresh > 1e3) {
+      if (_getTime3() - wheelRefresh > 1e3) {
         lastRefreshID = 0;
-        wheelRefresh = _getTime2();
+        wheelRefresh = _getTime3();
       }
     };
     vars.onChange = function(self2, dx, dy, xArray, yArray) {
@@ -6461,7 +8635,7 @@
     vars.onEnable = function() {
       _allowNativePanning(target, normalizeScrollX ? false : "x");
       ScrollTrigger2.addEventListener("refresh", onResize);
-      _addListener3(_win4, "resize", onResize);
+      _addListener5(_win6, "resize", onResize);
       if (scrollFuncY.smooth) {
         scrollFuncY.target.style.scrollBehavior = "auto";
         scrollFuncY.smooth = scrollFuncX.smooth = false;
@@ -6470,7 +8644,7 @@
     };
     vars.onDisable = function() {
       _allowNativePanning(target, true);
-      _removeListener3(_win4, "resize", onResize);
+      _removeListener5(_win6, "resize", onResize);
       ScrollTrigger2.removeEventListener("refresh", onResize);
       inputObserver.kill();
     };
@@ -6478,9 +8652,9 @@
     self = new Observer(vars);
     self.iOS = _fixIOSBug;
     _fixIOSBug && !scrollFuncY() && scrollFuncY(1);
-    _fixIOSBug && gsap3.ticker.add(_passThrough3);
+    _fixIOSBug && gsap4.ticker.add(_passThrough3);
     onStopDelayedCall = self._dc;
-    tween = gsap3.to(self, {
+    tween = gsap4.to(self, {
       ease: "power4",
       paused: true,
       scrollX: normalizeScrollX ? "+=0.1" : "+=0",
@@ -6528,7 +8702,7 @@
       // when normalizeScroll sets the scroll position (ss = setScroll)
       ss: function ss() {
         _lastScrollTime || _dispatch3("scrollStart");
-        _lastScrollTime = _getTime2();
+        _lastScrollTime = _getTime3();
       },
       // a way to get the _refreshing value in Observer
       ref: function ref() {
@@ -6536,17 +8710,21 @@
       }
     }
   };
-  _getGSAP3() && gsap3.registerPlugin(ScrollTrigger2);
+  _getGSAP5() && gsap4.registerPlugin(ScrollTrigger2);
 
   // src/index.ts
   gsapWithCSS.registerPlugin(ScrollTrigger2);
+  gsapWithCSS.registerPlugin(Observer);
+  gsapWithCSS.registerPlugin(Draggable);
   var green = "#9ccca1";
   var aqua = "#96c1d4";
   var marine = "#729dad";
   var purple = "#c092b6";
-  var pink = "#ea958f";
+  var red = "#ea958f";
   var yellow = "#f4d791";
-  var colors = [green, aqua, marine, purple, yellow, pink];
+  var colors = [green, aqua, marine, purple, yellow, red];
+  var globalEase = "back.out";
+  var globalDuration = 0.75;
   function loopLogoLetters(letters) {
     gsapWithCSS.utils.shuffle(colors);
     gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colors), duration: 0.25 });
@@ -6573,50 +8751,165 @@
             console.log(el);
           }
         });
+        const hhpHeroImg = document.querySelector('[cs-el="hhp-hero-img"]');
+        if (hhpHeroImg) {
+          gsapWithCSS.to(hhpHeroImg, {
+            yPercent: 20,
+            scrollTrigger: { trigger: hhpHeroImg, start: "top top", end: "bottom top", scrub: 1 }
+          });
+        }
+        const hhpSections = gsapWithCSS.utils.toArray('[cs-el="hhp-profile-section"]');
+        if (hhpSections.length > 0) {
+          hhpSections.forEach((el) => {
+            gsapWithCSS.from(el, {
+              opacity: 0,
+              xPercent: 15,
+              ease: "sin.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top bottom",
+                end: "top 75%",
+                scrub: 1
+              }
+            });
+          });
+        }
         const hhpAside = document.querySelector('[cs-el="hhp-aside"]');
         const hhpUserCard = document.querySelector('[cs-el="hhp-user-card"]');
-        const hhpBody = document.querySelector('[cs-el="hha-body"]');
+        const hhpBody = document.querySelector('[cs-el="hhp-body"]');
         const toggleNav = gsapWithCSS.timeline({ paused: true });
         const stNav = ScrollTrigger2.create({
           trigger: hhpAside,
           start: "top 34rem",
           endTrigger: hhpBody,
-          end: () => `bottom ${document.querySelector(".hhp_user-card-wrap").offsetHeight + 64}`,
+          end: () => `bottom ${hhpUserCard.offsetHeight + 64}`,
           markers: false,
           pin: hhpUserCard,
           pinSpacing: true,
           invalidateOnRefresh: true,
-          onEnter: () => toggleNav.timeScale(1).play(),
-          onLeaveBack: () => toggleNav.timeScale(2).reverse()
+          onEnter: () => toggleNav.delay(2).timeScale(1).play(),
+          onLeaveBack: () => toggleNav.timeScale(4).reverse()
         });
         const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
         if (hhpNav) {
-          const navItems = gsapWithCSS.utils.toArray('[cs-el="nav-item"]');
+          const navItems = gsapWithCSS.utils.toArray('[cs-el="hhp-nav-item"]');
           toggleNav.from(navItems, {
             autoAlpha: 0,
             duration: 0.3,
             y: "-2rem",
-            ease: "back.out",
+            ease: globalEase,
             stagger: 0.1
+          });
+          const navLinks = gsapWithCSS.utils.toArray('[cs-el="hhp-nav-link"]');
+          navLinks.forEach((item) => {
+            const navItemHover = gsapWithCSS.timeline({ paused: true });
+            navItemHover.to(item, { x: "0.25rem", duration: 1, ease: globalEase });
+            item.addEventListener("mouseenter", () => {
+              navItemHover.play();
+            });
+            item.addEventListener("mouseleave", () => {
+              navItemHover.timeScale(3).reverse();
+            });
           });
         }
         const slider = document.querySelector('[cs-el="hhp-slider"]');
         if (slider) {
-          let count = 0;
-          const fadeTime = 2;
-          const turnTime = 5;
           const slides = document.querySelectorAll('[cs-el="hhp-slide"]');
-          if (slides.length > 0) {
-            let fadeIt2 = function() {
+          const slidesLength = slides.length;
+          if (slidesLength > 0) {
+            let fadeIt2 = function(dir, index) {
               gsapWithCSS.to(slides[count], { duration: fadeTime, opacity: 0 });
-              count = count < slides.length - 1 ? ++count : 0;
+              if (typeof index === "number" && index >= 0 && index < slidesLength) {
+                count = index;
+              } else {
+                if (dir === "next") {
+                  count = (count + 1) % slidesLength;
+                }
+                if (dir === "prev") {
+                  count = (count - 1 + slidesLength) % slidesLength;
+                }
+              }
+              setActiveThumb2(count);
               gsapWithCSS.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
-              gsapWithCSS.to({}, { duration: turnTime, onComplete: fadeIt2 });
+            }, setActiveThumb2 = function(index) {
+              allThumbs.forEach((thumb) => {
+                thumb.firstChild?.removeAttribute("hh-background-color");
+              });
+              allThumbs[index].firstChild?.setAttribute("hh-background-color", "p");
+            }, goNext2 = function() {
+              fadeIt2("next");
+            }, goPrev2 = function() {
+              gsapWithCSS.killTweensOf(fadeIt2);
+              fadeIt2("prev");
             };
-            var fadeIt = fadeIt2;
+            var fadeIt = fadeIt2, setActiveThumb = setActiveThumb2, goNext = goNext2, goPrev = goPrev2;
+            let count = 0;
+            const fadeTime = 2;
+            const turnTime = 5;
+            Observer.create({
+              target: slider,
+              type: "touch",
+              onLeft: () => {
+                console.log("left");
+                goPrev2();
+              },
+              onRight: () => {
+                console.log("right");
+                goNext2();
+              }
+            });
+            const next = document.querySelector('[cs-el="hhp-slider-nav-next"]');
+            const prev = document.querySelector('[cs-el="hhp-slider-nav-prev"]');
+            const thumbsWrap = document.querySelector('[cs-el="hhp-slider-thumbs-wrap"]');
+            let allThumbs = [];
+            const toggleControls = gsapWithCSS.timeline({ paused: true });
+            toggleControls.from(next, {
+              opacity: 0,
+              duration: globalDuration,
+              ease: globalEase,
+              x: "-100%"
+            });
+            toggleControls.from(
+              prev,
+              { opacity: 0, duration: globalDuration, ease: globalEase, x: "100%" },
+              "<"
+            );
+            if (thumbsWrap) {
+              const thumb = thumbsWrap.querySelector('[cs-el="hhp-slider-thumb"]');
+              thumb?.classList.remove("is-active");
+              slides.forEach((slide) => {
+                const clonedThumb = thumb?.cloneNode(true);
+                thumb?.parentNode?.appendChild(clonedThumb);
+              });
+              thumb?.remove();
+              allThumbs = gsapWithCSS.utils.toArray('[cs-el="hhp-slider-thumb"]');
+              setActiveThumb2(0);
+              allThumbs.forEach((element, index) => {
+                element.addEventListener("click", () => {
+                  fadeIt2(null, index);
+                });
+              });
+              toggleControls.from(
+                thumbsWrap,
+                {
+                  opacity: 0,
+                  delay: 0.25,
+                  duration: globalDuration,
+                  ease: globalEase
+                },
+                "<"
+              );
+            }
+            slider.addEventListener("mouseenter", () => {
+              toggleControls.timeScale(1).play();
+            });
+            slider.addEventListener("mouseleave", () => {
+              toggleControls.timeScale(2).reverse();
+            });
+            next?.addEventListener("click", () => goNext2());
+            prev?.addEventListener("click", () => goPrev2());
             gsapWithCSS.set(slides, { opacity: 0 });
             gsapWithCSS.set(slides[0], { opacity: 1 });
-            gsapWithCSS.delayedCall(turnTime, () => fadeIt2());
           }
         }
         const hhaTab = document.querySelector('[cs-el="hha-tab"]');
@@ -6636,23 +8929,20 @@
             }
           });
         }
-        const nav = document.querySelector('[cs-el="nav"]');
-        if (nav && isMobile) {
-          const toggleNavMob = gsapWithCSS.from(nav, {
-            yPercent: -100,
-            paused: true,
-            duration: 0.5,
-            ease: "Power1.out"
-          }).progress(1);
-          ScrollTrigger2.create({
-            start: "top top",
-            end: 99999,
-            onUpdate: (self) => {
-              self.direction === -1 ? toggleNavMob.play() : toggleNavMob.reverse();
-            }
-          });
+        const drag = document.querySelector('[cs-el="hhu-admin-modal"]');
+        if (drag) {
+          Draggable.create(drag, {});
         }
         function init4() {
+          const onPageLoadElms = gsapWithCSS.utils.toArray('[cs-tr="pl-fadein"]');
+          if (onPageLoadElms.length > 0) {
+            gsapWithCSS.from(onPageLoadElms, {
+              autoAlpha: 0,
+              duration: globalDuration,
+              ease: globalEase,
+              stagger: 0.25
+            });
+          }
         }
         window.addEventListener("resize", () => {
           init4();
@@ -6690,6 +8980,28 @@ gsap/CSSPlugin.js:
    * Club GreenSock members, the agreement issued with that membership.
    * @author: Jack Doyle, jack@greensock.com
   *)
+
+gsap/utils/matrix.js:
+  (*!
+   * matrix 3.12.2
+   * https://greensock.com
+   *
+   * Copyright 2008-2023, GreenSock. All rights reserved.
+   * Subject to the terms at https://greensock.com/standard-license or for
+   * Club GreenSock members, the agreement issued with that membership.
+   * @author: Jack Doyle, jack@greensock.com
+  *)
+
+gsap/Draggable.js:
+  (*!
+   * Draggable 3.12.2
+   * https://greensock.com
+   *
+   * @license Copyright 2008-2023, GreenSock. All rights reserved.
+   * Subject to the terms at https://greensock.com/standard-license or for
+   * Club GreenSock members, the agreement issued with that membership.
+   * @author: Jack Doyle, jack@greensock.com
+   *)
 
 gsap/Observer.js:
   (*!
