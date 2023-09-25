@@ -8758,84 +8758,6 @@
             scrollTrigger: { trigger: hhpHeroImg, start: "top top", end: "bottom top", scrub: 1 }
           });
         }
-        function customColorPicker(handleSelector, parentSelector) {
-          const handle = document.querySelector(handleSelector);
-          const parent = document.querySelector(parentSelector);
-          if (!handle || !parent) {
-            throw new Error("Handle or parent element not found.");
-          }
-          function getParentGradientColor(eventX) {
-            const parentWidth = parent.clientWidth;
-            const gradientPercentage = eventX / parentWidth * 100;
-            const computedStyle = window.getComputedStyle(parent, null).getPropertyValue("background-image");
-            const gradientColors = computedStyle.match(/rgba?\([^)]+\)/g);
-            if (!gradientColors || gradientColors.length < 2) {
-              throw new Error("Gradient colors not found in background-image.");
-            }
-            const colorIndex = (gradientColors.length - 1) * (gradientPercentage / 100);
-            const startIndex = Math.floor(colorIndex);
-            const endIndex = Math.ceil(colorIndex);
-            const startColor = gradientColors[startIndex];
-            const endColor = gradientColors[endIndex];
-            const color = interpolateColor(startColor, endColor, colorIndex - startIndex);
-            return color;
-          }
-          function rgbStringToHex(rgbString) {
-            const match = rgbString.match(/\d+/g);
-            if (!match || match.length !== 3) {
-              throw new Error("Invalid RGB string format. Use 'rgb(r, g, b)'.");
-            }
-            const r = parseInt(match[0], 10);
-            const g = parseInt(match[1], 10);
-            const b = parseInt(match[2], 10);
-            const clamp3 = (value) => Math.min(255, Math.max(0, value));
-            const clampedR = clamp3(r);
-            const clampedG = clamp3(g);
-            const clampedB = clamp3(b);
-            const rHex = clampedR.toString(16).padStart(2, "0");
-            const gHex = clampedG.toString(16).padStart(2, "0");
-            const bHex = clampedB.toString(16).padStart(2, "0");
-            const hexColor = `#${rHex}${gHex}${bHex}`;
-            return hexColor;
-          }
-          function interpolateColor(startColor, endColor, percentage) {
-            const startRGB = startColor.match(/\d+/g)?.map(Number);
-            const endRGB = endColor.match(/\d+/g)?.map(Number);
-            if (!startRGB || !endRGB || startRGB.length !== 3 || endRGB.length !== 3) {
-              throw new Error("Invalid color format.");
-            }
-            const interpolatedRGB = startRGB.map(
-              (startChannel, index) => Math.round(startChannel + percentage * (endRGB[index] - startChannel))
-            );
-            return `rgba(${interpolatedRGB.join(", ")})`;
-          }
-          const hhColorElms = document.querySelectorAll("[hh-color], [hh-link-color]");
-          const hhBgColorElms = gsapWithCSS.utils.toArray("[hh-background-color], [hh-button-color]");
-          const selectedColorHex = document.querySelector('[cs-el="hha-color-selected-hex"]');
-          Draggable.create(handle, {
-            type: "x",
-            bounds: parent,
-            onClick: function() {
-              console.log("clicked");
-            },
-            onDrag: function() {
-              console.log("drag ended");
-              const color = getParentGradientColor(
-                handle.firstChild.getBoundingClientRect().left - parent.getBoundingClientRect().left
-              );
-              const hexColor = rgbStringToHex(color);
-              selectedColorHex.textContent = hexColor;
-              hhColorElms.forEach((el) => {
-                el.style.color = color;
-              });
-              hhBgColorElms.forEach((el) => {
-                el.style.backgroundColor = color;
-              });
-            }
-          });
-          return "";
-        }
-        customColorPicker('[cs-el="hha-colorpicker-handle"]', '[cs-el="hha-colorpicker-gradient"]');
         const hhpSections = gsapWithCSS.utils.toArray('[cs-el="hhp-profile-section"]');
         if (hhpSections.length > 0) {
           hhpSections.forEach((el) => {
@@ -8988,6 +8910,83 @@
             gsapWithCSS.set(slides, { opacity: 0 });
             gsapWithCSS.set(slides[0], { opacity: 1 });
           }
+        }
+        function customColorPicker(handle, parent) {
+          function getParentGradientColor(eventX) {
+            const parentWidth = parent.clientWidth;
+            const gradientPercentage = eventX / parentWidth * 100;
+            const computedStyle = window.getComputedStyle(parent, null).getPropertyValue("background-image");
+            const gradientColors = computedStyle.match(/rgba?\([^)]+\)/g);
+            if (!gradientColors || gradientColors.length < 2) {
+              throw new Error("Gradient colors not found in background-image.");
+            }
+            const colorIndex = (gradientColors.length - 1) * (gradientPercentage / 100);
+            const startIndex = Math.floor(colorIndex);
+            const endIndex = Math.ceil(colorIndex);
+            const startColor = gradientColors[startIndex];
+            const endColor = gradientColors[endIndex];
+            const color2 = interpolateColor(startColor, endColor, colorIndex - startIndex);
+            return color2;
+          }
+          function rgbStringToHex(rgbString) {
+            const match = rgbString.match(/\d+/g);
+            if (!match || match.length !== 3) {
+              throw new Error("Invalid RGB string format. Use 'rgb(r, g, b)'.");
+            }
+            const r = parseInt(match[0], 10);
+            const g = parseInt(match[1], 10);
+            const b = parseInt(match[2], 10);
+            const clamp3 = (value) => Math.min(255, Math.max(0, value));
+            const clampedR = clamp3(r);
+            const clampedG = clamp3(g);
+            const clampedB = clamp3(b);
+            const rHex = clampedR.toString(16).padStart(2, "0");
+            const gHex = clampedG.toString(16).padStart(2, "0");
+            const bHex = clampedB.toString(16).padStart(2, "0");
+            const hexColor = `#${rHex}${gHex}${bHex}`;
+            return hexColor;
+          }
+          function interpolateColor(startColor, endColor, percentage) {
+            const startRGB = startColor.match(/\d+/g)?.map(Number);
+            const endRGB = endColor.match(/\d+/g)?.map(Number);
+            if (!startRGB || !endRGB || startRGB.length !== 3 || endRGB.length !== 3) {
+              throw new Error("Invalid color format.");
+            }
+            const interpolatedRGB = startRGB.map(
+              (startChannel, index) => Math.round(startChannel + percentage * (endRGB[index] - startChannel))
+            );
+            return `rgba(${interpolatedRGB.join(", ")})`;
+          }
+          const hhColorElms = document.querySelectorAll("[hh-color], [hh-link-color]");
+          const hhBgColorElms = gsapWithCSS.utils.toArray("[hh-background-color], [hh-button-color]");
+          const selectedColorHex = document.querySelector('[cs-el="hha-color-selected-hex"]');
+          let color = "";
+          Draggable.create(handle, {
+            type: "x",
+            bounds: parent,
+            onClick: function() {
+            },
+            onDrag: function() {
+              color = getParentGradientColor(
+                handle.getBoundingClientRect().left - parent.getBoundingClientRect().left
+              );
+              const hexColor = rgbStringToHex(color);
+              selectedColorHex.textContent = hexColor;
+              hhColorElms.forEach((el) => {
+                el.style.color = color;
+              });
+              hhBgColorElms.forEach((el) => {
+                el.style.backgroundColor = color;
+              });
+            }
+          });
+          return color;
+        }
+        const colorPicker = document.querySelector('[cs-el="hha-colorpicker"]');
+        if (colorPicker) {
+          const colorPickerGradient = document.querySelector('[cs-el="hha-colorpicker-gradient"]');
+          const colorPickerHandle = document.querySelector('[cs-el="hha-colorpicker-handle"]');
+          customColorPicker(colorPickerHandle, colorPickerGradient);
         }
         const hhaTab = document.querySelector('[cs-el="hha-tab"]');
         if (hhaTab) {
