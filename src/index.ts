@@ -6,32 +6,30 @@ gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(Observer);
 gsap.registerPlugin(Draggable);
 
+import { colors } from '$utils/colors';
+
+//// Cookies for setting Script Source (local/remote)
 //import { setCookie } from '$utils/cookie';
-//import { customColorPicker } from '$utils/userAdmin';
+//import { getCookie } from '$utils/cookie';
+//setCookie('cs', 'local', 30);
+//setCookie('cs', 'remote', 30);
+//console.log(getCookie('cs'));
 
 //// Global Declarations
-const green = '#9ccca1';
-const aqua = '#96c1d4';
-const marine = '#729dad';
-const purple = '#c092b6';
-const red = '#ea958f';
-const yellow = '#f4d791';
+// const green = '#9ccca1';
+// const aqua = '#96c1d4';
+// const marine = '#729dad';
+// const purple = '#c092b6';
+// const red = '#ea958f';
+// const yellow = '#f4d791';
 
-const colors: string[] = [green, aqua, marine, purple, yellow, red];
+// const colors: string[] = [green, aqua, marine, purple, yellow, red];
 
 const globalEase = 'back.out';
 const globalDuration = 0.75;
-
 //// End: Global Declarations
 
-//setCookie('jssrc', 'local', 30);
-//setCookie('jssrc', 'remote', 30);
-
 //// Main Functions
-function loopLogoLetters(letters: string[]) {
-  gsap.utils.shuffle(colors);
-  gsap.to(letters, { color: gsap.utils.wrap(colors), duration: 0.25 });
-}
 //// End: Main Functions
 
 window.Webflow ||= [];
@@ -49,11 +47,15 @@ window.Webflow.push(() => {
     (context) => {
       const { isDesktop, isMobile, reduceMotion } = context.conditions;
 
-      // Logo Letters
-      const logoLetters = gsap.utils.toArray('.logo_letter');
+      //// Loop Logo Letter Color
+      const logoLetters: string[] = gsap.utils.toArray('.logo_letter');
       if (logoLetters.length > 0) {
+        function loopLogoLetters(letters: string[]) {
+          gsap.utils.shuffle(colors);
+          gsap.to(letters, { color: gsap.utils.wrap(colors), duration: 0.25 });
+        }
         setInterval(() => loopLogoLetters(logoLetters), 1000);
-      } // End: Logo Letter Color fades
+      } // End: Logo Letter Color
 
       // Check for wider DOM elements
       const docWidth = document.documentElement.offsetWidth;
@@ -358,17 +360,22 @@ window.Webflow.push(() => {
       }
       // End: HHA ColorPicker
 
-      // HHA Tab/Panel
-      const hhaTab = document.querySelector('[cs-el="hha-tab"]');
+      // HHU Tab/Panel
+      const hhuTab = document.querySelector('[cs-el="hhu-admin-tab"]');
+      const hhuPanelWidth = '35rem';
 
-      if (hhaTab) {
-        const hhaPanel = document.querySelector('[cs-el="hha-admin-panel"]');
+      if (hhuTab) {
+        const hhuAdminMain = document.querySelector('[cs-el="hhu-admin-main"]');
+        const hhuAdminContent = hhuAdminMain?.querySelector('[cs-el="hhu-admin-main-content"]');
+        //const hhaMain = document.querySelector('[cs-el="main-wrapper"]');
 
         let isOpen = false;
+
         const openPanel = gsap.timeline({ paused: true });
-        openPanel.to(hhaPanel, { left: 0, ease: 'Power2.out' });
-        hhaTab.addEventListener('click', () => {
-          console.log('!');
+        openPanel.to(hhuAdminMain, { width: hhuPanelWidth, ease: 'Power2.out' });
+        //openPanel.to(hhaMain, { paddingLeft: hhaPanelWidth, ease: 'Power2.out' }, '<');
+        openPanel.to(hhuAdminContent, { opacity: 1 });
+        hhuTab.addEventListener('click', () => {
           if (isOpen) {
             isOpen = false;
             openPanel.timeScale(1.75).reverse();

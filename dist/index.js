@@ -8712,10 +8712,7 @@
   };
   _getGSAP5() && gsap4.registerPlugin(ScrollTrigger2);
 
-  // src/index.ts
-  gsapWithCSS.registerPlugin(ScrollTrigger2);
-  gsapWithCSS.registerPlugin(Observer);
-  gsapWithCSS.registerPlugin(Draggable);
+  // src/utils/colors.ts
   var green = "#9ccca1";
   var aqua = "#96c1d4";
   var marine = "#729dad";
@@ -8723,12 +8720,13 @@
   var red = "#ea958f";
   var yellow = "#f4d791";
   var colors = [green, aqua, marine, purple, yellow, red];
+
+  // src/index.ts
+  gsapWithCSS.registerPlugin(ScrollTrigger2);
+  gsapWithCSS.registerPlugin(Observer);
+  gsapWithCSS.registerPlugin(Draggable);
   var globalEase = "back.out";
   var globalDuration = 0.75;
-  function loopLogoLetters(letters) {
-    gsapWithCSS.utils.shuffle(colors);
-    gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colors), duration: 0.25 });
-  }
   window.Webflow ||= [];
   window.Webflow.push(() => {
     const mm = gsapWithCSS.matchMedia();
@@ -8743,7 +8741,12 @@
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
         const logoLetters = gsapWithCSS.utils.toArray(".logo_letter");
         if (logoLetters.length > 0) {
-          setInterval(() => loopLogoLetters(logoLetters), 1e3);
+          let loopLogoLetters2 = function(letters) {
+            gsapWithCSS.utils.shuffle(colors);
+            gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colors), duration: 0.25 });
+          };
+          var loopLogoLetters = loopLogoLetters2;
+          setInterval(() => loopLogoLetters2(logoLetters), 1e3);
         }
         const docWidth = document.documentElement.offsetWidth;
         [].forEach.call(document.querySelectorAll("*"), function(el) {
@@ -8988,14 +8991,16 @@
           const colorPickerHandle = document.querySelector('[cs-el="hha-colorpicker-handle"]');
           customColorPicker(colorPickerHandle, colorPickerGradient);
         }
-        const hhaTab = document.querySelector('[cs-el="hha-tab"]');
-        if (hhaTab) {
-          const hhaPanel = document.querySelector('[cs-el="hha-admin-panel"]');
+        const hhuTab = document.querySelector('[cs-el="hhu-admin-tab"]');
+        const hhuPanelWidth = "35rem";
+        if (hhuTab) {
+          const hhuAdminMain = document.querySelector('[cs-el="hhu-admin-main"]');
+          const hhuAdminContent = hhuAdminMain?.querySelector('[cs-el="hhu-admin-main-content"]');
           let isOpen = false;
           const openPanel = gsapWithCSS.timeline({ paused: true });
-          openPanel.to(hhaPanel, { left: 0, ease: "Power2.out" });
-          hhaTab.addEventListener("click", () => {
-            console.log("!");
+          openPanel.to(hhuAdminMain, { width: hhuPanelWidth, ease: "Power2.out" });
+          openPanel.to(hhuAdminContent, { opacity: 1 });
+          hhuTab.addEventListener("click", () => {
             if (isOpen) {
               isOpen = false;
               openPanel.timeScale(1.75).reverse();
