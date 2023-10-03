@@ -1,9 +1,9 @@
-/* signup.ts used on hh/signup */
+/* signup.ts used on hh/signup & hh/login */
 console.log('signup.ts');
 
 import { gsap } from 'gsap';
 
-import { colors } from '$utils/colors';
+import { loopLogoLetters } from '$utils/colors';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -19,15 +19,34 @@ window.Webflow.push(() => {
     (context) => {
       const { isDesktop, isMobile, reduceMotion } = context.conditions;
 
-      //// Loop Logo Letter Color
+      //// Loop Logo Letter Colors
       const logoLetters: string[] = gsap.utils.toArray('.logo_letter');
       if (logoLetters.length > 0) {
-        function loopLogoLetters(letters: string[]) {
-          gsap.utils.shuffle(colors);
-          gsap.to(letters, { color: gsap.utils.wrap(colors), duration: 0.25 });
-        }
         setInterval(() => loopLogoLetters(logoLetters), 1000);
-      } // End: Logo Letter Color
+      } // End: Logo Letter Colors
+
+      const loginModal = gsap.utils.toArray('[cs-el="login-modal"]');
+      if (loginModal) {
+        gsap.set(loginModal, { autoAlpha: 0 });
+        let isOpen = false;
+        const loginModalContainer = document.querySelector('[cs-el="login-modal-container"]');
+        const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
+        const loginModalTriggers = gsap.utils.toArray('[cs-el="login-modal-trigger"]');
+        const openModal = gsap.timeline({ paused: true });
+        openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
+        openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: 'back.out' }, '<.25');
+        loginModalTriggers.forEach((trigger: any) => {
+          trigger.addEventListener('click', () => {
+            if (isOpen) {
+              openModal.timeScale(2).reverse();
+              isOpen = false;
+            } else {
+              openModal.timeScale(1).play();
+              isOpen = true;
+            }
+          });
+        });
+      }
 
       function init() {} // End: function init()
 

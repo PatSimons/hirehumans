@@ -903,11 +903,11 @@
     return values;
   };
   var _formatColors = function _formatColors2(s, toHSL, orderMatchData) {
-    var result = "", colors2 = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
-    if (!colors2) {
+    var result = "", colors = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
+    if (!colors) {
       return s;
     }
-    colors2 = colors2.map(function(color) {
+    colors = colors.map(function(color) {
       return (color = splitColor(color, toHSL, 1)) && type + (toHSL ? color[0] + "," + color[1] + "%," + color[2] + "%," + color[3] : color.join(",")) + ")";
     });
     if (orderMatchData) {
@@ -917,7 +917,7 @@
         shell = s.replace(_colorExp, "1").split(_numWithUnitExp);
         l = shell.length - 1;
         for (; i < l; i++) {
-          result += shell[i] + (~c.indexOf(i) ? colors2.shift() || type + "0,0,0,0)" : (d.length ? d : colors2.length ? colors2 : orderMatchData).shift());
+          result += shell[i] + (~c.indexOf(i) ? colors.shift() || type + "0,0,0,0)" : (d.length ? d : colors.length ? colors : orderMatchData).shift());
         }
       }
     }
@@ -925,7 +925,7 @@
       shell = s.split(_colorExp);
       l = shell.length - 1;
       for (; i < l; i++) {
-        result += shell[i] + colors2[i];
+        result += shell[i] + colors[i];
       }
     }
     return result + shell[l];
@@ -8719,7 +8719,11 @@
   var purple = "#c092b6";
   var red = "#ea958f";
   var yellow = "#f4d791";
-  var colors = [green, aqua, marine, purple, yellow, red];
+  var colorArray = [green, aqua, marine, purple, yellow, red];
+  function loopLogoLetters(letters) {
+    gsapWithCSS.utils.shuffle(colorArray);
+    gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colorArray), duration: 0.25 });
+  }
 
   // src/index.ts
   gsapWithCSS.registerPlugin(ScrollTrigger2);
@@ -8741,12 +8745,7 @@
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
         const logoLetters = gsapWithCSS.utils.toArray(".logo_letter");
         if (logoLetters.length > 0) {
-          let loopLogoLetters2 = function(letters) {
-            gsapWithCSS.utils.shuffle(colors);
-            gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colors), duration: 0.25 });
-          };
-          var loopLogoLetters = loopLogoLetters2;
-          setInterval(() => loopLogoLetters2(logoLetters), 1e3);
+          setInterval(() => loopLogoLetters(logoLetters), 1e3);
         }
         const docWidth = document.documentElement.offsetWidth;
         [].forEach.call(document.querySelectorAll("*"), function(el) {
@@ -8807,10 +8806,10 @@
             const navItemHover = gsapWithCSS.timeline({ paused: true });
             navItemHover.to(item, { x: "0.25rem", duration: 1, ease: globalEase });
             item.addEventListener("mouseenter", () => {
-              navItemHover.play();
+              navItemHover.timeScale(0.5).play();
             });
             item.addEventListener("mouseleave", () => {
-              navItemHover.timeScale(3).reverse();
+              navItemHover.timeScale(1.5).reverse();
             });
           });
         }
@@ -8987,8 +8986,8 @@
         }
         const colorPicker = document.querySelector('[cs-el="hha-colorpicker"]');
         if (colorPicker) {
-          const colorPickerGradient = document.querySelector('[cs-el="hha-colorpicker-gradient"]');
-          const colorPickerHandle = document.querySelector('[cs-el="hha-colorpicker-handle"]');
+          const colorPickerGradient = colorPicker.querySelector('[cs-el="hha-colorpicker-gradient"]');
+          const colorPickerHandle = colorPicker.querySelector('[cs-el="hha-colorpicker-handle"]');
           customColorPicker(colorPickerHandle, colorPickerGradient);
         }
         const hhuTab = document.querySelector('[cs-el="hhu-admin-tab"]');

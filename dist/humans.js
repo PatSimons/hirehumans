@@ -4241,8 +4241,8 @@
     gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colorArray), duration: 0.25 });
   }
 
-  // src/signup.ts
-  console.log("signup.ts");
+  // src/humans.ts
+  console.log("humans.ts");
   window.Webflow ||= [];
   window.Webflow.push(() => {
     const mm = gsapWithCSS.matchMedia();
@@ -4255,33 +4255,35 @@
       },
       (context3) => {
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
-        const logoLetters = gsapWithCSS.utils.toArray(".logo_letter");
-        if (logoLetters.length > 0) {
+        const logo = document.querySelector('[cs-el="logo"]');
+        if (logo) {
+          const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
           setInterval(() => loopLogoLetters(logoLetters), 1e3);
         }
-        const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
-        if (loginModal) {
-          gsapWithCSS.set(loginModal, { autoAlpha: 0 });
-          let isOpen = false;
-          const loginModalContainer = document.querySelector('[cs-el="login-modal-container"]');
-          const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
-          const loginModalTriggers = gsapWithCSS.utils.toArray('[cs-el="login-modal-trigger"]');
-          const openModal = gsapWithCSS.timeline({ paused: true });
-          openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
-          openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: "back.out" }, "<.25");
-          loginModalTriggers.forEach((trigger) => {
-            trigger.addEventListener("click", () => {
-              if (isOpen) {
-                openModal.timeScale(2).reverse();
-                isOpen = false;
-              } else {
-                openModal.timeScale(1).play();
-                isOpen = true;
-              }
+        const humans = document.querySelector('[cs-el="humans"]');
+        if (humans) {
+          const humansListItems = gsapWithCSS.utils.toArray('[cs-el="humans-list-item"]');
+          if (humansListItems) {
+            gsapWithCSS.from(humansListItems, {
+              autoAlpha: 0,
+              duration: 1,
+              stagger: 0.3,
+              ease: "power1.out"
             });
-          });
+            humansListItems.forEach((item) => {
+              const navItemHover = gsapWithCSS.timeline({ paused: true });
+              navItemHover.to(item, { y: "-0.5rem", duration: 0.5, ease: "power1.out" });
+              item.addEventListener("mouseenter", () => {
+                navItemHover.timeScale(1).play();
+              });
+              item.addEventListener("mouseleave", () => {
+                navItemHover.timeScale(3).reverse();
+              });
+            });
+          }
         }
         function init4() {
+          console.log("init called");
         }
         window.addEventListener("resize", () => {
           init4();
@@ -4320,4 +4322,4 @@ gsap/CSSPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=signup.js.map
+//# sourceMappingURL=humans.js.map

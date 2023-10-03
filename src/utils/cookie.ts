@@ -1,7 +1,6 @@
 /* cookie.ts */
 
 /**
- * Greets the user by printing a message in the console.
  * @param name @param value @param days
  */
 

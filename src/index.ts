@@ -6,7 +6,8 @@ gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(Observer);
 gsap.registerPlugin(Draggable);
 
-import { colors } from '$utils/colors';
+import { colorArray } from '$utils/colors';
+import { loopLogoLetters } from '$utils/colors';
 
 //// Cookies for setting Script Source (local/remote)
 //import { setCookie } from '$utils/cookie';
@@ -47,15 +48,11 @@ window.Webflow.push(() => {
     (context) => {
       const { isDesktop, isMobile, reduceMotion } = context.conditions;
 
-      //// Loop Logo Letter Color
+      //// Loop Logo Letter Colors
       const logoLetters: string[] = gsap.utils.toArray('.logo_letter');
       if (logoLetters.length > 0) {
-        function loopLogoLetters(letters: string[]) {
-          gsap.utils.shuffle(colors);
-          gsap.to(letters, { color: gsap.utils.wrap(colors), duration: 0.25 });
-        }
         setInterval(() => loopLogoLetters(logoLetters), 1000);
-      } // End: Logo Letter Color
+      } // End: Logo Letter Colors
 
       // Check for wider DOM elements
       const docWidth = document.documentElement.offsetWidth;
@@ -126,10 +123,10 @@ window.Webflow.push(() => {
           const navItemHover = gsap.timeline({ paused: true });
           navItemHover.to(item, { x: '0.25rem', duration: 1, ease: globalEase });
           item.addEventListener('mouseenter', () => {
-            navItemHover.play();
+            navItemHover.timeScale(0.5).play();
           });
           item.addEventListener('mouseleave', () => {
-            navItemHover.timeScale(3).reverse();
+            navItemHover.timeScale(1.5).reverse();
           });
         });
       }
@@ -354,8 +351,8 @@ window.Webflow.push(() => {
       } // End: export function customColorPicker()
       const colorPicker = document.querySelector('[cs-el="hha-colorpicker"]');
       if (colorPicker) {
-        const colorPickerGradient = document.querySelector('[cs-el="hha-colorpicker-gradient"]');
-        const colorPickerHandle = document.querySelector('[cs-el="hha-colorpicker-handle"]');
+        const colorPickerGradient = colorPicker.querySelector('[cs-el="hha-colorpicker-gradient"]');
+        const colorPickerHandle = colorPicker.querySelector('[cs-el="hha-colorpicker-handle"]');
         customColorPicker(colorPickerHandle, colorPickerGradient);
       }
       // End: HHA ColorPicker
