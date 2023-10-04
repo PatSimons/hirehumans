@@ -25,28 +25,35 @@ window.Webflow.push(() => {
         setInterval(() => loopLogoLetters(logoLetters), 1000);
       } // End: Logo Letter Colors
 
-      const loginModal = gsap.utils.toArray('[cs-el="login-modal"]');
-      if (loginModal) {
-        gsap.set(loginModal, { autoAlpha: 0 });
-        let isOpen = false;
-        const loginModalContainer = document.querySelector('[cs-el="login-modal-container"]');
-        const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
-        const loginModalTriggers = gsap.utils.toArray('[cs-el="login-modal-trigger"]');
-        const openModal = gsap.timeline({ paused: true });
-        openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
-        openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: 'back.out' }, '<.25');
-        loginModalTriggers.forEach((trigger: any) => {
-          trigger.addEventListener('click', () => {
-            if (isOpen) {
-              openModal.timeScale(2).reverse();
-              isOpen = false;
-            } else {
-              openModal.timeScale(1).play();
-              isOpen = true;
-            }
-          });
-        });
+      // On page load
+      const entryPanel = document.querySelector('[cs-el="entry-panel"]');
+      if (entryPanel) {
+        gsap.to(entryPanel, { autoAlpha: 1, yPercent: -5, ease: 'back.out', duration: 2 });
       }
+      // End: On page load
+
+      /// Login Modal
+      // const loginModal = gsap.utils.toArray('[cs-el="login-modal"]');
+      // if (loginModal) {
+      //   gsap.set(loginModal, { autoAlpha: 0 });
+      //   let isOpen = false;
+      //   const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
+      //   const loginModalTriggers = gsap.utils.toArray('[cs-el="login-modal-trigger"]');
+      //   const openModal = gsap.timeline({ paused: true });
+      //   openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
+      //   openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: 'back.out' }, '<.25');
+      //   loginModalTriggers.forEach((trigger: any) => {
+      //     trigger.addEventListener('click', () => {
+      //       if (isOpen) {
+      //         openModal.timeScale(2).reverse();
+      //         isOpen = false;
+      //       } else {
+      //         openModal.timeScale(1).play();
+      //         isOpen = true;
+      //       }
+      //     });
+      //   });
+      //} /// End: Login Modal
 
       function init() {} // End: function init()
 
