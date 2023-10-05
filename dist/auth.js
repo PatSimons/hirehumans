@@ -4228,8 +4228,8 @@
   var gsapWithCSS = gsap.registerPlugin(CSSPlugin) || gsap;
   var TweenMaxWithCSS = gsapWithCSS.core.Tween;
 
-  // src/humans.ts
-  console.log("humans.ts");
+  // src/auth.ts
+  console.log("auth.ts");
   window.Webflow ||= [];
   window.Webflow.push(() => {
     const mm = gsapWithCSS.matchMedia();
@@ -4242,27 +4242,9 @@
       },
       (context3) => {
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
-        const humans = document.querySelector('[cs-el="humans"]');
-        if (humans) {
-          const humansListItems = gsapWithCSS.utils.toArray('[cs-el="humans-list-item"]');
-          if (humansListItems) {
-            gsapWithCSS.from(humansListItems, {
-              autoAlpha: 0,
-              duration: 1,
-              stagger: 0.3,
-              ease: "power1.out"
-            });
-            humansListItems.forEach((item) => {
-              const navItemHover = gsapWithCSS.timeline({ paused: true });
-              navItemHover.to(item, { y: "-0.5rem", duration: 0.5, ease: "power1.out" });
-              item.addEventListener("mouseenter", () => {
-                navItemHover.timeScale(1).play();
-              });
-              item.addEventListener("mouseleave", () => {
-                navItemHover.timeScale(3).reverse();
-              });
-            });
-          }
+        const entryPanel = document.querySelector('[cs-el="entry-panel"]');
+        if (entryPanel) {
+          gsapWithCSS.to(entryPanel, { autoAlpha: 1, yPercent: -5, ease: "back.out", duration: 2 });
         }
         function init4() {
         }
@@ -4303,4 +4285,4 @@ gsap/CSSPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=humans.js.map
+//# sourceMappingURL=auth.js.map

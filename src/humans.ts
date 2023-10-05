@@ -1,4 +1,4 @@
-/* signup.ts used on hh/humans */
+/* humans.ts used on hh/humans */
 console.log('humans.ts');
 
 import { gsap } from 'gsap';
@@ -19,12 +19,12 @@ window.Webflow.push(() => {
     (context) => {
       const { isDesktop, isMobile, reduceMotion } = context.conditions;
 
-      //// Loop Logo Letter Colors
-      const logo = document.querySelector('[cs-el="logo"]');
-      if (logo) {
-        const logoLetters: string[] = gsap.utils.toArray('[cs-el="logo-letter"]');
-        setInterval(() => loopLogoLetters(logoLetters), 1000);
-      } // End: Logo Letter Colors
+      // //// Loop Logo Letter Colors
+      // const logo = document.querySelector('[cs-el="logo"]');
+      // if (logo) {
+      //   const logoLetters: string[] = gsap.utils.toArray('[cs-el="logo-letter"]');
+      //   setInterval(() => loopLogoLetters(logoLetters), 1000);
+      // } // End: Logo Letter Colors
 
       // Humans
       const humans = document.querySelector('[cs-el="humans"]');
@@ -39,7 +39,7 @@ window.Webflow.push(() => {
             ease: 'power1.out',
           });
           // Nav Hovers
-          humansListItems.forEach((item: HTMLElement) => {
+          humansListItems.forEach((item: any) => {
             const navItemHover = gsap.timeline({ paused: true });
             navItemHover.to(item, { y: '-0.5rem', duration: 0.5, ease: 'power1.out' });
             item.addEventListener('mouseenter', () => {
@@ -52,9 +52,7 @@ window.Webflow.push(() => {
         }
       } // End: Humans
 
-      function init() {
-        console.log('init called');
-      } // End: function init()
+      function init() {} // End: function init()
 
       window.addEventListener('resize', () => {
         init();

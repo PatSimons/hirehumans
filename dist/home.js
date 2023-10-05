@@ -4228,21 +4228,7 @@
   var gsapWithCSS = gsap.registerPlugin(CSSPlugin) || gsap;
   var TweenMaxWithCSS = gsapWithCSS.core.Tween;
 
-  // src/utils/colors.ts
-  var green = "#9ccca1";
-  var aqua = "#96c1d4";
-  var marine = "#729dad";
-  var purple = "#c092b6";
-  var red = "#ea958f";
-  var yellow = "#f4d791";
-  var colorArray = [green, aqua, marine, purple, yellow, red];
-  function loopLogoLetters(letters) {
-    gsapWithCSS.utils.shuffle(colorArray);
-    gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colorArray), duration: 0.25 });
-  }
-
-  // src/signup.ts
-  console.log("signup.ts");
+  // src/home.ts
   window.Webflow ||= [];
   window.Webflow.push(() => {
     const mm = gsapWithCSS.matchMedia();
@@ -4255,14 +4241,6 @@
       },
       (context3) => {
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
-        const logoLetters = gsapWithCSS.utils.toArray(".logo_letter");
-        if (logoLetters.length > 0) {
-          setInterval(() => loopLogoLetters(logoLetters), 1e3);
-        }
-        const entryPanel = document.querySelector('[cs-el="entry-panel"]');
-        if (entryPanel) {
-          gsapWithCSS.to(entryPanel, { autoAlpha: 1, yPercent: -5, ease: "back.out", duration: 2 });
-        }
         function init4() {
         }
         window.addEventListener("resize", () => {
@@ -4302,4 +4280,4 @@ gsap/CSSPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=signup.js.map
+//# sourceMappingURL=home.js.map
