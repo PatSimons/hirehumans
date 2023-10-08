@@ -8797,7 +8797,7 @@
             let thumbsEnabled = false;
             let captionEnabled = false;
             let loopEnabled = false;
-            let swipeEnabled = false;
+            const swipeEnabled = false;
             const sliderSettings = slider?.getAttribute("slider-settings");
             if (sliderSettings) {
               const settingsArray = sliderSettings.split(", ");
@@ -8806,10 +8806,9 @@
               captionEnabled = settingsArray.includes("thumbs");
               loopEnabled = settingsArray.includes("loop");
             }
-            swipeEnabled = true;
             const slides = document.querySelectorAll('[cs-el="slide"]');
             const slidesLength = slides.length;
-            if (slidesLength > 0) {
+            if (slidesLength > 1) {
               let sliderSlide2 = function(dir, index) {
                 gsapWithCSS.to(slides[count], { duration: fadeTime, opacity: 0 });
                 if (typeof index === "number" && index >= 0 && index < slidesLength) {
@@ -8845,9 +8844,8 @@
               Observer.create({
                 target: slider,
                 type: "touch",
-                // onDrag: () => {
-                //   console.log('swipe');
-                // },
+                onUp: () => {
+                },
                 onLeft: () => {
                   goPrev2();
                 },

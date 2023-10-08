@@ -118,7 +118,7 @@ window.Webflow.push(() => {
           let thumbsEnabled = false;
           let captionEnabled = false;
           let loopEnabled = false;
-          let swipeEnabled = false;
+          const swipeEnabled = false;
 
           // Get slider settings (nav, thumbs, caption, loop)
           const sliderSettings = slider?.getAttribute('slider-settings');
@@ -133,11 +133,12 @@ window.Webflow.push(() => {
           }
 
           //captionEnabled = false;
-          swipeEnabled = true;
+          //swipeEnabled = true;
 
+          // Setup sildes
           const slides = document.querySelectorAll<HTMLElement>('[cs-el="slide"]');
           const slidesLength = slides.length;
-          if (slidesLength > 0) {
+          if (slidesLength > 1) {
             let count = 0;
             const fadeTime = 2;
             const turnTime = 5;
@@ -148,9 +149,9 @@ window.Webflow.push(() => {
             Observer.create({
               target: slider,
               type: 'touch',
-              // onDrag: () => {
-              //   console.log('swipe');
-              // },
+              onUp: () => {
+                //   console.log('swipe');
+              },
               onLeft: () => {
                 //console.log('onLeft');
                 goPrev();

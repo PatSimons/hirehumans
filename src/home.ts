@@ -1,10 +1,35 @@
 import { gsap } from 'gsap';
+import { Observer } from 'gsap/Observer';
+gsap.registerPlugin(Observer);
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
   //// Setup Match Media
   const mm = gsap.matchMedia();
   const breakPoint = 800;
+
+  //// Swipe Test
+  const swipeTest: any = document.querySelector('.swipe-test');
+  if (swipeTest) {
+    console.log('swipetest going on');
+    Observer.create({
+      target: swipeTest,
+      type: 'touch',
+      onUp: () => {
+        swipeTest.innerHTML('onUp');
+        //   console.log('swipe');
+      },
+      onLeft: () => {
+        swipeTest.innerHTML('onLeft');
+        //console.log('onLeft');
+      },
+      onRight: () => {
+        //console.log('onRight');
+        swipeTest.innerHTML('onRight');
+      },
+    });
+  }
+  //// End: Swipe test
 
   mm.add(
     {
