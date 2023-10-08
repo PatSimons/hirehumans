@@ -99,116 +99,167 @@ window.Webflow.push(() => {
 
       // End: HHP User Card & Nav
 
-      // HHP Slider
-      const slider = document.querySelector('[cs-el="hhp-slider"]');
+      // Sliders
+      /* Makes use of the following data attributes
+      cs-el="slider"
+      cs-el="slide"
+      cs-el="slider-nav"
+      cs-el="slider-nav_next"
+      cs-el="slider-nav_prev"
+      cs-el="slider-thumbs"
+      cs-el="slider-thumb"
+      slider-settings="nav, thumbs, caption, loop, swipe"
+      */
+      //      const slider = document.querySelector('[cs-el="slider"]');
+      const sliders = gsap.utils.toArray<HTMLElement>('[cs-el="slider"]');
+      sliders.forEach((slider: any) => {
+        if (slider) {
+          let navEnabled = false;
+          let thumbsEnabled = false;
+          let captionEnabled = false;
+          let loopEnabled = false;
+          let swipeEnabled = false;
 
-      if (slider) {
-        const slides = document.querySelectorAll('[cs-el="hhp-slide"]');
-        const slidesLength = slides.length;
-        if (slidesLength > 0) {
-          let count = 0;
-          const fadeTime = 2;
-          const turnTime = 5;
+          // Get slider settings (nav, thumbs, caption, loop)
+          const sliderSettings = slider?.getAttribute('slider-settings');
+          if (sliderSettings) {
+            // Split the CSV values into an array
+            const settingsArray = sliderSettings.split(', ');
+            // Access individual values
+            navEnabled = settingsArray.includes('nav');
+            thumbsEnabled = settingsArray.includes('thumbs');
+            captionEnabled = settingsArray.includes('thumbs');
+            loopEnabled = settingsArray.includes('loop');
+          }
 
-          Observer.create({
-            target: slider,
-            type: 'touch',
-            onLeft: () => {
-              console.log('left');
-              goPrev();
-            },
-            onRight: () => {
-              console.log('right');
-              goNext();
-            },
-          });
+          //captionEnabled = false;
+          swipeEnabled = true;
 
-          const next = document.querySelector('[cs-el="hhp-slider-nav-next"]');
-          const prev = document.querySelector('[cs-el="hhp-slider-nav-prev"]');
-          const thumbsWrap = document.querySelector('[cs-el="hhp-slider-thumbs-wrap"]');
-          let allThumbs: HTMLElement[] = [];
+          const slides = document.querySelectorAll<HTMLElement>('[cs-el="slide"]');
+          const slidesLength = slides.length;
+          if (slidesLength > 0) {
+            let count = 0;
+            const fadeTime = 2;
+            const turnTime = 5;
 
-          const toggleControls = gsap.timeline({ paused: true });
-          toggleControls.from(next, {
-            opacity: 0,
-            duration: globalDuration,
-            ease: globalEase,
-            x: '-100%',
-          });
-          toggleControls.from(
-            prev,
-            { opacity: 0, duration: globalDuration, ease: globalEase, x: '100%' },
-            '<'
-          );
-          if (thumbsWrap) {
-            const thumb = thumbsWrap.querySelector('[cs-el="hhp-slider-thumb"]');
-            thumb?.classList.remove('is-active');
-            slides.forEach((slide: any) => {
-              const clonedThumb = thumb?.cloneNode(true);
+            gsap.set(slides, { opacity: 0 });
+            gsap.set(slides[0], { opacity: 1 });
 
-              thumb?.parentNode?.appendChild(clonedThumb);
+            Observer.create({
+              target: slider,
+              type: 'touch',
+              // onDrag: () => {
+              //   console.log('swipe');
+              // },
+              onLeft: () => {
+                //console.log('onLeft');
+                goPrev();
+              },
+              onRight: () => {
+                //console.log('onRight');
+                goNext();
+              },
             });
-            thumb?.remove();
-            allThumbs = gsap.utils.toArray('[cs-el="hhp-slider-thumb"]');
-            setActiveThumb(0);
-            allThumbs.forEach((element: any, index) => {
-              element.addEventListener('click', () => {
-                fadeIt(null, index);
-              });
+
+            // Show/hide slider controls in hover.
+            const toggleControls = gsap.timeline({ paused: true });
+            slider.addEventListener('mouseenter', () => {
+              toggleControls.timeScale(1).play();
             });
-            toggleControls.from(
-              thumbsWrap,
-              {
+            slider.addEventListener('mouseleave', () => {
+              toggleControls.timeScale(2).reverse();
+            });
+            const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+            if (navEnabled && sliderNav) {
+              const next = sliderNav.querySelector('[cs-el="slider-nav_next"]');
+              const prev = sliderNav.querySelector('[cs-el="slider-nav_prev"]');
+
+              next?.addEventListener('click', () => goNext());
+              prev?.addEventListener('click', () => goPrev());
+              toggleControls.from(next, {
                 opacity: 0,
-                delay: 0.25,
                 duration: globalDuration,
                 ease: globalEase,
-              },
-              '<'
-            );
-          }
-          slider.addEventListener('mouseenter', () => {
-            toggleControls.timeScale(1).play();
-          });
-          slider.addEventListener('mouseleave', () => {
-            toggleControls.timeScale(2).reverse();
-          });
-          next?.addEventListener('click', () => goNext());
-          prev?.addEventListener('click', () => goPrev());
-          gsap.set(slides, { opacity: 0 });
-          gsap.set(slides[0], { opacity: 1 });
-
-          function fadeIt(dir?: string, index?: number) {
-            gsap.to(slides[count], { duration: fadeTime, opacity: 0 });
-            if (typeof index === 'number' && index >= 0 && index < slidesLength) {
-              count = index;
+                x: '-100%',
+              });
+              toggleControls.from(
+                prev,
+                { opacity: 0, duration: globalDuration, ease: globalEase, x: '100%' },
+                '<'
+              );
             } else {
-              if (dir === 'next') {
-                count = (count + 1) % slidesLength;
-              }
-              if (dir === 'prev') {
-                count = (count - 1 + slidesLength) % slidesLength;
-              }
+              sliderNav?.remove();
             }
-            setActiveThumb(count);
-            gsap.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
+            // End: if (navEnabled && sliderNav) {
+
+            // Slider Thumbs
+            const sliderThumbs = document.querySelector('[cs-el="slider-thumbs"]');
+            let allThumbs: HTMLElement[] = [];
+            if (thumbsEnabled && sliderThumbs) {
+              const thumb = sliderThumbs.querySelector('[cs-el="slider-thumb"]');
+              thumb?.classList.remove('is-active');
+              slides.forEach((slide: any) => {
+                const clonedThumb = thumb?.cloneNode(true);
+
+                thumb?.parentNode?.appendChild(clonedThumb);
+              });
+              thumb?.remove();
+              allThumbs = gsap.utils.toArray('[cs-el="slider-thumb"]');
+              setActiveThumb(0);
+              allThumbs.forEach((element: any, index) => {
+                element.addEventListener('click', () => {
+                  sliderSlide(null, index, false);
+                });
+              });
+              toggleControls.from(
+                sliderThumbs,
+                {
+                  opacity: 0,
+                  delay: 0.25,
+                  duration: globalDuration,
+                  ease: globalEase,
+                },
+                '<'
+              );
+            } else {
+              sliderThumbs?.remove();
+            } // End: if (thumbsEnabled && sliderThumbs) {
+            // End: Slider Thumbs
+
+            function sliderSlide(dir: 'next' | 'prev', index?: number) {
+              gsap.to(slides[count], { duration: fadeTime, opacity: 0 });
+              if (typeof index === 'number' && index >= 0 && index < slidesLength) {
+                count = index;
+              } else {
+                if (dir === 'next') {
+                  // Set count to next slide index. If 'loopEnabled = true' slides will loop back to first slide
+                  count = count < slidesLength - 1 ? count + 1 : loopEnabled ? 0 : count;
+                } else if (dir === 'prev') {
+                  // Set count to previous slide index. If 'loopEnabled = true' slides will loop back to last slide
+                  count = count > 0 ? count - 1 : loopEnabled ? slidesLength - 1 : count;
+                }
+              }
+              if (thumbsEnabled) {
+                setActiveThumb(count);
+              }
+              gsap.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
+            }
+            function setActiveThumb(index: number) {
+              allThumbs.forEach((thumb: HTMLElement) => {
+                thumb.firstChild?.removeAttribute('hh-background-color');
+              });
+              allThumbs[index].firstChild?.setAttribute('hh-background-color', 'p');
+            }
+            function goNext() {
+              sliderSlide('next');
+            }
+            function goPrev() {
+              gsap.killTweensOf(sliderSlide);
+              sliderSlide('prev');
+            }
           }
-          function setActiveThumb(index: number) {
-            allThumbs.forEach((thumb: HTMLElement) => {
-              thumb.firstChild?.removeAttribute('hh-background-color');
-            });
-            allThumbs[index].firstChild?.setAttribute('hh-background-color', 'p');
-          }
-          function goNext() {
-            fadeIt('next');
-          }
-          function goPrev() {
-            gsap.killTweensOf(fadeIt);
-            fadeIt('prev');
-          }
-        }
-      }
-      // END: HHP Slider
+        } // END: Slider
+      }); // End: sliders.forEach
 
       function init() {} // End: function init()
 

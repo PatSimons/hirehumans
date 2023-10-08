@@ -75,28 +75,33 @@ window.Webflow.push(() => {
       // }
       //// End: Loop Gradient Backsgrounds
 
-      /// Login Modal
-      // const loginModal = gsap.utils.toArray('[cs-el="login-modal"]');
-      // if (loginModal) {
-      //   gsap.set(loginModal, { autoAlpha: 0 });
-      //   let isOpen = false;
-      //   const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
-      //   const loginModalTriggers = gsap.utils.toArray('[cs-el="login-modal-trigger"]');
-      //   const openModal = gsap.timeline({ paused: true });
-      //   openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
-      //   openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: 'back.out' }, '<.25');
-      //   loginModalTriggers.forEach((trigger: any) => {
-      //     trigger.addEventListener('click', () => {
-      //       if (isOpen) {
-      //         openModal.timeScale(2).reverse();
-      //         isOpen = false;
-      //       } else {
-      //         openModal.timeScale(1).play();
-      //         isOpen = true;
-      //       }
-      //     });
-      //   });
-      //} /// End: Login Modal
+      //// Login Modal
+      const loginModal = gsap.utils.toArray('[cs-el="login-modal"]');
+      if (loginModal) {
+        gsap.set(loginModal, { autoAlpha: 0 });
+        let isOpen = false;
+        const body = document.querySelector('body');
+        const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
+        const loginModalTriggers = gsap.utils.toArray('[cs-el="login-modal-toggle"]');
+
+        const openModal = gsap.timeline({ paused: true });
+        openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
+        openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: 'back.out' }, '<.25');
+        loginModalTriggers.forEach((trigger: any) => {
+          trigger.addEventListener('click', () => {
+            if (isOpen) {
+              openModal.timeScale(2).reverse();
+              body?.classList.toggle('overflow-hidden');
+              isOpen = false;
+            } else {
+              openModal.timeScale(1).play();
+              body?.classList.toggle('overflow-hidden');
+              isOpen = true;
+            }
+          });
+        });
+      }
+      //// End: Login Modal
 
       function init() {
         // Animate elements On Page Load
@@ -115,13 +120,13 @@ window.Webflow.push(() => {
           scrolltriggerOnEnterElms.forEach((el: any) => {
             gsap.from(el, {
               opacity: 0,
-              yPercent: 20,
+              yPercent: 10,
               //filter: 'blur(5px)',
               ease: 'sin.out',
               scrollTrigger: {
                 trigger: el,
                 start: 'top bottom',
-                end: 'top 75%',
+                end: 'top 70%',
                 scrub: 1,
               },
             });

@@ -6578,6 +6578,30 @@
           const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
           setInterval(() => loopLogoLetters(logoLetters), 1e3);
         }
+        const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
+        if (loginModal) {
+          gsapWithCSS.set(loginModal, { autoAlpha: 0 });
+          let isOpen = false;
+          const body = document.querySelector("body");
+          const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
+          const loginModalTriggers = gsapWithCSS.utils.toArray('[cs-el="login-modal-toggle"]');
+          const openModal = gsapWithCSS.timeline({ paused: true });
+          openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
+          openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: "back.out" }, "<.25");
+          loginModalTriggers.forEach((trigger) => {
+            trigger.addEventListener("click", () => {
+              if (isOpen) {
+                openModal.timeScale(2).reverse();
+                body?.classList.toggle("overflow-hidden");
+                isOpen = false;
+              } else {
+                openModal.timeScale(1).play();
+                body?.classList.toggle("overflow-hidden");
+                isOpen = true;
+              }
+            });
+          });
+        }
         function init4() {
           const onPageLoadElms = gsapWithCSS.utils.toArray('[cs-tr="pageload"]');
           if (onPageLoadElms.length > 0) {
@@ -6593,13 +6617,13 @@
             scrolltriggerOnEnterElms.forEach((el) => {
               gsapWithCSS.from(el, {
                 opacity: 0,
-                yPercent: 20,
+                yPercent: 10,
                 //filter: 'blur(5px)',
                 ease: "sin.out",
                 scrollTrigger: {
                   trigger: el,
                   start: "top bottom",
-                  end: "top 75%",
+                  end: "top 70%",
                   scrub: 1
                 }
               });
