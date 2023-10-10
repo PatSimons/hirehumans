@@ -4704,23 +4704,6 @@
   window.Webflow.push(() => {
     const mm = gsapWithCSS.matchMedia();
     const breakPoint = 800;
-    const swipeTest = document.querySelector(".swipe-test");
-    if (swipeTest) {
-      console.log("swipetest going on");
-      Observer.create({
-        target: swipeTest,
-        type: "touch",
-        onUp: () => {
-          swipeTest.innerHTML("onUp");
-        },
-        onLeft: () => {
-          swipeTest.innerHTML("onLeft");
-        },
-        onRight: () => {
-          swipeTest.innerHTML("onRight");
-        }
-      });
-    }
     mm.add(
       {
         isDesktop: `(min-width: ${breakPoint}px)`,

@@ -99,7 +99,7 @@ window.Webflow.push(() => {
 
       // End: HHP User Card & Nav
 
-      // Sliders
+      // SLIDERS
       /* Makes use of the following data attributes
       cs-el="slider"
       cs-el="slide"
@@ -110,159 +110,170 @@ window.Webflow.push(() => {
       cs-el="slider-thumb"
       slider-settings="nav, thumbs, caption, loop, swipe"
       */
-      //      const slider = document.querySelector('[cs-el="slider"]');
-      const sliders = gsap.utils.toArray<HTMLElement>('[cs-el="slider"]');
-      sliders.forEach((slider: any) => {
-        if (slider) {
-          let navEnabled = false;
-          let thumbsEnabled = false;
-          let captionEnabled = false;
-          let loopEnabled = false;
-          const swipeEnabled = false;
+      function initSliders() {
+        const sliders = gsap.utils.toArray<HTMLElement>('[cs-el="slider"]');
+        console.log(sliders.length);
+        sliders.forEach((slider: any) => {
+          if (slider) {
+            let navEnabled = false;
+            let thumbsEnabled = false;
+            let captionEnabled = false;
+            let loopEnabled = false;
+            const swipeEnabled = false;
 
-          // Get slider settings (nav, thumbs, caption, loop)
-          const sliderSettings = slider?.getAttribute('slider-settings');
-          if (sliderSettings) {
-            // Split the CSV values into an array
-            const settingsArray = sliderSettings.split(', ');
-            // Access individual values
-            navEnabled = settingsArray.includes('nav');
-            thumbsEnabled = settingsArray.includes('thumbs');
-            captionEnabled = settingsArray.includes('thumbs');
-            loopEnabled = settingsArray.includes('loop');
-          }
-
-          //captionEnabled = false;
-          //swipeEnabled = true;
-
-          // Setup sildes
-          const slides = document.querySelectorAll<HTMLElement>('[cs-el="slide"]');
-          const slidesLength = slides.length;
-          if (slidesLength > 1) {
-            let count = 0;
-            const fadeTime = 2;
-            const turnTime = 5;
-
-            gsap.set(slides, { opacity: 0 });
-            gsap.set(slides[0], { opacity: 1 });
-
-            Observer.create({
-              target: slider,
-              type: 'touch',
-              onUp: () => {
-                //   console.log('swipe');
-              },
-              onLeft: () => {
-                //console.log('onLeft');
-                goPrev();
-              },
-              onRight: () => {
-                //console.log('onRight');
-                goNext();
-              },
-            });
-
-            // Show/hide slider controls in hover.
-            const toggleControls = gsap.timeline({ paused: true });
-            slider.addEventListener('mouseenter', () => {
-              toggleControls.timeScale(1).play();
-            });
-            slider.addEventListener('mouseleave', () => {
-              toggleControls.timeScale(2).reverse();
-            });
-            const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-            if (navEnabled && sliderNav) {
-              const next = sliderNav.querySelector('[cs-el="slider-nav_next"]');
-              const prev = sliderNav.querySelector('[cs-el="slider-nav_prev"]');
-
-              next?.addEventListener('click', () => goNext());
-              prev?.addEventListener('click', () => goPrev());
-              toggleControls.from(next, {
-                opacity: 0,
-                duration: globalDuration,
-                ease: globalEase,
-                x: '-100%',
-              });
-              toggleControls.from(
-                prev,
-                { opacity: 0, duration: globalDuration, ease: globalEase, x: '100%' },
-                '<'
-              );
-            } else {
-              sliderNav?.remove();
+            // Get slider settings (nav, thumbs, caption, loop)
+            const sliderSettings = slider?.getAttribute('slider-settings');
+            if (sliderSettings) {
+              // Split the CSV values into an array
+              const settingsArray = sliderSettings.split(', ');
+              // Access individual values
+              navEnabled = settingsArray.includes('nav');
+              thumbsEnabled = settingsArray.includes('thumbs');
+              captionEnabled = settingsArray.includes('thumbs');
+              loopEnabled = settingsArray.includes('loop');
             }
-            // End: if (navEnabled && sliderNav) {
 
-            // Slider Thumbs
-            const sliderThumbs = document.querySelector('[cs-el="slider-thumbs"]');
-            let allThumbs: HTMLElement[] = [];
-            if (thumbsEnabled && sliderThumbs) {
-              const thumb = sliderThumbs.querySelector('[cs-el="slider-thumb"]');
-              thumb?.classList.remove('is-active');
-              slides.forEach((slide: any) => {
-                const clonedThumb = thumb?.cloneNode(true);
+            //captionEnabled = false;
+            //swipeEnabled = true;
 
-                thumb?.parentNode?.appendChild(clonedThumb);
+            // Setup sildes
+            const slides = slider.querySelectorAll('[cs-el="slide"]');
+            const slidesLength = slides.length;
+            if (slidesLength > 1) {
+              let count = 0;
+              const fadeTime = 2;
+              const turnTime = 5;
+
+              gsap.set(slides, { opacity: 0 });
+              gsap.set(slides[0], { opacity: 1 });
+
+              Observer.create({
+                target: slider,
+                type: 'touch',
+                onUp: () => {
+                  //   console.log('swipe');
+                },
+                onLeft: () => {
+                  //console.log('onLeft');
+                  goPrev();
+                },
+                onRight: () => {
+                  //console.log('onRight');
+                  goNext();
+                },
               });
-              thumb?.remove();
-              allThumbs = gsap.utils.toArray('[cs-el="slider-thumb"]');
-              setActiveThumb(0);
-              allThumbs.forEach((element: any, index) => {
-                element.addEventListener('click', () => {
-                  sliderSlide(null, index, false);
-                });
+
+              // Show/hide slider controls in hover.
+              const toggleControls = gsap.timeline({ paused: true });
+              slider.addEventListener('mouseenter', () => {
+                toggleControls.timeScale(1).play();
               });
-              toggleControls.from(
-                sliderThumbs,
-                {
+              slider.addEventListener('mouseleave', () => {
+                toggleControls.timeScale(2).reverse();
+              });
+              const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+              if (navEnabled && sliderNav) {
+                const next = sliderNav.querySelector('[cs-el="slider-nav_next"]');
+                const prev = sliderNav.querySelector('[cs-el="slider-nav_prev"]');
+
+                next?.addEventListener('click', () => goNext());
+                prev?.addEventListener('click', () => goPrev());
+                toggleControls.from(next, {
                   opacity: 0,
-                  delay: 0.25,
                   duration: globalDuration,
                   ease: globalEase,
-                },
-                '<'
-              );
-            } else {
-              sliderThumbs?.remove();
-            } // End: if (thumbsEnabled && sliderThumbs) {
-            // End: Slider Thumbs
-
-            function sliderSlide(dir: 'next' | 'prev', index?: number) {
-              gsap.to(slides[count], { duration: fadeTime, opacity: 0 });
-              if (typeof index === 'number' && index >= 0 && index < slidesLength) {
-                count = index;
+                  x: '-100%',
+                });
+                toggleControls.from(
+                  prev,
+                  { opacity: 0, duration: globalDuration, ease: globalEase, x: '100%' },
+                  '<'
+                );
               } else {
-                if (dir === 'next') {
-                  // Set count to next slide index. If 'loopEnabled = true' slides will loop back to first slide
-                  count = count < slidesLength - 1 ? count + 1 : loopEnabled ? 0 : count;
-                } else if (dir === 'prev') {
-                  // Set count to previous slide index. If 'loopEnabled = true' slides will loop back to last slide
-                  count = count > 0 ? count - 1 : loopEnabled ? slidesLength - 1 : count;
-                }
+                sliderNav?.remove();
               }
-              if (thumbsEnabled) {
-                setActiveThumb(count);
-              }
-              gsap.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
-            }
-            function setActiveThumb(index: number) {
-              allThumbs.forEach((thumb: HTMLElement) => {
-                thumb.firstChild?.removeAttribute('hh-background-color');
-              });
-              allThumbs[index].firstChild?.setAttribute('hh-background-color', 'p');
-            }
-            function goNext() {
-              sliderSlide('next');
-            }
-            function goPrev() {
-              gsap.killTweensOf(sliderSlide);
-              sliderSlide('prev');
-            }
-          }
-        } // END: Slider
-      }); // End: sliders.forEach
+              // End: if (navEnabled && sliderNav) {
 
-      function init() {} // End: function init()
+              // Slider Thumbs
+              const sliderThumbs = slider.querySelector('[cs-el="slider-thumbs"]');
+              let allThumbs: HTMLElement[] = [];
+              if (thumbsEnabled && sliderThumbs) {
+                // Check for initial thumb element and clone
+                const thumbs = sliderThumbs.querySelectorAll<HTMLElement>('[cs-el="slider-thumb"]');
+                // Avoid doing this again and again on Window Resize etc.
+                if (thumbs.length == 1) {
+                  thumbs.forEach((thumb: any) => {
+                    //const thumb = sliderThumbs.querySelector('[cs-el="slider-thumb"]');
+                    thumb?.classList.remove('is-active');
+                    slides.forEach((slide: any) => {
+                      const clonedThumb = thumb?.cloneNode(true);
+
+                      thumb?.parentNode?.appendChild(clonedThumb);
+                    });
+                    thumb?.remove();
+                    allThumbs = slider.querySelectorAll('[cs-el="slider-thumb"]');
+                    setActiveThumb(0);
+                    allThumbs.forEach((element: any, index) => {
+                      element.addEventListener('click', () => {
+                        sliderSlide(null, index, false);
+                      });
+                    });
+                    toggleControls.from(
+                      sliderThumbs,
+                      {
+                        opacity: 0,
+                        delay: 0.25,
+                        duration: globalDuration,
+                        ease: globalEase,
+                      },
+                      '<'
+                    );
+                  }); // End: thumbs.forEach
+                } // End: if thumbs.length > 1
+              } else {
+                sliderThumbs?.remove();
+              } // End: if (thumbsEnabled && sliderThumbs) {
+              // End: Slider Thumbs
+
+              function sliderSlide(dir: 'next' | 'prev', index?: number) {
+                gsap.to(slides[count], { duration: fadeTime, opacity: 0 });
+                if (typeof index === 'number' && index >= 0 && index < slidesLength) {
+                  count = index;
+                } else {
+                  if (dir === 'next') {
+                    // Set count to next slide index. If 'loopEnabled = true' slides will loop back to first slide
+                    count = count < slidesLength - 1 ? count + 1 : loopEnabled ? 0 : count;
+                  } else if (dir === 'prev') {
+                    // Set count to previous slide index. If 'loopEnabled = true' slides will loop back to last slide
+                    count = count > 0 ? count - 1 : loopEnabled ? slidesLength - 1 : count;
+                  }
+                }
+                if (thumbsEnabled) {
+                  setActiveThumb(count);
+                }
+                gsap.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
+              }
+              function setActiveThumb(index: number) {
+                allThumbs.forEach((thumb: HTMLElement) => {
+                  thumb.firstChild?.removeAttribute('hh-background-color');
+                });
+                allThumbs[index].firstChild?.setAttribute('hh-background-color', 'p');
+              }
+              function goNext() {
+                sliderSlide('next');
+              }
+              function goPrev() {
+                gsap.killTweensOf(sliderSlide);
+                sliderSlide('prev');
+              }
+            }
+          } // END: Slider
+        }); // End: sliders.forEach
+      } // End: function initSliders()
+
+      function init() {
+        initSliders();
+      } // End: function init()
 
       window.addEventListener('resize', () => {
         init();

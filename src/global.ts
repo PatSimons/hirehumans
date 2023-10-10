@@ -1,9 +1,14 @@
 import { gsap } from 'gsap';
+//import { Draggable } from 'gsap/Draggable';
+//import { Observer } from 'gsap/Observer';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
+//gsap.registerPlugin(Observer);
+//gsap.registerPlugin(Draggable);
 
 import { colorArray } from '$utils/colors';
 import { loopLogoLetters } from '$utils/colors';
+import { initSliders } from '$utils/components';
 
 //// Global Declarations
 const globalEase = 'back.out';
@@ -103,6 +108,7 @@ window.Webflow.push(() => {
       }
       //// End: Login Modal
 
+      initSliders();
       function init() {
         // Animate elements On Page Load
         const onPageLoadElms = gsap.utils.toArray('[cs-tr="pageload"]');
@@ -115,23 +121,23 @@ window.Webflow.push(() => {
           });
         }
         // Scrolltrigger elements On Enter Viewport
-        const scrolltriggerOnEnterElms = gsap.utils.toArray('[cs-tr="scroll"]');
-        if (scrolltriggerOnEnterElms.length > 0) {
-          scrolltriggerOnEnterElms.forEach((el: any) => {
-            gsap.from(el, {
-              opacity: 0,
-              yPercent: 10,
-              //filter: 'blur(5px)',
-              ease: 'sin.out',
-              scrollTrigger: {
-                trigger: el,
-                start: 'top bottom',
-                end: 'top 70%',
-                scrub: 1,
-              },
-            });
-          });
-        }
+        // const scrolltriggerOnEnterElms = gsap.utils.toArray('[cs-tr="scroll"]');
+        // if (scrolltriggerOnEnterElms.length > 0) {
+        //   scrolltriggerOnEnterElms.forEach((el: any) => {
+        //     gsap.from(el, {
+        //       opacity: 0,
+        //       yPercent: 10,
+        //       //filter: 'blur(5px)',
+        //       ease: 'sin.out',
+        //       scrollTrigger: {
+        //         trigger: el,
+        //         start: 'top bottom',
+        //         end: 'top 70%',
+        //         scrub: 1,
+        //       },
+        //     });
+        //   });
+        // }
       } // End: function init()
 
       window.addEventListener('resize', () => {

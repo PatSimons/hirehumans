@@ -8790,130 +8790,138 @@
             });
           });
         }
-        const sliders = gsapWithCSS.utils.toArray('[cs-el="slider"]');
-        sliders.forEach((slider) => {
-          if (slider) {
-            let navEnabled = false;
-            let thumbsEnabled = false;
-            let captionEnabled = false;
-            let loopEnabled = false;
-            const swipeEnabled = false;
-            const sliderSettings = slider?.getAttribute("slider-settings");
-            if (sliderSettings) {
-              const settingsArray = sliderSettings.split(", ");
-              navEnabled = settingsArray.includes("nav");
-              thumbsEnabled = settingsArray.includes("thumbs");
-              captionEnabled = settingsArray.includes("thumbs");
-              loopEnabled = settingsArray.includes("loop");
-            }
-            const slides = document.querySelectorAll('[cs-el="slide"]');
-            const slidesLength = slides.length;
-            if (slidesLength > 1) {
-              let sliderSlide2 = function(dir, index) {
-                gsapWithCSS.to(slides[count], { duration: fadeTime, opacity: 0 });
-                if (typeof index === "number" && index >= 0 && index < slidesLength) {
-                  count = index;
-                } else {
-                  if (dir === "next") {
-                    count = count < slidesLength - 1 ? count + 1 : loopEnabled ? 0 : count;
-                  } else if (dir === "prev") {
-                    count = count > 0 ? count - 1 : loopEnabled ? slidesLength - 1 : count;
+        function initSliders() {
+          const sliders = gsapWithCSS.utils.toArray('[cs-el="slider"]');
+          console.log(sliders.length);
+          sliders.forEach((slider) => {
+            if (slider) {
+              let navEnabled = false;
+              let thumbsEnabled = false;
+              let captionEnabled = false;
+              let loopEnabled = false;
+              const swipeEnabled = false;
+              const sliderSettings = slider?.getAttribute("slider-settings");
+              if (sliderSettings) {
+                const settingsArray = sliderSettings.split(", ");
+                navEnabled = settingsArray.includes("nav");
+                thumbsEnabled = settingsArray.includes("thumbs");
+                captionEnabled = settingsArray.includes("thumbs");
+                loopEnabled = settingsArray.includes("loop");
+              }
+              const slides = slider.querySelectorAll('[cs-el="slide"]');
+              const slidesLength = slides.length;
+              if (slidesLength > 1) {
+                let sliderSlide2 = function(dir, index) {
+                  gsapWithCSS.to(slides[count], { duration: fadeTime, opacity: 0 });
+                  if (typeof index === "number" && index >= 0 && index < slidesLength) {
+                    count = index;
+                  } else {
+                    if (dir === "next") {
+                      count = count < slidesLength - 1 ? count + 1 : loopEnabled ? 0 : count;
+                    } else if (dir === "prev") {
+                      count = count > 0 ? count - 1 : loopEnabled ? slidesLength - 1 : count;
+                    }
                   }
-                }
-                if (thumbsEnabled) {
-                  setActiveThumb2(count);
-                }
-                gsapWithCSS.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
-              }, setActiveThumb2 = function(index) {
-                allThumbs.forEach((thumb) => {
-                  thumb.firstChild?.removeAttribute("hh-background-color");
-                });
-                allThumbs[index].firstChild?.setAttribute("hh-background-color", "p");
-              }, goNext2 = function() {
-                sliderSlide2("next");
-              }, goPrev2 = function() {
-                gsapWithCSS.killTweensOf(sliderSlide2);
-                sliderSlide2("prev");
-              };
-              var sliderSlide = sliderSlide2, setActiveThumb = setActiveThumb2, goNext = goNext2, goPrev = goPrev2;
-              let count = 0;
-              const fadeTime = 2;
-              const turnTime = 5;
-              gsapWithCSS.set(slides, { opacity: 0 });
-              gsapWithCSS.set(slides[0], { opacity: 1 });
-              Observer.create({
-                target: slider,
-                type: "touch",
-                onUp: () => {
-                },
-                onLeft: () => {
-                  goPrev2();
-                },
-                onRight: () => {
-                  goNext2();
-                }
-              });
-              const toggleControls = gsapWithCSS.timeline({ paused: true });
-              slider.addEventListener("mouseenter", () => {
-                toggleControls.timeScale(1).play();
-              });
-              slider.addEventListener("mouseleave", () => {
-                toggleControls.timeScale(2).reverse();
-              });
-              const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-              if (navEnabled && sliderNav) {
-                const next = sliderNav.querySelector('[cs-el="slider-nav_next"]');
-                const prev = sliderNav.querySelector('[cs-el="slider-nav_prev"]');
-                next?.addEventListener("click", () => goNext2());
-                prev?.addEventListener("click", () => goPrev2());
-                toggleControls.from(next, {
-                  opacity: 0,
-                  duration: globalDuration,
-                  ease: globalEase,
-                  x: "-100%"
-                });
-                toggleControls.from(
-                  prev,
-                  { opacity: 0, duration: globalDuration, ease: globalEase, x: "100%" },
-                  "<"
-                );
-              } else {
-                sliderNav?.remove();
-              }
-              const sliderThumbs = document.querySelector('[cs-el="slider-thumbs"]');
-              let allThumbs = [];
-              if (thumbsEnabled && sliderThumbs) {
-                const thumb = sliderThumbs.querySelector('[cs-el="slider-thumb"]');
-                thumb?.classList.remove("is-active");
-                slides.forEach((slide) => {
-                  const clonedThumb = thumb?.cloneNode(true);
-                  thumb?.parentNode?.appendChild(clonedThumb);
-                });
-                thumb?.remove();
-                allThumbs = gsapWithCSS.utils.toArray('[cs-el="slider-thumb"]');
-                setActiveThumb2(0);
-                allThumbs.forEach((element, index) => {
-                  element.addEventListener("click", () => {
-                    sliderSlide2(null, index, false);
+                  if (thumbsEnabled) {
+                    setActiveThumb2(count);
+                  }
+                  gsapWithCSS.fromTo(slides[count], { opacity: 0 }, { duration: fadeTime, opacity: 1 });
+                }, setActiveThumb2 = function(index) {
+                  allThumbs.forEach((thumb) => {
+                    thumb.firstChild?.removeAttribute("hh-background-color");
                   });
-                });
-                toggleControls.from(
-                  sliderThumbs,
-                  {
-                    opacity: 0,
-                    delay: 0.25,
-                    duration: globalDuration,
-                    ease: globalEase
+                  allThumbs[index].firstChild?.setAttribute("hh-background-color", "p");
+                }, goNext2 = function() {
+                  sliderSlide2("next");
+                }, goPrev2 = function() {
+                  gsapWithCSS.killTweensOf(sliderSlide2);
+                  sliderSlide2("prev");
+                };
+                var sliderSlide = sliderSlide2, setActiveThumb = setActiveThumb2, goNext = goNext2, goPrev = goPrev2;
+                let count = 0;
+                const fadeTime = 2;
+                const turnTime = 5;
+                gsapWithCSS.set(slides, { opacity: 0 });
+                gsapWithCSS.set(slides[0], { opacity: 1 });
+                Observer.create({
+                  target: slider,
+                  type: "touch",
+                  onUp: () => {
                   },
-                  "<"
-                );
-              } else {
-                sliderThumbs?.remove();
+                  onLeft: () => {
+                    goPrev2();
+                  },
+                  onRight: () => {
+                    goNext2();
+                  }
+                });
+                const toggleControls = gsapWithCSS.timeline({ paused: true });
+                slider.addEventListener("mouseenter", () => {
+                  toggleControls.timeScale(1).play();
+                });
+                slider.addEventListener("mouseleave", () => {
+                  toggleControls.timeScale(2).reverse();
+                });
+                const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+                if (navEnabled && sliderNav) {
+                  const next = sliderNav.querySelector('[cs-el="slider-nav_next"]');
+                  const prev = sliderNav.querySelector('[cs-el="slider-nav_prev"]');
+                  next?.addEventListener("click", () => goNext2());
+                  prev?.addEventListener("click", () => goPrev2());
+                  toggleControls.from(next, {
+                    opacity: 0,
+                    duration: globalDuration,
+                    ease: globalEase,
+                    x: "-100%"
+                  });
+                  toggleControls.from(
+                    prev,
+                    { opacity: 0, duration: globalDuration, ease: globalEase, x: "100%" },
+                    "<"
+                  );
+                } else {
+                  sliderNav?.remove();
+                }
+                const sliderThumbs = slider.querySelector('[cs-el="slider-thumbs"]');
+                let allThumbs = [];
+                if (thumbsEnabled && sliderThumbs) {
+                  const thumbs = sliderThumbs.querySelectorAll('[cs-el="slider-thumb"]');
+                  if (thumbs.length == 1) {
+                    thumbs.forEach((thumb) => {
+                      thumb?.classList.remove("is-active");
+                      slides.forEach((slide) => {
+                        const clonedThumb = thumb?.cloneNode(true);
+                        thumb?.parentNode?.appendChild(clonedThumb);
+                      });
+                      thumb?.remove();
+                      allThumbs = slider.querySelectorAll('[cs-el="slider-thumb"]');
+                      setActiveThumb2(0);
+                      allThumbs.forEach((element, index) => {
+                        element.addEventListener("click", () => {
+                          sliderSlide2(null, index, false);
+                        });
+                      });
+                      toggleControls.from(
+                        sliderThumbs,
+                        {
+                          opacity: 0,
+                          delay: 0.25,
+                          duration: globalDuration,
+                          ease: globalEase
+                        },
+                        "<"
+                      );
+                    });
+                  }
+                } else {
+                  sliderThumbs?.remove();
+                }
               }
             }
-          }
-        });
+          });
+        }
         function init4() {
+          initSliders();
         }
         window.addEventListener("resize", () => {
           init4();

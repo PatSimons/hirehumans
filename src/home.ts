@@ -8,28 +8,23 @@ window.Webflow.push(() => {
   const mm = gsap.matchMedia();
   const breakPoint = 800;
 
-  //// Swipe Test
-  const swipeTest: any = document.querySelector('.swipe-test');
-  if (swipeTest) {
-    console.log('swipetest going on');
-    Observer.create({
-      target: swipeTest,
-      type: 'touch',
-      onUp: () => {
-        swipeTest.innerHTML('onUp');
-        //   console.log('swipe');
-      },
-      onLeft: () => {
-        swipeTest.innerHTML('onLeft');
-        //console.log('onLeft');
-      },
-      onRight: () => {
-        //console.log('onRight');
-        swipeTest.innerHTML('onRight');
-      },
-    });
-  }
-  //// End: Swipe test
+  // //// Swipe Test
+  // const swpy = document.querySelector('.swipe-test');
+  // console.log('swwwwwipey!!');
+  // Observer.create({
+  //   target: swpy,
+  //   type: 'wheel,touch,pointer',
+  //   preventDefault: true,
+  //   wheelSpeed: -1,
+  //   onLeft: () => {
+  //     console.log('left');
+  //   },
+  //   onDown: () => {
+  //     console.log('right');
+  //   },
+  //   tolerance: 10,
+  // });
+  // //// End: Swipe test
 
   mm.add(
     {
