@@ -6,9 +6,10 @@ gsap.registerPlugin(ScrollTrigger);
 //gsap.registerPlugin(Observer);
 //gsap.registerPlugin(Draggable);
 
+import { initSliders } from 'src/components/sliders';
+
 import { colorArray } from '$utils/colors';
 import { loopLogoLetters } from '$utils/colors';
-import { initSliders } from '$utils/components';
 
 //// Global Declarations
 const globalEase = 'back.out';
@@ -109,6 +110,7 @@ window.Webflow.push(() => {
       //// End: Login Modal
 
       initSliders();
+
       function init() {
         // Animate elements On Page Load
         const onPageLoadElms = gsap.utils.toArray('[cs-tr="pageload"]');

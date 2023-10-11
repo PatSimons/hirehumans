@@ -12,6 +12,7 @@ const ENTRY_POINTS = [
   'src/home.ts',
   'src/humans.ts',
   'src/human.ts',
+  'src/jobs.ts',
   'src/auth.ts',
   'src/profileadmin.ts',
 ];
