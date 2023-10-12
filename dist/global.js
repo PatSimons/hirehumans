@@ -6569,8 +6569,15 @@
   function initSlider(slider) {
     const slides = slider.querySelectorAll('[cs-el="slide"]');
     const slidesLength = slides.length;
-    if (slidesLength <= 1)
+    if (slidesLength === 0)
       return;
+    if (slidesLength === 1) {
+      const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+      sliderNav?.remove();
+      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+      sliderIndicators?.remove();
+      return;
+    }
     const settings = parseSliderSettings(slider);
     if (!settings)
       return;
@@ -6586,8 +6593,10 @@
     let isFirstSlide = false;
     let isLastSlide = false;
     const playDuration = 3e3;
+    const tl_slideIn = gsapWithCSS.timeline({ paused: true });
+    const tl_slideOut = gsapWithCSS.timeline({ paused: true });
+    let initialSlide = true;
     gsapWithCSS.set(slides, { opacity: 0 });
-    gsapWithCSS.set(slides[0], { opacity: 1 });
     if (settings.nav)
       setupNav();
     if (!settings.nav) {
@@ -6681,13 +6690,15 @@
       Observer.create({
         target: slider,
         type: "touch",
-        onLeft: () => goPrev(),
-        onRight: () => goNext()
+        onLeft: () => goNext(),
+        onRight: () => goPrev()
       });
     }
     function slideAction(dir, index) {
       const transitionType = sliderType;
-      gsapSlideOut(count);
+      if (!initialSlide)
+        gsapSlideOut(count);
+      initialSlide = false;
       if (typeof index === "number" && index >= 0 && index < slidesLength) {
         if (index > count) {
           dir = "next";
@@ -6695,7 +6706,6 @@
         if (index < count) {
           dir = "prev";
         }
-        gsapSlideOut(count);
         count = index;
         gsapSlideIn(count);
       } else {
@@ -6722,41 +6732,43 @@
       }
       function gsapSlideIn(i) {
         if (transitionType === "fade") {
-          gsapWithCSS.fromTo(slides[i], { opacity: 0 }, { duration: transitionDuration, opacity: 1 });
+          tl_slideIn.fromTo(slides[i], { opacity: 0 }, { duration: transitionDuration, opacity: 1 });
         } else if (transitionType === "slide") {
           const xPercent = dir === "next" ? 50 : dir === "prev" ? -50 : 0;
-          gsapWithCSS.fromTo(
+          tl_slideIn.fromTo(
             slides[i],
             { opacity: 0, xPercent },
             { duration: transitionDuration, opacity: 1, xPercent: 0, ease: sliderEaseIn }
           );
         } else if (transitionType === "updown") {
           const yPercent = dir === "next" ? 50 : dir === "prev" ? -50 : 0;
-          gsapWithCSS.fromTo(
+          tl_slideIn.fromTo(
             slides[i],
             { opacity: 0, yPercent },
             { duration: transitionDuration, opacity: 1, yPercent: 0, ease: sliderEaseIn }
           );
         }
+        tl_slideIn.timeScale(1).play();
       }
       function gsapSlideOut(i) {
         if (transitionType === "fade") {
-          gsapWithCSS.to(slides[i], { duration: transitionDuration, opacity: 0 });
+          tl_slideOut.to(slides[i], { duration: transitionDuration, opacity: 0 });
         } else if (transitionType === "slide") {
           const xPercent = dir === "next" ? -50 : dir === "prev" ? 50 : 0;
-          gsapWithCSS.fromTo(
+          tl_slideOut.fromTo(
             slides[i],
             { opacity: 1, xPercent: 0 },
             { duration: transitionDuration, opacity: 0, xPercent, ease: sliderEaseOut }
           );
         } else if (transitionType === "updown") {
           const yPercent = dir === "next" ? -50 : dir === "prev" ? 50 : 0;
-          gsapWithCSS.fromTo(
+          tl_slideOut.fromTo(
             slides[i],
             { opacity: 1, yPercent: 0 },
             { duration: transitionDuration, opacity: 0, yPercent, ease: sliderEaseOut }
           );
         }
+        tl_slideOut.timeScale(1).play();
       }
     }
     function checkSlideIndex(count2) {
@@ -6776,25 +6788,31 @@
     function setActiveindicator(index) {
       allIndicators.forEach((indicator, i) => {
         if (i === index) {
-          indicator.firstChild?.setAttribute("hh-background-color", "p");
-          indicator.firstChild?.classList.add("is-active");
+          if (indicator.firstChild instanceof Element) {
+            indicator.firstChild.classList.add("is-active");
+          }
         } else {
-          indicator.firstChild?.removeAttribute("hh-background-color");
-          indicator.firstChild?.classList.remove("is-active");
+          if (indicator.firstChild instanceof Element) {
+            indicator.firstChild.classList.remove("is-active");
+          }
         }
       });
     }
     function goNext() {
-      gsapWithCSS.killTweensOf(slideAction);
-      slideAction("next");
-      if (isPlaying)
-        stopSlider(isPlaying);
+      if (!tl_slideIn.isActive()) {
+        gsapWithCSS.killTweensOf(slideAction);
+        slideAction("next");
+        if (isPlaying)
+          stopSlider(isPlaying);
+      }
     }
     function goPrev() {
-      gsapWithCSS.killTweensOf(slideAction);
-      slideAction("prev");
-      if (isPlaying)
-        stopSlider(isPlaying);
+      if (!tl_slideOut.isActive()) {
+        gsapWithCSS.killTweensOf(slideAction);
+        slideAction("prev");
+        if (isPlaying)
+          stopSlider(isPlaying);
+      }
     }
     function goIndex(i) {
       gsapWithCSS.killTweensOf(slideAction);

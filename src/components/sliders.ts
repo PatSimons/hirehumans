@@ -52,7 +52,7 @@ function parseSliderSettings(slider: HTMLElement): SliderSettings | null {
 // Export Initialize all sliders
 export function initSliders() {
   const sliders = gsap.utils.toArray<HTMLElement>('[cs-el="slider"]');
-  sliders.forEach((slider: any) => {
+  sliders.forEach((slider) => {
     if (slider) {
       initSlider(slider); // Call the function for each slider
     }
@@ -64,8 +64,16 @@ function initSlider(slider: HTMLElement) {
   const slides = slider.querySelectorAll<HTMLElement>('[cs-el="slide"]');
   const slidesLength = slides.length;
 
-  // Abort if there's only one slide.
-  if (slidesLength <= 1) return;
+  // Abort if there are no slides.
+  if (slidesLength === 0) return;
+  // Remove Nav and Indicator and abort if there'e only 1 slide
+  if (slidesLength === 1) {
+    const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+    sliderNav?.remove();
+    const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+    sliderIndicators?.remove();
+    return;
+  }
 
   // Parse the slider settings.
   const settings = parseSliderSettings(slider);
@@ -83,10 +91,13 @@ function initSlider(slider: HTMLElement) {
   let isFirstSlide = false;
   let isLastSlide = false;
   const playDuration = 3000;
+  const tl_slideIn: gsap.core.Timeline = gsap.timeline({ paused: true });
+  const tl_slideOut: gsap.core.Timeline = gsap.timeline({ paused: true });
+  let initialSlide = true;
 
   // Initialize slides.
   gsap.set(slides, { opacity: 0 });
-  gsap.set(slides[0], { opacity: 1 });
+  //gsap.set(slides[0], { opacity: 1 });
 
   if (settings.nav) setupNav();
   if (!settings.nav) {
@@ -195,8 +206,8 @@ function initSlider(slider: HTMLElement) {
     Observer.create({
       target: slider,
       type: 'touch',
-      onLeft: () => goPrev(),
-      onRight: () => goNext(),
+      onLeft: () => goNext(),
+      onRight: () => goPrev(),
     });
   }
 
@@ -206,8 +217,8 @@ function initSlider(slider: HTMLElement) {
     const transitionType = sliderType;
 
     // Fade out current slide
-    gsapSlideOut(count);
-
+    if (!initialSlide) gsapSlideOut(count);
+    initialSlide = false;
     // Go directly to slide index or to next/prev slide
     if (typeof index === 'number' && index >= 0 && index < slidesLength) {
       if (index > count) {
@@ -216,7 +227,7 @@ function initSlider(slider: HTMLElement) {
       if (index < count) {
         dir = 'prev';
       }
-      gsapSlideOut(count);
+      //gsapSlideOut(count);
       count = index;
       gsapSlideIn(count);
     } else {
@@ -249,42 +260,48 @@ function initSlider(slider: HTMLElement) {
     // Do the actual slide animations In and Out
     function gsapSlideIn(i: number) {
       if (transitionType === 'fade') {
-        gsap.fromTo(slides[i], { opacity: 0 }, { duration: transitionDuration, opacity: 1 });
+        tl_slideIn.fromTo(slides[i], { opacity: 0 }, { duration: transitionDuration, opacity: 1 });
       } else if (transitionType === 'slide') {
         const xPercent = dir === 'next' ? 50 : dir === 'prev' ? -50 : 0;
-        gsap.fromTo(
+        tl_slideIn.fromTo(
           slides[i],
           { opacity: 0, xPercent },
           { duration: transitionDuration, opacity: 1, xPercent: 0, ease: sliderEaseIn }
         );
       } else if (transitionType === 'updown') {
         const yPercent = dir === 'next' ? 50 : dir === 'prev' ? -50 : 0;
-        gsap.fromTo(
+        tl_slideIn.fromTo(
           slides[i],
           { opacity: 0, yPercent },
           { duration: transitionDuration, opacity: 1, yPercent: 0, ease: sliderEaseIn }
         );
       }
+      //if (!tl_slideIn.isActive()) {
+      tl_slideIn.timeScale(1).play();
+      //}
     }
 
     function gsapSlideOut(i: number) {
       if (transitionType === 'fade') {
-        gsap.to(slides[i], { duration: transitionDuration, opacity: 0 });
+        tl_slideOut.to(slides[i], { duration: transitionDuration, opacity: 0 });
       } else if (transitionType === 'slide') {
         const xPercent = dir === 'next' ? -50 : dir === 'prev' ? 50 : 0;
-        gsap.fromTo(
+        tl_slideOut.fromTo(
           slides[i],
           { opacity: 1, xPercent: 0 },
           { duration: transitionDuration, opacity: 0, xPercent, ease: sliderEaseOut }
         );
       } else if (transitionType === 'updown') {
         const yPercent = dir === 'next' ? -50 : dir === 'prev' ? 50 : 0;
-        gsap.fromTo(
+        tl_slideOut.fromTo(
           slides[i],
           { opacity: 1, yPercent: 0 },
           { duration: transitionDuration, opacity: 0, yPercent, ease: sliderEaseOut }
         );
       }
+      //if (!tl_slideOut.isActive()) {
+      tl_slideOut.timeScale(1).play();
+      //}
     }
   } // End: function Slide Action
 
@@ -310,25 +327,31 @@ function initSlider(slider: HTMLElement) {
   function setActiveindicator(index: number) {
     allIndicators.forEach((indicator: HTMLElement, i) => {
       if (i === index) {
-        indicator.firstChild?.setAttribute('hh-background-color', 'p');
-        indicator.firstChild?.classList.add('is-active');
+        if (indicator.firstChild instanceof Element) {
+          indicator.firstChild.classList.add('is-active');
+        }
       } else {
-        indicator.firstChild?.removeAttribute('hh-background-color');
-        indicator.firstChild?.classList.remove('is-active');
+        if (indicator.firstChild instanceof Element) {
+          indicator.firstChild.classList.remove('is-active');
+        }
       }
     });
   }
   //// Function to go next slide
   function goNext() {
-    gsap.killTweensOf(slideAction);
-    slideAction('next');
-    if (isPlaying) stopSlider(isPlaying);
+    if (!tl_slideIn.isActive()) {
+      gsap.killTweensOf(slideAction);
+      slideAction('next');
+      if (isPlaying) stopSlider(isPlaying);
+    }
   }
   //// Function to go previous slide
   function goPrev() {
-    gsap.killTweensOf(slideAction);
-    slideAction('prev');
-    if (isPlaying) stopSlider(isPlaying);
+    if (!tl_slideOut.isActive()) {
+      gsap.killTweensOf(slideAction);
+      slideAction('prev');
+      if (isPlaying) stopSlider(isPlaying);
+    }
   }
   //// Function to go to slide Index
   function goIndex(i: number) {
