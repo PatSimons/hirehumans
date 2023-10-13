@@ -1,8 +1,20 @@
-// * sliders.ts */
+// * COMPONENTS > SLIDERS */
 
 /* DATA ATTRIBUTES:
-slider-type="fade (default) | slide | updown" 
-slider-settings="nav, indicators, swipe, loop, togglecontrols, isPlaying"
+[cs-el="slider"]
+  [cs-el="slide"]
+  [cs-el="slide"]
+  ...
+
+[cs-el="slider-nav"]
+  [cs-el="slider-nav_prev"]
+  [cs-el="slider-nav_next"]
+
+[cs-el="slider-indicators"]
+  [cs-el="slider-indicator"]
+
+[slider-type="fade (default) | slide | updown"]
+[slider-settings="nav, indicators, swipe, loop, togglecontrols, isPlaying"]
 
 /*  HTML MARK-UP:
 
@@ -61,7 +73,7 @@ export function initSliders() {
 
 // Init Slider
 function initSlider(slider: HTMLElement) {
-  const slides = slider.querySelectorAll<HTMLElement>('[cs-el="slide"]');
+  const slides: NodeListOf<HTMLElement> = slider.querySelectorAll<HTMLElement>('[cs-el="slide"]');
   const slidesLength = slides.length;
 
   // Abort if there are no slides.
@@ -95,9 +107,28 @@ function initSlider(slider: HTMLElement) {
   const tl_slideOut: gsap.core.Timeline = gsap.timeline({ paused: true });
   let initialSlide = true;
 
-  // Initialize slides.
+  // Initialise slides.
   gsap.set(slides, { opacity: 0 });
   //gsap.set(slides[0], { opacity: 1 });
+
+  // Initialise all Prev/Next listeners
+  function initAllPrevNextButtons() {
+    const allNextButtons: NodeListOf<HTMLElement> =
+      slider.querySelectorAll('[cs-el="slider-next"]');
+    const allPrevButtons: NodeListOf<HTMLElement> =
+      slider.querySelectorAll('[cs-el="slider-prev"]');
+    if (allNextButtons.length > 0) {
+      allNextButtons.forEach((el: HTMLElement) => {
+        el.addEventListener('click', goNext);
+      });
+    }
+    if (allPrevButtons.length > 0) {
+      allPrevButtons.forEach((el: HTMLElement) => {
+        el.addEventListener('click', goPrev);
+      });
+    }
+  }
+  initAllPrevNextButtons();
 
   if (settings.nav) setupNav();
   if (!settings.nav) {
@@ -118,11 +149,16 @@ function initSlider(slider: HTMLElement) {
 
   // Function to set up next/prev navigation.
   function setupNav() {
-    const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+    const sliderNav = slider.querySelector<HTMLElement>('[cs-el="slider-nav"]');
     if (!sliderNav) return;
 
     next = sliderNav.querySelector<HTMLElement>('[cs-el="slider-nav_next"]');
     prev = sliderNav.querySelector<HTMLElement>('[cs-el="slider-nav_prev"]');
+
+    // Set CSS pointer-events
+    sliderNav.style.pointerEvents = 'none';
+    next.style.pointerEvents = 'auto';
+    prev.style.pointerEvents = 'auto';
 
     navAddEventListeners(null);
   }
@@ -206,6 +242,7 @@ function initSlider(slider: HTMLElement) {
     Observer.create({
       target: slider,
       type: 'touch',
+      dragMinimum: 400,
       onLeft: () => goNext(),
       onRight: () => goPrev(),
     });
@@ -276,9 +313,9 @@ function initSlider(slider: HTMLElement) {
           { duration: transitionDuration, opacity: 1, yPercent: 0, ease: sliderEaseIn }
         );
       }
-      //if (!tl_slideIn.isActive()) {
+      gsap.set(slides, { zIndex: 1 });
+      slides[i].style.zIndex = '2';
       tl_slideIn.timeScale(1).play();
-      //}
     }
 
     function gsapSlideOut(i: number) {
@@ -299,9 +336,10 @@ function initSlider(slider: HTMLElement) {
           { duration: transitionDuration, opacity: 0, yPercent, ease: sliderEaseOut }
         );
       }
-      //if (!tl_slideOut.isActive()) {
+      gsap.set(slides, { zIndex: 1 });
+      slides[i].style.zIndex = '2';
+
       tl_slideOut.timeScale(1).play();
-      //}
     }
   } // End: function Slide Action
 

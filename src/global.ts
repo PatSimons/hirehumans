@@ -1,10 +1,10 @@
 import { gsap } from 'gsap';
-//import { Draggable } from 'gsap/Draggable';
+import { Draggable } from 'gsap/Draggable';
 //import { Observer } from 'gsap/Observer';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 //gsap.registerPlugin(Observer);
-//gsap.registerPlugin(Draggable);
+gsap.registerPlugin(Draggable);
 
 import { initSliders } from 'src/components/sliders';
 
@@ -122,6 +122,15 @@ window.Webflow.push(() => {
             stagger: 0.25,
           });
         }
+        // Draggable elements
+        const draggableElms = gsap.utils.toArray('[cs-tr="draggable"]');
+        if (draggableElms.length > 0) {
+          console.log(draggableElms.length);
+          draggableElms.forEach((el: any) => {
+            Draggable.create(el, { type: 'x,y' });
+          });
+        }
+
         // Scrolltrigger elements On Enter Viewport
         // const scrolltriggerOnEnterElms = gsap.utils.toArray('[cs-tr="scroll"]');
         // if (scrolltriggerOnEnterElms.length > 0) {
