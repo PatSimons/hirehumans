@@ -6872,6 +6872,10 @@
   };
   _getGSAP3() && gsap3.registerPlugin(Observer);
 
+  // src/utils/globalvars.ts
+  var gsapEaseType = "back.out";
+  var gsapDuration = 0.75;
+
   // src/profileadmin.ts
   gsapWithCSS.registerPlugin(Observer);
   gsapWithCSS.registerPlugin(Draggable);
@@ -6987,6 +6991,66 @@
         if (drag) {
           Draggable.create(drag, {});
         }
+        const editables = gsapWithCSS.utils.toArray('[cs-el="hha_editable"]');
+        editables.forEach((el) => {
+          const tl_hoverEditable = gsapWithCSS.timeline({ paused: true });
+          const tl_openCopyAsist = gsapWithCSS.timeline({ paused: true });
+          const hoverWrap = el.querySelector('[cs-el="hha_editable-hover"]');
+          const openCopyAsist = el.querySelector('[cs-el="open-asist"]');
+          const closeCopyAsist = el.querySelectorAll('[cs-el="close-asist"]');
+          const copyAsist = el.querySelector('[cs-el="asist"]');
+          let isOpen = false;
+          gsapWithCSS.set(hoverWrap, { opacity: 0, scale: 1.03 });
+          gsapWithCSS.set(copyAsist, { autoAlpha: 0, scale: 1 });
+          gsapWithCSS.set(openCopyAsist, { color: "#C3bdb7" });
+          tl_hoverEditable.to(hoverWrap, {
+            opacity: 1,
+            scale: 1,
+            duration: gsapDuration,
+            ease: gsapEaseType
+          });
+          tl_openCopyAsist.to(copyAsist, {
+            autoAlpha: 1,
+            scale: 1,
+            duration: gsapDuration,
+            ease: gsapEaseType
+          });
+          tl_openCopyAsist.to(
+            openCopyAsist,
+            {
+              color: "#70c278",
+              duration: gsapDuration,
+              ease: gsapEaseType
+            },
+            "<"
+          );
+          el.addEventListener("mouseenter", () => {
+            tl_hoverEditable.timeScale(1).play();
+          });
+          el.addEventListener("mouseleave", () => {
+            if (!isOpen) {
+              tl_hoverEditable.timeScale(2).reverse();
+            }
+          });
+          openCopyAsist.addEventListener("click", () => {
+            tl_openCopyAsist.timeScale(1).play();
+            isOpen = true;
+          });
+          closeCopyAsist.forEach((el2) => {
+            el2.addEventListener("click", () => {
+              tl_openCopyAsist.timeScale(2).reverse();
+              isOpen = false;
+            });
+          });
+          document.addEventListener("click", (event) => {
+            if (!el.contains(event.target)) {
+              tl_hoverEditable.timeScale(2).reverse();
+              if (isOpen) {
+                tl_openCopyAsist.timeScale(2).reverse();
+              }
+            }
+          });
+        });
         function init4() {
         }
         window.addEventListener("resize", () => {

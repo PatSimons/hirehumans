@@ -8770,6 +8770,8 @@
     const tl_slideIn = gsapWithCSS.timeline({ paused: true });
     const tl_slideOut = gsapWithCSS.timeline({ paused: true });
     let initialSlide = true;
+    const allowNext = true;
+    const allowPrev = true;
     gsapWithCSS.set(slides, { opacity: 0 });
     function initAllPrevNextButtons() {
       const allNextButtons = slider.querySelectorAll('[cs-el="slider-next"]');
@@ -8882,23 +8884,21 @@
       Observer.create({
         target: slider,
         type: "touch",
-        dragMinimum: 400,
+        dragMinimum: 200,
         onLeft: () => goNext(),
         onRight: () => goPrev()
       });
     }
     function slideAction(dir, index) {
+      if (index > count && !allowNext)
+        return;
+      if (index < count && !allowPrev)
+        return;
       const transitionType = sliderType;
       if (!initialSlide)
         gsapSlideOut(count);
       initialSlide = false;
       if (typeof index === "number" && index >= 0 && index < slidesLength) {
-        if (index > count) {
-          dir = "next";
-        }
-        if (index < count) {
-          dir = "prev";
-        }
         count = index;
         gsapSlideIn(count);
       } else {
@@ -8996,7 +8996,7 @@
       });
     }
     function goNext() {
-      if (!tl_slideIn.isActive()) {
+      if (!tl_slideIn.isActive() && allowNext) {
         gsapWithCSS.killTweensOf(slideAction);
         slideAction("next");
         if (isPlaying)
@@ -9004,7 +9004,7 @@
       }
     }
     function goPrev() {
-      if (!tl_slideOut.isActive()) {
+      if (!tl_slideOut.isActive() && allowPrev) {
         gsapWithCSS.killTweensOf(slideAction);
         slideAction("prev");
         if (isPlaying)

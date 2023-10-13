@@ -1,6 +1,8 @@
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { Observer } from 'gsap/Observer';
+
+import { gsapDuration, gsapEaseType } from '$utils/globalvars';
 gsap.registerPlugin(Observer);
 gsap.registerPlugin(Draggable);
 
@@ -163,6 +165,69 @@ window.Webflow.push(() => {
         Draggable.create(drag, {});
       }
       // End: HHA Draggable test
+
+      const editables = gsap.utils.toArray('[cs-el="hha_editable"]');
+      editables.forEach((el: any) => {
+        const tl_hoverEditable = gsap.timeline({ paused: true });
+        const tl_openCopyAsist = gsap.timeline({ paused: true });
+        const hoverWrap = el.querySelector('[cs-el="hha_editable-hover"]');
+        const openCopyAsist = el.querySelector('[cs-el="open-asist"]');
+        const closeCopyAsist = el.querySelectorAll('[cs-el="close-asist"]');
+        const copyAsist = el.querySelector('[cs-el="asist"]');
+        let isOpen = false;
+
+        gsap.set(hoverWrap, { opacity: 0, scale: 1.03 });
+        gsap.set(copyAsist, { autoAlpha: 0, scale: 1 });
+        gsap.set(openCopyAsist, { color: '#C3bdb7' });
+        tl_hoverEditable.to(hoverWrap, {
+          opacity: 1,
+          scale: 1,
+          duration: gsapDuration,
+          ease: gsapEaseType,
+        });
+        tl_openCopyAsist.to(copyAsist, {
+          autoAlpha: 1,
+          scale: 1,
+          duration: gsapDuration,
+          ease: gsapEaseType,
+        });
+        tl_openCopyAsist.to(
+          openCopyAsist,
+          {
+            color: '#70c278',
+            duration: gsapDuration,
+            ease: gsapEaseType,
+          },
+          '<'
+        );
+
+        el.addEventListener('mouseenter', () => {
+          tl_hoverEditable.timeScale(1).play();
+        });
+        el.addEventListener('mouseleave', () => {
+          if (!isOpen) {
+            tl_hoverEditable.timeScale(2).reverse();
+          }
+        });
+        openCopyAsist.addEventListener('click', () => {
+          tl_openCopyAsist.timeScale(1).play();
+          isOpen = true;
+        });
+        closeCopyAsist.forEach((el: any) => {
+          el.addEventListener('click', () => {
+            tl_openCopyAsist.timeScale(2).reverse();
+            isOpen = false;
+          });
+        });
+        document.addEventListener('click', (event) => {
+          if (!el.contains(event.target)) {
+            tl_hoverEditable.timeScale(2).reverse();
+            if (isOpen) {
+              tl_openCopyAsist.timeScale(2).reverse();
+            }
+          }
+        });
+      });
 
       function init() {} // End: function init()
 

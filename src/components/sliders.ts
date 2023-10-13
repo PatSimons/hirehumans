@@ -106,6 +106,8 @@ function initSlider(slider: HTMLElement) {
   const tl_slideIn: gsap.core.Timeline = gsap.timeline({ paused: true });
   const tl_slideOut: gsap.core.Timeline = gsap.timeline({ paused: true });
   let initialSlide = true;
+  const allowNext = true;
+  const allowPrev = true;
 
   // Initialise slides.
   gsap.set(slides, { opacity: 0 });
@@ -242,7 +244,7 @@ function initSlider(slider: HTMLElement) {
     Observer.create({
       target: slider,
       type: 'touch',
-      dragMinimum: 400,
+      dragMinimum: 200,
       onLeft: () => goNext(),
       onRight: () => goPrev(),
     });
@@ -250,22 +252,28 @@ function initSlider(slider: HTMLElement) {
 
   //// Function to handle slider transitions.
   function slideAction(dir: 'next' | 'prev' | null, index?: number | null) {
+    // Disallow Prev/Next condition
+    if (index > count && !allowNext) return;
+    if (index < count && !allowPrev) return;
+
     // Set slider Type
     const transitionType = sliderType;
 
-    // Fade out current slide
+    // Fade out current slide, only if not initial slide
     if (!initialSlide) gsapSlideOut(count);
     initialSlide = false;
+
     // Go directly to slide index or to next/prev slide
     if (typeof index === 'number' && index >= 0 && index < slidesLength) {
-      if (index > count) {
-        dir = 'next';
-      }
-      if (index < count) {
-        dir = 'prev';
-      }
+      // if (index > count) {
+      //   dir = 'next';
+      // }
+      // if (index < count) {
+      //   dir = 'prev';
+      // }
       //gsapSlideOut(count);
       count = index;
+
       gsapSlideIn(count);
     } else {
       if (dir === 'next') {
@@ -377,7 +385,7 @@ function initSlider(slider: HTMLElement) {
   }
   //// Function to go next slide
   function goNext() {
-    if (!tl_slideIn.isActive()) {
+    if (!tl_slideIn.isActive() && allowNext) {
       gsap.killTweensOf(slideAction);
       slideAction('next');
       if (isPlaying) stopSlider(isPlaying);
@@ -385,7 +393,7 @@ function initSlider(slider: HTMLElement) {
   }
   //// Function to go previous slide
   function goPrev() {
-    if (!tl_slideOut.isActive()) {
+    if (!tl_slideOut.isActive() && allowPrev) {
       gsap.killTweensOf(slideAction);
       slideAction('prev');
       if (isPlaying) stopSlider(isPlaying);
