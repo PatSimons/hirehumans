@@ -37,12 +37,12 @@ window.Webflow.push(() => {
       ///////////////////// Development Only
 
       // DEV: Check for wider DOM elements
-      const docWidth = document.documentElement.offsetWidth;
-      [].forEach.call(document.querySelectorAll('*'), function (el: HTMLElement) {
-        if (el.offsetWidth > docWidth) {
-          console.log(el);
-        }
-      }); // End: DEV: Check for wider DOM elements
+      // const docWidth = document.documentElement.offsetWidth;
+      // [].forEach.call(document.querySelectorAll('*'), function (el: HTMLElement) {
+      //   if (el.offsetWidth > docWidth) {
+      //     console.log(el);
+      //   }
+      // }); // End: DEV: Check for wider DOM elements
 
       ///////////////////// End: Development Only
 
@@ -83,7 +83,7 @@ window.Webflow.push(() => {
 
       //// Login Modal
       const loginModal = gsap.utils.toArray('[cs-el="login-modal"]');
-      if (loginModal) {
+      if (loginModal.length > 0) {
         gsap.set(loginModal, { autoAlpha: 0 });
         let isOpen = false;
         const body = document.querySelector('body');
@@ -125,7 +125,7 @@ window.Webflow.push(() => {
         // Draggable elements
         const draggableElms = gsap.utils.toArray('[cs-tr="draggable"]');
         if (draggableElms.length > 0) {
-          console.log(draggableElms.length);
+          //console.log(draggableElms.length);
           draggableElms.forEach((el: any) => {
             Draggable.create(el, { type: 'x,y' });
           });

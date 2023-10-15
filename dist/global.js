@@ -8729,7 +8729,8 @@
       loop: settingsArray.includes("loop"),
       swipe: settingsArray.includes("swipe"),
       autoplay: settingsArray.includes("autoplay"),
-      togglecontrols: settingsArray.includes("togglecontrols")
+      togglecontrols: settingsArray.includes("togglecontrols"),
+      hascover: settingsArray.includes("hascover")
     };
   }
   function initSliders() {
@@ -8758,7 +8759,7 @@
     let sliderType = slider.getAttribute("slider-type");
     if (!sliderType)
       sliderType = "fade";
-    let count = 0;
+    let count;
     const transitionDuration = 0.5;
     const sliderEaseIn = "power2.out";
     const sliderEaseOut = "power2.out";
@@ -8772,6 +8773,7 @@
     let initialSlide = true;
     const allowNext = true;
     const allowPrev = true;
+    const tl_toggleControls = gsapWithCSS.timeline({ paused: true });
     gsapWithCSS.set(slides, { opacity: 0 });
     function initAllPrevNextButtons() {
       const allNextButtons = slider.querySelectorAll('[cs-el="slider-next"]');
@@ -8850,35 +8852,36 @@
       return indicatorsArray;
     }
     function setupToggleControls() {
-      const tl_toggleControls = gsapWithCSS.timeline({ paused: true });
       tl_toggleControls.from(next, {
-        opacity: 0,
+        autoAlpha: 0,
         duration: gsapDuration,
         ease: gsapEaseType,
         x: "-100%"
       });
       tl_toggleControls.from(
         prev,
-        { opacity: 0, duration: gsapDuration, ease: gsapEaseType, x: "100%" },
+        { autoAlpha: 0, duration: gsapDuration, ease: gsapEaseType, x: "100%" },
         "<"
       );
       const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
       tl_toggleControls.from(
         sliderIndicators,
         {
-          opacity: 0,
+          autoAlpha: 0,
           delay: 0.25,
           duration: gsapDuration,
           ease: gsapEaseType
         },
         "<"
       );
-      slider.addEventListener("mouseenter", () => {
-        tl_toggleControls.timeScale(1).play();
-      });
-      slider.addEventListener("mouseleave", () => {
-        tl_toggleControls.timeScale(2).reverse();
-      });
+      slider.addEventListener("mouseenter", aL_mouseEnter);
+      slider.addEventListener("mouseleave", aL_mouseLeave);
+    }
+    function aL_mouseEnter() {
+      tl_toggleControls.timeScale(1).play();
+    }
+    function aL_mouseLeave() {
+      tl_toggleControls.timeScale(2).reverse();
     }
     function setupSwipe() {
       Observer.create({
@@ -8890,15 +8893,21 @@
       });
     }
     function slideAction(dir, index) {
-      if (index > count && !allowNext)
+      if (index && index > count && !allowNext)
         return;
-      if (index < count && !allowPrev)
+      if (index && index < count && !allowPrev)
         return;
       const transitionType = sliderType;
       if (!initialSlide)
         gsapSlideOut(count);
       initialSlide = false;
       if (typeof index === "number" && index >= 0 && index < slidesLength) {
+        if (count > index) {
+          dir = "prev";
+        }
+        if (count < index) {
+          dir = "next";
+        }
         count = index;
         gsapSlideIn(count);
       } else {
@@ -9035,7 +9044,37 @@
         prev?.removeEventListener("click", goPrev);
       }
     }
-    slideAction(null, 0);
+    function setCover() {
+      console.log("hascover");
+      const cover = slider.querySelector('[cs-el="slider-cover"]');
+      if (!cover)
+        slideAction(null, 0);
+      if (settings?.nav) {
+        const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
+        if (!sliderNav)
+          return;
+        gsapWithCSS.set(sliderNav, { autoAlpha: 0 });
+      }
+      if (settings?.indicators) {
+        const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+        if (!sliderIndicators)
+          return;
+        gsapWithCSS.set(sliderIndicators, { autoAlpha: 0 });
+      }
+      if (settings?.togglecontrols) {
+        slider.removeEventListener("mouseenter", aL_mouseEnter);
+        slider.removeEventListener("mouseleave", aL_mouseLeave);
+      }
+    }
+    function firstSlide() {
+      slideAction(null, 0);
+    }
+    settings.hascover = true;
+    if (!settings.hascover) {
+      slideAction(null, 0);
+    } else {
+      setCover();
+    }
   }
 
   // src/utils/colors.ts
@@ -9068,19 +9107,13 @@
       },
       (context3) => {
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
-        const docWidth = document.documentElement.offsetWidth;
-        [].forEach.call(document.querySelectorAll("*"), function(el) {
-          if (el.offsetWidth > docWidth) {
-            console.log(el);
-          }
-        });
         const logo = document.querySelector('[cs-el="logo"]');
         if (logo) {
           const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
           setInterval(() => loopLogoLetters(logoLetters), 1e3);
         }
         const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
-        if (loginModal) {
+        if (loginModal.length > 0) {
           gsapWithCSS.set(loginModal, { autoAlpha: 0 });
           let isOpen = false;
           const body = document.querySelector("body");
@@ -9116,7 +9149,6 @@
           }
           const draggableElms = gsapWithCSS.utils.toArray('[cs-tr="draggable"]');
           if (draggableElms.length > 0) {
-            console.log(draggableElms.length);
             draggableElms.forEach((el) => {
               Draggable.create(el, { type: "x,y" });
             });

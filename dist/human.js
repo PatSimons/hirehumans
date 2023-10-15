@@ -8792,7 +8792,6 @@
         }
         function initSliders() {
           const sliders = gsapWithCSS.utils.toArray('[cs-el="slider"]');
-          console.log(sliders.length);
           sliders.forEach((slider) => {
             if (slider) {
               let navEnabled = false;

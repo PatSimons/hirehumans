@@ -112,7 +112,7 @@ window.Webflow.push(() => {
       */
       function initSliders() {
         const sliders = gsap.utils.toArray<HTMLElement>('[cs-el="slider"]');
-        console.log(sliders.length);
+        //console.log(sliders.length);
         sliders.forEach((slider: any) => {
           if (slider) {
             let navEnabled = false;

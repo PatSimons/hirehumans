@@ -44,6 +44,7 @@ interface SliderSettings {
   loop: boolean;
   togglecontrols: boolean;
   autoplay: boolean;
+  hascover: boolean;
 }
 // Function to parse slider settings from a data attribute.
 function parseSliderSettings(slider: HTMLElement): SliderSettings | null {
@@ -59,6 +60,7 @@ function parseSliderSettings(slider: HTMLElement): SliderSettings | null {
     swipe: settingsArray.includes('swipe'),
     autoplay: settingsArray.includes('autoplay'),
     togglecontrols: settingsArray.includes('togglecontrols'),
+    hascover: settingsArray.includes('hascover'),
   };
 }
 // Export Initialize all sliders
@@ -71,7 +73,7 @@ export function initSliders() {
   });
 } // End: Initialize all sliders
 
-// Init Slider
+// Init each Slider
 function initSlider(slider: HTMLElement) {
   const slides: NodeListOf<HTMLElement> = slider.querySelectorAll<HTMLElement>('[cs-el="slide"]');
   const slidesLength = slides.length;
@@ -94,7 +96,7 @@ function initSlider(slider: HTMLElement) {
   let sliderType = slider.getAttribute('slider-type');
   if (!sliderType) sliderType = 'fade';
 
-  let count = 0;
+  let count: number;
   const transitionDuration = 0.5;
   const sliderEaseIn = 'power2.out';
   const sliderEaseOut = 'power2.out';
@@ -108,12 +110,12 @@ function initSlider(slider: HTMLElement) {
   let initialSlide = true;
   const allowNext = true;
   const allowPrev = true;
+  const tl_toggleControls = gsap.timeline({ paused: true });
 
-  // Initialise slides.
+  // Set opacity 0 all slides.
   gsap.set(slides, { opacity: 0 });
-  //gsap.set(slides[0], { opacity: 1 });
 
-  // Initialise all Prev/Next listeners
+  // Initialise all Prev/Next listeners ([cs-el="slider-next"] / [cs-el="slider-prev"])
   function initAllPrevNextButtons() {
     const allNextButtons: NodeListOf<HTMLElement> =
       slider.querySelectorAll('[cs-el="slider-next"]');
@@ -208,35 +210,37 @@ function initSlider(slider: HTMLElement) {
 
   // setup toggleControls
   function setupToggleControls() {
-    const tl_toggleControls = gsap.timeline({ paused: true });
     tl_toggleControls.from(next, {
-      opacity: 0,
+      autoAlpha: 0,
       duration: gsapDuration,
       ease: gsapEaseType,
       x: '-100%',
     });
     tl_toggleControls.from(
       prev,
-      { opacity: 0, duration: gsapDuration, ease: gsapEaseType, x: '100%' },
+      { autoAlpha: 0, duration: gsapDuration, ease: gsapEaseType, x: '100%' },
       '<'
     );
     const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
     tl_toggleControls.from(
       sliderIndicators,
       {
-        opacity: 0,
+        autoAlpha: 0,
         delay: 0.25,
         duration: gsapDuration,
         ease: gsapEaseType,
       },
       '<'
     );
-    slider.addEventListener('mouseenter', () => {
-      tl_toggleControls.timeScale(1).play();
-    });
-    slider.addEventListener('mouseleave', () => {
-      tl_toggleControls.timeScale(2).reverse();
-    });
+    slider.addEventListener('mouseenter', aL_mouseEnter);
+    slider.addEventListener('mouseleave', aL_mouseLeave);
+  }
+
+  function aL_mouseEnter() {
+    tl_toggleControls.timeScale(1).play();
+  }
+  function aL_mouseLeave() {
+    tl_toggleControls.timeScale(2).reverse();
   }
 
   // Function to set up swipe navigation.
@@ -253,8 +257,8 @@ function initSlider(slider: HTMLElement) {
   //// Function to handle slider transitions.
   function slideAction(dir: 'next' | 'prev' | null, index?: number | null) {
     // Disallow Prev/Next condition
-    if (index > count && !allowNext) return;
-    if (index < count && !allowPrev) return;
+    if (index && index > count && !allowNext) return;
+    if (index && index < count && !allowPrev) return;
 
     // Set slider Type
     const transitionType = sliderType;
@@ -265,15 +269,14 @@ function initSlider(slider: HTMLElement) {
 
     // Go directly to slide index or to next/prev slide
     if (typeof index === 'number' && index >= 0 && index < slidesLength) {
-      // if (index > count) {
-      //   dir = 'next';
-      // }
-      // if (index < count) {
-      //   dir = 'prev';
-      // }
-      //gsapSlideOut(count);
+      // Determine direction
+      if (count > index) {
+        dir = 'prev';
+      }
+      if (count < index) {
+        dir = 'next';
+      }
       count = index;
-
       gsapSlideIn(count);
     } else {
       if (dir === 'next') {
@@ -321,6 +324,7 @@ function initSlider(slider: HTMLElement) {
           { duration: transitionDuration, opacity: 1, yPercent: 0, ease: sliderEaseIn }
         );
       }
+
       gsap.set(slides, { zIndex: 1 });
       slides[i].style.zIndex = '2';
       tl_slideIn.timeScale(1).play();
@@ -383,6 +387,7 @@ function initSlider(slider: HTMLElement) {
       }
     });
   }
+
   //// Function to go next slide
   function goNext() {
     if (!tl_slideIn.isActive() && allowNext) {
@@ -391,6 +396,7 @@ function initSlider(slider: HTMLElement) {
       if (isPlaying) stopSlider(isPlaying);
     }
   }
+
   //// Function to go previous slide
   function goPrev() {
     if (!tl_slideOut.isActive() && allowPrev) {
@@ -399,6 +405,7 @@ function initSlider(slider: HTMLElement) {
       if (isPlaying) stopSlider(isPlaying);
     }
   }
+
   //// Function to go to slide Index
   function goIndex(i: number) {
     gsap.killTweensOf(slideAction);
@@ -427,8 +434,39 @@ function initSlider(slider: HTMLElement) {
       prev?.removeEventListener('click', goPrev);
     }
   }
-  // Make initial slide to first slide
-  slideAction(null, 0);
+
+  //// function setCover
+  function setCover() {
+    console.log('hascover');
+    const cover = slider.querySelector<HTMLElement>('[cs-el="slider-cover"]');
+    if (!cover) slideAction(null, 0);
+    if (settings?.nav) {
+      const sliderNav = slider.querySelector<HTMLElement>('[cs-el="slider-nav"]');
+      if (!sliderNav) return;
+      gsap.set(sliderNav, { autoAlpha: 0 });
+    }
+    if (settings?.indicators) {
+      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+      if (!sliderIndicators) return;
+      gsap.set(sliderIndicators, { autoAlpha: 0 });
+    }
+    if (settings?.togglecontrols) {
+      slider.removeEventListener('mouseenter', aL_mouseEnter);
+      slider.removeEventListener('mouseleave', aL_mouseLeave);
+    }
+  }
+  //// Set initial slide
+  function firstSlide() {
+    slideAction(null, 0);
+  }
+  settings.hascover = true;
+
+  //// Call initial slide
+  if (!settings.hascover) {
+    slideAction(null, 0);
+  } else {
+    setCover();
+  }
 } // End: initSlider
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
