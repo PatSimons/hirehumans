@@ -8718,21 +8718,6 @@
 
   // src/components/sliders.ts
   gsapWithCSS.registerPlugin(Observer);
-  function parseSliderSettings(slider) {
-    const sliderSettings = slider.getAttribute("slider-settings");
-    if (!sliderSettings)
-      return null;
-    const settingsArray = sliderSettings.split(", ");
-    return {
-      nav: settingsArray.includes("nav"),
-      indicators: settingsArray.includes("indicators"),
-      loop: settingsArray.includes("loop"),
-      swipe: settingsArray.includes("swipe"),
-      autoplay: settingsArray.includes("autoplay"),
-      togglecontrols: settingsArray.includes("togglecontrols"),
-      hascover: settingsArray.includes("hascover")
-    };
-  }
   function initSliders() {
     const sliders = gsapWithCSS.utils.toArray('[cs-el="slider"]');
     sliders.forEach((slider) => {
@@ -8747,15 +8732,17 @@
     if (slidesLength === 0)
       return;
     if (slidesLength === 1) {
-      const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-      sliderNav?.remove();
-      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
-      sliderIndicators?.remove();
+      removeElementsByAttribute("slider-nav");
+      removeElementsByAttribute("slider-indicators");
+      removeElementsByAttribute("slider-cover");
       return;
     }
-    const settings = parseSliderSettings(slider);
-    if (!settings)
-      return;
+    function removeElementsByAttribute(attributeValue) {
+      const elements = document.querySelectorAll(`[cs-el="${attributeValue}"]`);
+      elements.forEach((element) => {
+        element.remove();
+      });
+    }
     let sliderType = slider.getAttribute("slider-type");
     if (!sliderType)
       sliderType = "fade";
@@ -8774,6 +8761,30 @@
     const allowNext = true;
     const allowPrev = true;
     const tl_toggleControls = gsapWithCSS.timeline({ paused: true });
+    const nav = slider.querySelector('[cs-el="slider-nav"]');
+    if (nav)
+      setupNav(nav);
+    const indicators = slider.querySelector('[cs-el="slider-indicators"]');
+    let allIndicators = [];
+    if (indicators)
+      allIndicators = setupIndicators();
+    const cover = slider.querySelector('[cs-el="slider-cover"]');
+    const getLoop = slider.getAttribute("slider-loop");
+    let loop = false;
+    if (getLoop === "loop") {
+      loop = true;
+    }
+    const GetToggleControls = slider.getAttribute("slider-controls");
+    let toggleControls = false;
+    if (GetToggleControls === "toggle") {
+      toggleControls = true;
+      setupToggleControls();
+    }
+    const getAutoPlay = slider.getAttribute("slider-autoplay");
+    let isPlaying;
+    if (getAutoPlay === "play") {
+      playSlider();
+    }
     gsapWithCSS.set(slides, { opacity: 0 });
     function initAllPrevNextButtons() {
       const allNextButtons = slider.querySelectorAll('[cs-el="slider-next"]');
@@ -8790,35 +8801,14 @@
       }
     }
     initAllPrevNextButtons();
-    if (settings.nav)
-      setupNav();
-    if (!settings.nav) {
-      const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-      sliderNav?.remove();
-    }
-    if (settings.swipe)
-      setupSwipe();
-    let isPlaying;
-    if (settings.autoplay)
-      playSlider();
-    if (settings.togglecontrols)
-      setupToggleControls();
-    let allIndicators = [];
-    if (settings.indicators)
-      allIndicators = setupIndicators();
-    if (!settings.indicators) {
-      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
-      sliderIndicators?.remove();
-    }
-    function setupNav() {
-      const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-      if (!sliderNav)
-        return;
-      next = sliderNav.querySelector('[cs-el="slider-nav_next"]');
-      prev = sliderNav.querySelector('[cs-el="slider-nav_prev"]');
-      sliderNav.style.pointerEvents = "none";
-      next.style.pointerEvents = "auto";
-      prev.style.pointerEvents = "auto";
+    function setupNav(nav2) {
+      next = nav2.querySelector('[cs-el="slider-nav_next"]');
+      prev = nav2.querySelector('[cs-el="slider-nav_prev"]');
+      nav2.style.pointerEvents = "none";
+      if (next)
+        next.style.pointerEvents = "auto";
+      if (prev)
+        prev.style.pointerEvents = "auto";
       navAddEventListeners(null);
     }
     function playSlider() {
@@ -8874,8 +8864,10 @@
         },
         "<"
       );
-      slider.addEventListener("mouseenter", aL_mouseEnter);
-      slider.addEventListener("mouseleave", aL_mouseLeave);
+      if (!cover) {
+        slider.addEventListener("mouseenter", aL_mouseEnter);
+        slider.addEventListener("mouseleave", aL_mouseLeave);
+      }
     }
     function aL_mouseEnter() {
       tl_toggleControls.timeScale(1).play();
@@ -8912,15 +8904,15 @@
         gsapSlideIn(count);
       } else {
         if (dir === "next") {
-          count = count < slidesLength - 1 ? count + 1 : settings?.loop ? 0 : count;
+          count = count < slidesLength - 1 ? count + 1 : loop ? 0 : count;
           gsapSlideIn(count);
         } else if (dir === "prev") {
-          count = count > 0 ? count - 1 : settings?.loop ? slidesLength - 1 : count;
+          count = count > 0 ? count - 1 : loop ? slidesLength - 1 : count;
           gsapSlideIn(count);
         }
       }
       checkSlideIndex(count);
-      if (!settings?.loop) {
+      if (!loop) {
         next?.classList.remove("is-muted");
         prev?.classList.remove("is-muted");
         navAddEventListeners(null);
@@ -8929,7 +8921,7 @@
         if (isLastSlide)
           ifIsLastSlide();
       }
-      if (settings?.indicators) {
+      if (indicators) {
         setActiveindicator(count);
       }
       function gsapSlideIn(i) {
@@ -9044,36 +9036,31 @@
         prev?.removeEventListener("click", goPrev);
       }
     }
-    function setCover() {
-      console.log("hascover");
-      const cover = slider.querySelector('[cs-el="slider-cover"]');
-      if (!cover)
-        slideAction(null, 0);
-      if (settings?.nav) {
-        const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-        if (!sliderNav)
-          return;
-        gsapWithCSS.set(sliderNav, { autoAlpha: 0 });
+    function setCover(cover2) {
+      console.log("setCover called");
+      if (!toggleControls) {
+        setupToggleControls();
       }
-      if (settings?.indicators) {
-        const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
-        if (!sliderIndicators)
-          return;
-        gsapWithCSS.set(sliderIndicators, { autoAlpha: 0 });
-      }
-      if (settings?.togglecontrols) {
-        slider.removeEventListener("mouseenter", aL_mouseEnter);
-        slider.removeEventListener("mouseleave", aL_mouseLeave);
-      }
+      tl_toggleControls.progress(0);
+      const startSliderBtn = slider.querySelector('[cs-el="slider-start"]');
+      startSliderBtn?.addEventListener("click", () => {
+        startSlider(cover2);
+      });
     }
-    function firstSlide() {
+    function startSlider(cover2) {
+      gsapWithCSS.to(cover2, { autoAlpha: 0 });
       slideAction(null, 0);
+      tl_toggleControls.timeScale(1).play();
+      if (toggleControls) {
+        slider.addEventListener("mouseenter", aL_mouseEnter);
+        slider.addEventListener("mouseleave", aL_mouseLeave);
+      }
     }
-    settings.hascover = true;
-    if (!settings.hascover) {
+    setupSwipe();
+    if (!cover) {
       slideAction(null, 0);
     } else {
-      setCover();
+      setCover(cover);
     }
   }
 
@@ -9110,7 +9097,9 @@
         const logo = document.querySelector('[cs-el="logo"]');
         if (logo) {
           const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
-          setInterval(() => loopLogoLetters(logoLetters), 1e3);
+          if (logoLetters.length > 0) {
+            setInterval(() => loopLogoLetters(logoLetters), 1e3);
+          }
         }
         const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
         if (loginModal.length > 0) {

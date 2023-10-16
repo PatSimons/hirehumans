@@ -50,7 +50,9 @@ window.Webflow.push(() => {
       const logo = document.querySelector('[cs-el="logo"]');
       if (logo) {
         const logoLetters: string[] = gsap.utils.toArray('[cs-el="logo-letter"]');
-        setInterval(() => loopLogoLetters(logoLetters), 1000);
+        if (logoLetters.length > 0) {
+          setInterval(() => loopLogoLetters(logoLetters), 1000);
+        }
       } // End: Logo Letter Colors
 
       //// Loop Gradient Backsgrounds

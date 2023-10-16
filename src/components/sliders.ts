@@ -1,7 +1,12 @@
-// * COMPONENTS > SLIDERS */
+/* COMPONENTS > SLIDERS
 
-/* DATA ATTRIBUTES:
+//// DATA ATTRIBUTES:
 [cs-el="slider"]
+
+[cs-el="slider-cover"]
+  [cs-el="slider-start"]
+  
+[cs-el="slides"]
   [cs-el="slide"]
   [cs-el="slide"]
   ...
@@ -13,12 +18,16 @@
 [cs-el="slider-indicators"]
   [cs-el="slider-indicator"]
 
-[slider-type="fade (default) | slide | updown"]
-[slider-settings="nav, indicators, swipe, loop, togglecontrols, isPlaying"]
+//// CONFIG OPTIONS
+[cs-el="slider"] >
+  [slider-type="fade (default) | slide | updown"]
+  [slider-type="slide"] 
+  [slider-controls="toggle"] 
+  [slider-loop="loop"] 
+  [slider-autoplay="play"]
 
-/*  HTML MARK-UP:
-
-<div cs-el="slider" slider-type="" slider-settings="">
+////  HTML MARK-UP:
+<div cs-el="slider">
   <div cs-el="slide"></div>
   <div cs-el="slider-nav">
     <div cs-el="slider-nav_prev">
@@ -28,41 +37,19 @@
     <div cs-el="slider-indicator">
       <div cs-el="slider-indicator-inner"></div>
     </div>
+  </div>
+  <div cs-el="slider-cover">
+    <div cs-el="slider-start">
+    </div>    
   </div>  
 */
+
 import { gsap } from 'gsap';
 import { Observer } from 'gsap/Observer';
 gsap.registerPlugin(Observer);
 
 import { gsapDuration, gsapEaseType } from '$utils/globalvars';
 
-// Define a type for the slider settings.
-interface SliderSettings {
-  nav: boolean;
-  indicators: boolean;
-  swipe: boolean;
-  loop: boolean;
-  togglecontrols: boolean;
-  autoplay: boolean;
-  hascover: boolean;
-}
-// Function to parse slider settings from a data attribute.
-function parseSliderSettings(slider: HTMLElement): SliderSettings | null {
-  const sliderSettings = slider.getAttribute('slider-settings');
-  if (!sliderSettings) return null;
-
-  const settingsArray = sliderSettings.split(', ');
-
-  return {
-    nav: settingsArray.includes('nav'),
-    indicators: settingsArray.includes('indicators'),
-    loop: settingsArray.includes('loop'),
-    swipe: settingsArray.includes('swipe'),
-    autoplay: settingsArray.includes('autoplay'),
-    togglecontrols: settingsArray.includes('togglecontrols'),
-    hascover: settingsArray.includes('hascover'),
-  };
-}
 // Export Initialize all sliders
 export function initSliders() {
   const sliders = gsap.utils.toArray<HTMLElement>('[cs-el="slider"]');
@@ -80,22 +67,26 @@ function initSlider(slider: HTMLElement) {
 
   // Abort if there are no slides.
   if (slidesLength === 0) return;
-  // Remove Nav and Indicator and abort if there'e only 1 slide
+
+  // Remove Nav, Indicators and Cover and abort if there'e only 1 slide
   if (slidesLength === 1) {
-    const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-    sliderNav?.remove();
-    const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
-    sliderIndicators?.remove();
+    removeElementsByAttribute('slider-nav');
+    removeElementsByAttribute('slider-indicators');
+    removeElementsByAttribute('slider-cover');
     return;
   }
 
-  // Parse the slider settings.
-  const settings = parseSliderSettings(slider);
-  if (!settings) return; // Skip if settings couldn't be parsed.
+  function removeElementsByAttribute(attributeValue: string): void {
+    const elements = document.querySelectorAll<HTMLElement>(`[cs-el="${attributeValue}"]`);
+    elements.forEach((element) => {
+      element.remove();
+    });
+  }
 
   let sliderType = slider.getAttribute('slider-type');
   if (!sliderType) sliderType = 'fade';
 
+  // Declare some vars
   let count: number;
   const transitionDuration = 0.5;
   const sliderEaseIn = 'power2.out';
@@ -111,6 +102,35 @@ function initSlider(slider: HTMLElement) {
   const allowNext = true;
   const allowPrev = true;
   const tl_toggleControls = gsap.timeline({ paused: true });
+
+  // Find Base Elements for Config
+  const nav = slider.querySelector<HTMLElement>('[cs-el="slider-nav"]');
+  if (nav) setupNav(nav);
+
+  const indicators = slider.querySelector<HTMLElement>('[cs-el="slider-indicators"]');
+  let allIndicators: HTMLElement[] = [];
+  if (indicators) allIndicators = setupIndicators();
+
+  const cover = slider.querySelector<HTMLElement>('[cs-el="slider-cover"]');
+
+  // Additional Config
+  const getLoop = slider.getAttribute('slider-loop');
+  let loop = false;
+  if (getLoop === 'loop') {
+    loop = true;
+  }
+  const GetToggleControls = slider.getAttribute('slider-controls');
+  let toggleControls = false;
+  if (GetToggleControls === 'toggle') {
+    toggleControls = true;
+    setupToggleControls();
+  }
+
+  const getAutoPlay = slider.getAttribute('slider-autoplay');
+  let isPlaying: number | undefined;
+  if (getAutoPlay === 'play') {
+    playSlider();
+  }
 
   // Set opacity 0 all slides.
   gsap.set(slides, { opacity: 0 });
@@ -134,42 +154,23 @@ function initSlider(slider: HTMLElement) {
   }
   initAllPrevNextButtons();
 
-  if (settings.nav) setupNav();
-  if (!settings.nav) {
-    const sliderNav = slider.querySelector('[cs-el="slider-nav"]');
-    sliderNav?.remove();
-  }
-  if (settings.swipe) setupSwipe();
-  let isPlaying: number | undefined;
-  if (settings.autoplay) playSlider();
-  if (settings.togglecontrols) setupToggleControls();
-
-  let allIndicators: HTMLElement[] = [];
-  if (settings.indicators) allIndicators = setupIndicators();
-  if (!settings.indicators) {
-    const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
-    sliderIndicators?.remove();
-  }
-
   // Function to set up next/prev navigation.
-  function setupNav() {
-    const sliderNav = slider.querySelector<HTMLElement>('[cs-el="slider-nav"]');
-    if (!sliderNav) return;
-
-    next = sliderNav.querySelector<HTMLElement>('[cs-el="slider-nav_next"]');
-    prev = sliderNav.querySelector<HTMLElement>('[cs-el="slider-nav_prev"]');
+  function setupNav(nav: HTMLElement) {
+    next = nav.querySelector<HTMLElement>('[cs-el="slider-nav_next"]');
+    prev = nav.querySelector<HTMLElement>('[cs-el="slider-nav_prev"]');
 
     // Set CSS pointer-events
-    sliderNav.style.pointerEvents = 'none';
-    next.style.pointerEvents = 'auto';
-    prev.style.pointerEvents = 'auto';
+    nav.style.pointerEvents = 'none';
+    if (next) next.style.pointerEvents = 'auto';
+    if (prev) prev.style.pointerEvents = 'auto';
 
     navAddEventListeners(null);
   }
-
+  // Play Slider
   function playSlider() {
     isPlaying = setInterval(() => slideAction('next'), playDuration);
   }
+  // Stop Slider
   function stopSlider(ap: number | undefined) {
     clearInterval(ap);
   }
@@ -196,8 +197,8 @@ function initSlider(slider: HTMLElement) {
       const clonedIndicator = indicator.cloneNode(true);
       indicator.parentNode?.appendChild(clonedIndicator);
     });
-    //indicator.remove(); // Remove
 
+    // Make array of all Indicator elements
     const indicatorsArray = sliderIndicators.querySelectorAll<HTMLElement>(
       '[cs-el="slider-indicator"]'
     );
@@ -232,18 +233,23 @@ function initSlider(slider: HTMLElement) {
       },
       '<'
     );
-    slider.addEventListener('mouseenter', aL_mouseEnter);
-    slider.addEventListener('mouseleave', aL_mouseLeave);
+    // Set toggleControls listeners to slide. Accept when Cover is set.
+    if (!cover) {
+      slider.addEventListener('mouseenter', aL_mouseEnter);
+      slider.addEventListener('mouseleave', aL_mouseLeave);
+    }
   }
 
   function aL_mouseEnter() {
+    //console.log('aL_mouseEnter called');
     tl_toggleControls.timeScale(1).play();
   }
   function aL_mouseLeave() {
+    //console.log('aL_mouseLeave called');
     tl_toggleControls.timeScale(2).reverse();
   }
 
-  // Function to set up swipe navigation.
+  // Function to set up swipe on touch devices.
   function setupSwipe() {
     Observer.create({
       target: slider,
@@ -280,12 +286,12 @@ function initSlider(slider: HTMLElement) {
       gsapSlideIn(count);
     } else {
       if (dir === 'next') {
-        // Set count to next slide index. If 'loopEnabled = true' slides will loop back to first slide
-        count = count < slidesLength - 1 ? count + 1 : settings?.loop ? 0 : count;
+        // Set count to next slide index. If 'loop = true' slides will loop back to first slide
+        count = count < slidesLength - 1 ? count + 1 : loop ? 0 : count;
         gsapSlideIn(count);
       } else if (dir === 'prev') {
-        // Set count to previous slide index. If 'loopEnabled = true' slides will loop back to last slide
-        count = count > 0 ? count - 1 : settings?.loop ? slidesLength - 1 : count;
+        // Set count to previous slide index. If 'loop = true' slides will loop back to last slide
+        count = count > 0 ? count - 1 : loop ? slidesLength - 1 : count;
         gsapSlideIn(count);
       }
     }
@@ -293,7 +299,7 @@ function initSlider(slider: HTMLElement) {
     checkSlideIndex(count);
 
     // if no loop
-    if (!settings?.loop) {
+    if (!loop) {
       next?.classList.remove('is-muted');
       prev?.classList.remove('is-muted');
       navAddEventListeners(null);
@@ -301,7 +307,7 @@ function initSlider(slider: HTMLElement) {
       if (isLastSlide) ifIsLastSlide();
     }
     // Set indicator to current slide
-    if (settings?.indicators) {
+    if (indicators) {
       setActiveindicator(count);
     }
 
@@ -436,36 +442,40 @@ function initSlider(slider: HTMLElement) {
   }
 
   //// function setCover
-  function setCover() {
-    console.log('hascover');
-    const cover = slider.querySelector<HTMLElement>('[cs-el="slider-cover"]');
-    if (!cover) slideAction(null, 0);
-    if (settings?.nav) {
-      const sliderNav = slider.querySelector<HTMLElement>('[cs-el="slider-nav"]');
-      if (!sliderNav) return;
-      gsap.set(sliderNav, { autoAlpha: 0 });
-    }
-    if (settings?.indicators) {
-      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
-      if (!sliderIndicators) return;
-      gsap.set(sliderIndicators, { autoAlpha: 0 });
-    }
-    if (settings?.togglecontrols) {
-      slider.removeEventListener('mouseenter', aL_mouseEnter);
-      slider.removeEventListener('mouseleave', aL_mouseLeave);
-    }
-  }
-  //// Set initial slide
-  function firstSlide() {
-    slideAction(null, 0);
-  }
-  settings.hascover = true;
+  function setCover(cover: HTMLElement) {
+    // eslint-disable-next-line no-console
+    console.log('setCover called');
 
-  //// Call initial slide
-  if (!settings.hascover) {
+    if (!toggleControls) {
+      setupToggleControls();
+    }
+    tl_toggleControls.progress(0);
+
+    const startSliderBtn = slider.querySelector('[cs-el="slider-start"]');
+    startSliderBtn?.addEventListener('click', () => {
+      startSlider(cover);
+    });
+  }
+
+  //// Set initial slide
+  function startSlider(cover: HTMLElement) {
+    gsap.to(cover, { autoAlpha: 0 });
+    slideAction(null, 0);
+
+    tl_toggleControls.timeScale(1).play();
+    if (toggleControls) {
+      slider.addEventListener('mouseenter', aL_mouseEnter);
+      slider.addEventListener('mouseleave', aL_mouseLeave);
+    }
+  }
+
+  setupSwipe();
+
+  //// Call initial slide.
+  if (!cover) {
     slideAction(null, 0);
   } else {
-    setCover();
+    setCover(cover);
   }
 } // End: initSlider
 
