@@ -8823,16 +8823,18 @@
         console.log("no sliderIndicators found");
         return [];
       }
-      const indicator = sliderIndicators.querySelector('[cs-el="slider-indicator"]');
-      if (!indicator) {
+      const indicator = sliderIndicators.querySelectorAll('[cs-el="slider-indicator"]');
+      if (indicator.length === 0) {
         console.log("no indicator found");
         return [];
       }
-      const slideArray = Array.from(slides);
-      slideArray.slice(0, -1).forEach(() => {
-        const clonedIndicator = indicator.cloneNode(true);
-        indicator.parentNode?.appendChild(clonedIndicator);
-      });
+      if (indicator.length === 1) {
+        const slideArray = Array.from(slides);
+        slideArray.slice(0, -1).forEach(() => {
+          const clonedIndicator = indicator[0].cloneNode(true);
+          indicator[0].parentNode?.appendChild(clonedIndicator);
+        });
+      }
       const indicatorsArray = sliderIndicators.querySelectorAll(
         '[cs-el="slider-indicator"]'
       );
@@ -8875,16 +8877,18 @@
     function aL_mouseLeave() {
       tl_toggleControls.timeScale(2).reverse();
     }
-    function setupSwipe() {
+    function setSwipe() {
+      console.log("Fnc setSwipe called");
       Observer.create({
         target: slider,
         type: "touch",
-        dragMinimum: 200,
+        dragMinimum: 100,
         onLeft: () => goNext(),
         onRight: () => goPrev()
       });
     }
     function slideAction(dir, index) {
+      console.log("Fnc slideAction called");
       if (index && index > count && !allowNext)
         return;
       if (index && index < count && !allowPrev)
@@ -9037,7 +9041,8 @@
       }
     }
     function setCover(cover2) {
-      console.log("setCover called");
+      console.log("Fnc setCover called");
+      gsapWithCSS.to(cover2, { autoAlpha: 1 });
       if (!toggleControls) {
         setupToggleControls();
       }
@@ -9048,6 +9053,7 @@
       });
     }
     function startSlider(cover2) {
+      console.log("Fnc startSlider called");
       gsapWithCSS.to(cover2, { autoAlpha: 0 });
       slideAction(null, 0);
       tl_toggleControls.timeScale(1).play();
@@ -9056,7 +9062,7 @@
         slider.addEventListener("mouseleave", aL_mouseLeave);
       }
     }
-    setupSwipe();
+    setSwipe();
     if (!cover) {
       slideAction(null, 0);
     } else {
@@ -9094,6 +9100,12 @@
       },
       (context3) => {
         const { isDesktop, isMobile, reduceMotion } = context3.conditions;
+        if (isDesktop) {
+        }
+        if (isMobile) {
+        }
+        if (reduceMotion) {
+        }
         const logo = document.querySelector('[cs-el="logo"]');
         if (logo) {
           const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
@@ -9125,7 +9137,6 @@
             });
           });
         }
-        initSliders();
         function init4() {
           const onPageLoadElms = gsapWithCSS.utils.toArray('[cs-tr="pageload"]');
           if (onPageLoadElms.length > 0) {
@@ -9150,10 +9161,12 @@
           init4();
         });
         return () => {
+          console.log("viewport size changed");
         };
       }
       // End: MM Context
     );
+    initSliders();
   });
 })();
 /*! Bundled license information:

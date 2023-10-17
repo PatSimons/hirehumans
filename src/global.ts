@@ -34,6 +34,12 @@ window.Webflow.push(() => {
     (context) => {
       const { isDesktop, isMobile, reduceMotion } = context.conditions;
 
+      if (isDesktop) {
+      }
+      if (isMobile) {
+      }
+      if (reduceMotion) {
+      }
       ///////////////////// Development Only
 
       // DEV: Check for wider DOM elements
@@ -111,8 +117,6 @@ window.Webflow.push(() => {
       }
       //// End: Login Modal
 
-      initSliders();
-
       function init() {
         // Animate elements On Page Load
         const onPageLoadElms = gsap.utils.toArray('[cs-tr="pageload"]');
@@ -159,7 +163,43 @@ window.Webflow.push(() => {
       window.addEventListener('load', () => {
         init();
       });
-      return () => {};
+      return () => {
+        console.log('viewport size changed');
+      };
     } // End: MM Context
   ); // End: Setup Match Media
+
+  initSliders();
 }); // End: Webflow Push
+
+// window.Webflow = window.Webflow || [];
+// window.Webflow.push(() => {
+//   // Define a breakpoint for responsive design
+//   const breakpoint = 800;
+
+//   // Initialize Match Media instance
+//   const matchMedia = gsap.matchMedia();
+
+//   // Define the media query conditions
+//   const mediaQueries = {
+//     isDesktop: `(min-width: ${breakpoint}px)`,
+//     isMobile: `(max-width: ${breakpoint - 1}px)`,
+//     reduceMotion: '(prefers-reduced-motion: reduce)',
+//   };
+
+//   // Callback function to handle media query changes
+//   matchMedia.add(mediaQueries, (context) => {
+//     const { isDesktop, isMobile, reduceMotion } = context.conditions || {};
+
+//     // Your code to respond to media query changes
+//     if (isDesktop) {
+//       // Code for desktop view
+//     } else if (isMobile) {
+//       // Code for mobile view
+//     }
+
+//     if (reduceMotion) {
+//       // Code for reduced motion setting
+//     }
+//   });
+// });

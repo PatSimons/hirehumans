@@ -185,19 +185,20 @@ function initSlider(slider: HTMLElement) {
       return [];
     }
     // Check if indicator elelemnt is present
-    const indicator = sliderIndicators.querySelector<HTMLElement>('[cs-el="slider-indicator"]');
-    if (!indicator) {
+    const indicator = sliderIndicators.querySelectorAll<HTMLElement>('[cs-el="slider-indicator"]');
+    if (indicator.length === 0) {
       // eslint-disable-next-line no-console
       console.log('no indicator found');
       return [];
     }
-    // Clone the indicator element for each slide
-    const slideArray = Array.from(slides);
-    slideArray.slice(0, -1).forEach(() => {
-      const clonedIndicator = indicator.cloneNode(true);
-      indicator.parentNode?.appendChild(clonedIndicator);
-    });
-
+    if (indicator.length === 1) {
+      // Clone the indicator element for each slide
+      const slideArray = Array.from(slides);
+      slideArray.slice(0, -1).forEach(() => {
+        const clonedIndicator = indicator[0].cloneNode(true);
+        indicator[0].parentNode?.appendChild(clonedIndicator);
+      });
+    }
     // Make array of all Indicator elements
     const indicatorsArray = sliderIndicators.querySelectorAll<HTMLElement>(
       '[cs-el="slider-indicator"]'
@@ -241,27 +242,29 @@ function initSlider(slider: HTMLElement) {
   }
 
   function aL_mouseEnter() {
-    //console.log('aL_mouseEnter called');
     tl_toggleControls.timeScale(1).play();
   }
   function aL_mouseLeave() {
-    //console.log('aL_mouseLeave called');
     tl_toggleControls.timeScale(2).reverse();
   }
 
   // Function to set up swipe on touch devices.
-  function setupSwipe() {
+  function setSwipe() {
+    console.log('Fnc setSwipe called');
+
     Observer.create({
       target: slider,
       type: 'touch',
-      dragMinimum: 200,
+      dragMinimum: 100,
       onLeft: () => goNext(),
       onRight: () => goPrev(),
     });
+    //console.log('swipe setup');
   }
 
   //// Function to handle slider transitions.
   function slideAction(dir: 'next' | 'prev' | null, index?: number | null) {
+    console.log('Fnc slideAction called');
     // Disallow Prev/Next condition
     if (index && index > count && !allowNext) return;
     if (index && index < count && !allowPrev) return;
@@ -443,8 +446,9 @@ function initSlider(slider: HTMLElement) {
 
   //// function setCover
   function setCover(cover: HTMLElement) {
-    // eslint-disable-next-line no-console
-    console.log('setCover called');
+    console.log('Fnc setCover called');
+    // Make sure cover is visible
+    gsap.to(cover, { autoAlpha: 1 });
 
     if (!toggleControls) {
       setupToggleControls();
@@ -459,6 +463,8 @@ function initSlider(slider: HTMLElement) {
 
   //// Set initial slide
   function startSlider(cover: HTMLElement) {
+    console.log('Fnc startSlider called');
+
     gsap.to(cover, { autoAlpha: 0 });
     slideAction(null, 0);
 
@@ -469,7 +475,7 @@ function initSlider(slider: HTMLElement) {
     }
   }
 
-  setupSwipe();
+  setSwipe();
 
   //// Call initial slide.
   if (!cover) {
