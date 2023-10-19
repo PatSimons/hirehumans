@@ -12,11 +12,11 @@
   ...
 
 [cs-el="slider-nav"]
-  [cs-el="slider-nav_prev"]
-  [cs-el="slider-nav_next"]
+  [cs-el="slider-nav_prev"] > Needs CSS class 'is-muted' defined
+  [cs-el="slider-nav_next"] > Needs CSS class 'is-muted' defined
 
 [cs-el="slider-indicators"]
-  [cs-el="slider-indicator"]
+  [cs-el="slider-indicator"] > Needs CSS class 'is-active' defined
 
 //// CONFIG OPTIONS
 [cs-el="slider"] >

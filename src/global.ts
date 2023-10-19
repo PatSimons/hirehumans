@@ -1,11 +1,12 @@
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
-//import { Observer } from 'gsap/Observer';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
-//gsap.registerPlugin(Observer);
-gsap.registerPlugin(Draggable);
+//import { SplitText } from 'gsap/SplitText';
+import SplitType from 'split-type';
 
+gsap.registerPlugin(ScrollTrigger, Draggable, SplitType);
+
+//import { initMarquees } from 'src/components/marquees';
 import { initSliders } from 'src/components/sliders';
 
 import { colorArray } from '$utils/colors';
@@ -60,6 +61,32 @@ window.Webflow.push(() => {
           setInterval(() => loopLogoLetters(logoLetters), 1000);
         }
       } // End: Logo Letter Colors
+
+      // Split text into spans
+      const splitTextElms = gsap.utils.toArray<HTMLElement>('[txt-split]');
+      if (splitTextElms.length > 0) {
+        splitTextElms.forEach((el) => {
+          const splitTextType = el.getAttribute('txt-split');
+          if (splitTextType === 'words') {
+            const typeSplit = new SplitType(el, {
+              types: 'words',
+              tagName: 'div',
+              wordClass: 'el',
+            });
+          }
+          if (splitTextType === 'chars') {
+            const typeSplit = new SplitType(el, {
+              types: 'chars',
+              tagName: 'div',
+              charClass: 'el',
+            });
+          }
+          const letters = el.querySelectorAll<HTMLElement>('.el');
+          if (letters.length > 0) {
+            setInterval(() => loopLogoLetters(letters), 1000);
+          }
+        });
+      }
 
       //// Loop Gradient Backsgrounds
       // const animatedGradientBackgroundElms = gsap.utils.toArray(
@@ -119,7 +146,7 @@ window.Webflow.push(() => {
 
       function init() {
         // Animate elements On Page Load
-        const onPageLoadElms = gsap.utils.toArray('[cs-tr="pageload"]');
+        const onPageLoadElms = gsap.utils.toArray<HTMLElement>('[cs-tr="pageload"]');
         if (onPageLoadElms.length > 0) {
           gsap.to(onPageLoadElms, {
             autoAlpha: 1,
@@ -128,34 +155,44 @@ window.Webflow.push(() => {
             stagger: 0.25,
           });
         }
-        // Draggable elements
-        const draggableElms = gsap.utils.toArray('[cs-tr="draggable"]');
-        if (draggableElms.length > 0) {
-          //console.log(draggableElms.length);
-          draggableElms.forEach((el: any) => {
-            Draggable.create(el, { type: 'x,y' });
-          });
-        }
-
-        // Scrolltrigger elements On Enter Viewport
-        // const scrolltriggerOnEnterElms = gsap.utils.toArray('[cs-tr="scroll"]');
-        // if (scrolltriggerOnEnterElms.length > 0) {
-        //   scrolltriggerOnEnterElms.forEach((el: any) => {
-        //     gsap.from(el, {
-        //       opacity: 0,
-        //       yPercent: 10,
-        //       //filter: 'blur(5px)',
-        //       ease: 'sin.out',
-        //       scrollTrigger: {
-        //         trigger: el,
-        //         start: 'top bottom',
-        //         end: 'top 70%',
-        //         scrub: 1,
-        //       },
-        //     });
+        // // Draggable elements
+        // const draggableElms = gsap.utils.toArray<HTMLElement>('[cs-tr="draggable"]');
+        // if (draggableElms.length > 0) {
+        //   //console.log(draggableElms.length);
+        //   draggableElms.forEach((el: any) => {
+        //     Draggable.create(el, { type: 'x,y' });
         //   });
         // }
+
+        // Scrolltrigger elements On Enter Viewport
+        const scrolltriggerOnEnterElms = gsap.utils.toArray<HTMLElement>('[cs-st*="scroll-in"]');
+        if (scrolltriggerOnEnterElms.length > 0) {
+          scrolltriggerOnEnterElms.forEach((el) => {
+            gsap.from(el, {
+              opacity: 0,
+              yPercent: 10,
+              ease: 'sin.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top bottom',
+                end: 'top 70%',
+                scrub: 1,
+              },
+            });
+          });
+        }
       } // End: function init()
+      // Scrolltrigger paralax auto
+      const st_paralaxBgElms = gsap.utils.toArray<HTMLElement>('[cs-st*="paralax-bg"]');
+      if (st_paralaxBgElms.length > 0) {
+        st_paralaxBgElms.forEach((el) => {
+          gsap.to(el, {
+            yPercent: 20,
+            scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1 },
+          });
+        });
+      }
+      // End: HHP Hero Image Scrolltrigger
 
       window.addEventListener('resize', () => {
         init();
@@ -170,6 +207,7 @@ window.Webflow.push(() => {
   ); // End: Setup Match Media
 
   initSliders();
+  //initMarquees();
 }); // End: Webflow Push
 
 // window.Webflow = window.Webflow || [];
