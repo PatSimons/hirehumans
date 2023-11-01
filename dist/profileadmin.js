@@ -9251,11 +9251,17 @@
         }
       });
     });
+    const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
+    const style = document.createElement("style");
+    style.innerHTML = sortableClasses;
+    document.head.appendChild(style);
     const el = document.querySelector('[cs-el="sortable-list"]');
     const sortable = sortable_esm_default.create(el, {
       handle: ".hha_icon-btn",
-      ghostClass: "sortable-ghost",
-      animation: 250
+      ghostClass: "ghost",
+      //dragClass: 'drag',
+      animation: 250,
+      forceFallback: false
     });
     function init4() {
     }

@@ -3,7 +3,7 @@ console.log('humans.ts');
 
 import { gsap } from 'gsap';
 
-import { loopLogoLetters } from '$utils/colors';
+import { colors } from '$utils/colors';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -18,13 +18,6 @@ window.Webflow.push(() => {
     },
     (context) => {
       const { isDesktop, isMobile, reduceMotion } = context.conditions;
-
-      // //// Loop Logo Letter Colors
-      // const logo = document.querySelector('[cs-el="logo"]');
-      // if (logo) {
-      //   const logoLetters: string[] = gsap.utils.toArray('[cs-el="logo-letter"]');
-      //   setInterval(() => loopLogoLetters(logoLetters), 1000);
-      // } // End: Logo Letter Colors
 
       // Humans
       const humans = document.querySelector('[cs-el="humans"]');
@@ -51,6 +44,38 @@ window.Webflow.push(() => {
           });
         }
       } // End: Humans
+
+      function setRatingStars() {
+        const ratingContainers = document.querySelectorAll<HTMLElement>('[cs-el="rating-stars"]');
+
+        ratingContainers.forEach((container) => {
+          const rating = parseInt(container.getAttribute('rating') || '0', 10);
+          const color = container.getAttribute('color') || 'green'; // Default to green if not specified
+
+          if (!isNaN(rating) && rating >= 1 && rating <= 5) {
+            const stars = container.querySelectorAll<HTMLElement>('[cs-el="rating-star"]');
+
+            if (stars.length === 0) return; // No stars found, exit the loop.
+
+            for (let i = 0; i < rating; i++) {
+              if (stars[i]) {
+                gsap.to(stars[i], {
+                  opacity: 1,
+                  duration: 2,
+                  color: colors[color],
+                  stagger: 2, // Stagger the animation with 0.2 seconds between each star.
+                  onComplete: () => {
+                    stars[i].classList.add('is-active'); // Add the 'filled' class to the stars.
+                  },
+                });
+              }
+            }
+          }
+        });
+      }
+
+      // Call the function to set the rating stars.
+      setRatingStars();
 
       function init() {} // End: function init()
 

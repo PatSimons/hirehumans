@@ -903,11 +903,11 @@
     return values;
   };
   var _formatColors = function _formatColors2(s, toHSL, orderMatchData) {
-    var result = "", colors = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
-    if (!colors) {
+    var result = "", colors2 = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
+    if (!colors2) {
       return s;
     }
-    colors = colors.map(function(color) {
+    colors2 = colors2.map(function(color) {
       return (color = splitColor(color, toHSL, 1)) && type + (toHSL ? color[0] + "," + color[1] + "%," + color[2] + "%," + color[3] : color.join(",")) + ")";
     });
     if (orderMatchData) {
@@ -917,7 +917,7 @@
         shell = s.replace(_colorExp, "1").split(_numWithUnitExp);
         l = shell.length - 1;
         for (; i < l; i++) {
-          result += shell[i] + (~c.indexOf(i) ? colors.shift() || type + "0,0,0,0)" : (d.length ? d : colors.length ? colors : orderMatchData).shift());
+          result += shell[i] + (~c.indexOf(i) ? colors2.shift() || type + "0,0,0,0)" : (d.length ? d : colors2.length ? colors2 : orderMatchData).shift());
         }
       }
     }
@@ -925,7 +925,7 @@
       shell = s.split(_colorExp);
       l = shell.length - 1;
       for (; i < l; i++) {
-        result += shell[i] + colors[i];
+        result += shell[i] + colors2[i];
       }
     }
     return result + shell[l];
@@ -4228,6 +4228,22 @@
   var gsapWithCSS = gsap.registerPlugin(CSSPlugin) || gsap;
   var TweenMaxWithCSS = gsapWithCSS.core.Tween;
 
+  // src/utils/colors.ts
+  var green = "#9ccca1";
+  var aqua = "#96c1d4";
+  var marine = "#729dad";
+  var purple = "#c092b6";
+  var red = "#ea958f";
+  var yellow = "#f4d791";
+  var colors = {
+    green,
+    aqua,
+    marine,
+    purple,
+    yellow,
+    red
+  };
+
   // src/humans.ts
   console.log("humans.ts");
   window.Webflow ||= [];
@@ -4264,6 +4280,33 @@
             });
           }
         }
+        function setRatingStars() {
+          const ratingContainers = document.querySelectorAll('[cs-el="rating-stars"]');
+          ratingContainers.forEach((container) => {
+            const rating = parseInt(container.getAttribute("rating") || "0", 10);
+            const color = container.getAttribute("color") || "green";
+            if (!isNaN(rating) && rating >= 1 && rating <= 5) {
+              const stars = container.querySelectorAll('[cs-el="rating-star"]');
+              if (stars.length === 0)
+                return;
+              for (let i = 0; i < rating; i++) {
+                if (stars[i]) {
+                  gsapWithCSS.to(stars[i], {
+                    opacity: 1,
+                    duration: 2,
+                    color: colors[color],
+                    stagger: 2,
+                    // Stagger the animation with 0.2 seconds between each star.
+                    onComplete: () => {
+                      stars[i].classList.add("is-active");
+                    }
+                  });
+                }
+              }
+            }
+          });
+        }
+        setRatingStars();
         function init4() {
         }
         window.addEventListener("resize", () => {
