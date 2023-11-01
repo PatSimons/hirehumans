@@ -4282,6 +4282,7 @@
         }
         function setRatingStars() {
           const ratingContainers = document.querySelectorAll('[cs-el="rating-stars"]');
+          console.log(ratingContainers.length);
           ratingContainers.forEach((container) => {
             const rating = parseInt(container.getAttribute("rating") || "0", 10);
             const color = container.getAttribute("color") || "green";
