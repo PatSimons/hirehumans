@@ -4264,9 +4264,9 @@
           if (humansListItems) {
             gsapWithCSS.from(humansListItems, {
               autoAlpha: 0,
-              duration: 1,
-              stagger: 0.3,
-              ease: "power1.out"
+              duration: 0.5,
+              stagger: 0.1,
+              ease: "power1.in"
             });
             humansListItems.forEach((item) => {
               const navItemHover = gsapWithCSS.timeline({ paused: true });

@@ -27,9 +27,9 @@ window.Webflow.push(() => {
           // Fade in on page load
           gsap.from(humansListItems, {
             autoAlpha: 0,
-            duration: 1,
-            stagger: 0.3,
-            ease: 'power1.out',
+            duration: 0.5,
+            stagger: 0.1,
+            ease: 'power1.in',
           });
           // Nav Hovers
           humansListItems.forEach((item: any) => {
@@ -77,7 +77,7 @@ window.Webflow.push(() => {
       // Call the function to set the rating stars.
       setRatingStars();
 
-      function init() {} // End: function init()
+      function init() {}
 
       window.addEventListener('resize', () => {
         init();
