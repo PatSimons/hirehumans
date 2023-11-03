@@ -4298,23 +4298,19 @@
       }
     }
     function setRatingStars() {
-      const ratingContainers = document.querySelectorAll('[cs-el="rating-stars"]');
-      console.log(ratingContainers.length);
       ratingContainers.forEach((container) => {
         const rating = parseInt(container.getAttribute("rating") || "0", 10);
         const color = container.getAttribute("color") || "green";
-        if (!isNaN(rating) && rating >= 1 && rating <= 5) {
-          const stars = container.querySelectorAll('[cs-el="rating-star"]');
-          if (stars.length === 0)
-            return;
-          for (let i = 0; i < rating; i++) {
-            stars[i].classList.add("is-active");
-            gsapWithCSS.set(stars[i], { color: colors[color] });
-          }
+        const stars = container.querySelectorAll('[cs-el="rating-star"]');
+        for (let i = rating; i < stars.length; i++) {
+          stars[i].classList.add("is-muted");
         }
       });
     }
-    setRatingStars();
+    const ratingContainers = document.querySelectorAll('[cs-el="rating-stars"]');
+    if (ratingContainers.length > 0) {
+      setRatingStars();
+    }
     function init4() {
     }
     window.addEventListener("resize", () => {
