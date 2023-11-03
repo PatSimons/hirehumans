@@ -4285,7 +4285,7 @@
           );
           navItemHover_2.to(name, { color: colors["dark"], duration: 0.25, ease: "sin.in" }, "<");
           navItemHover_2.from(tagline, { opacity: 0, duration: 0.725, ease: "sin.in" }, ".25");
-          navItemHover_2.from(icon, { opacity: 0, duration: 0.25, ease: "sin.in" }, "<");
+          navItemHover_2.from(icon, { x: "-1rem", opacity: 0, duration: 0.25, ease: "sin.in" }, "<");
           item.addEventListener("mouseenter", () => {
             navItemHover_1.timeScale(1).play();
             navItemHover_2.timeScale(1).play();
