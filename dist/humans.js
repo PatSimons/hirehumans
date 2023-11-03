@@ -4229,6 +4229,11 @@
   var TweenMaxWithCSS = gsapWithCSS.core.Tween;
 
   // src/utils/colors.ts
+  var light = "#fffefc";
+  var lightGrey = "#eee9e4";
+  var grey = "#c3bdb7";
+  var darkGrey = "#767676";
+  var dark = "#262626";
   var green = "#9ccca1";
   var aqua = "#96c1d4";
   var marine = "#729dad";
@@ -4241,7 +4246,12 @@
     marine,
     purple,
     yellow,
-    red
+    red,
+    light,
+    lightGrey,
+    grey,
+    darkGrey,
+    dark
   };
 
   // src/humans.ts
@@ -4269,13 +4279,30 @@
               ease: "power1.in"
             });
             humansListItems.forEach((item) => {
-              const navItemHover = gsapWithCSS.timeline({ paused: true });
-              navItemHover.to(item, { y: "-0.5rem", duration: 0.5, ease: "power1.out" });
+              const overlay = item.querySelector('[cs-el="hhp_humans-overlay"]');
+              const tagline = overlay.querySelector('[cs-el="hhp_humans-tagline"]');
+              const details = item.querySelector('[cs-el="hhp_humans-details"]');
+              const name = details.querySelector('[cs-el="hhp_humans-name"]');
+              const icon = details.querySelector('[cs-el="hhp_humans-icon"]');
+              const navItemHover_1 = gsapWithCSS.timeline({ paused: true });
+              const navItemHover_2 = gsapWithCSS.timeline({ paused: true });
+              navItemHover_1.to(item, { y: "-0.5rem", duration: 0.5, ease: "sin.out" });
+              navItemHover_2.to(overlay, { opacity: 1, duration: 0.25, ease: "sin.in" }, "<");
+              navItemHover_2.to(
+                details,
+                { color: colors["darkGrey"], duration: 0.25, ease: "sin.in" },
+                "<"
+              );
+              navItemHover_2.to(name, { color: colors["dark"], duration: 0.25, ease: "sin.in" }, "<");
+              navItemHover_2.from(tagline, { opacity: 0, duration: 0.725, ease: "sin.in" }, ".25");
+              navItemHover_2.from(icon, { opacity: 0, duration: 0.25, ease: "sin.in" }, "<");
               item.addEventListener("mouseenter", () => {
-                navItemHover.timeScale(1).play();
+                navItemHover_1.timeScale(1).play();
+                navItemHover_2.timeScale(1).play();
               });
               item.addEventListener("mouseleave", () => {
-                navItemHover.timeScale(3).reverse();
+                navItemHover_1.timeScale(2).reverse();
+                navItemHover_2.timeScale(4).reverse();
               });
             });
           }
@@ -4291,18 +4318,8 @@
               if (stars.length === 0)
                 return;
               for (let i = 0; i < rating; i++) {
-                if (stars[i]) {
-                  gsapWithCSS.to(stars[i], {
-                    opacity: 1,
-                    duration: 2,
-                    color: colors[color],
-                    stagger: 2,
-                    // Stagger the animation with 0.2 seconds between each star.
-                    onComplete: () => {
-                      stars[i].classList.add("is-active");
-                    }
-                  });
-                }
+                stars[i].classList.add("is-active");
+                gsapWithCSS.set(stars[i], { color: colors[color] });
               }
             }
           });
