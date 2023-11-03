@@ -4258,86 +4258,71 @@
   console.log("humans.ts");
   window.Webflow ||= [];
   window.Webflow.push(() => {
-    const mm = gsapWithCSS.matchMedia();
-    const breakPoint = 800;
-    mm.add(
-      {
-        isDesktop: `(min-width: ${breakPoint}px)`,
-        isMobile: `(max-width: ${breakPoint - 1}px)`,
-        reduceMotion: "(prefers-reduced-motion: reduce)"
-      },
-      (context3) => {
-        const { isDesktop, isMobile, reduceMotion } = context3.conditions;
-        const humans = document.querySelector('[cs-el="humans"]');
-        if (humans) {
-          const humansListItems = gsapWithCSS.utils.toArray('[cs-el="humans-list-item"]');
-          if (humansListItems) {
-            gsapWithCSS.from(humansListItems, {
-              autoAlpha: 0,
-              duration: 0.5,
-              stagger: 0.1,
-              ease: "power1.in"
-            });
-            humansListItems.forEach((item) => {
-              const overlay = item.querySelector('[cs-el="hhp_humans-overlay"]');
-              const tagline = overlay.querySelector('[cs-el="hhp_humans-tagline"]');
-              const details = item.querySelector('[cs-el="hhp_humans-details"]');
-              const name = details.querySelector('[cs-el="hhp_humans-name"]');
-              const icon = details.querySelector('[cs-el="hhp_humans-icon"]');
-              const navItemHover_1 = gsapWithCSS.timeline({ paused: true });
-              const navItemHover_2 = gsapWithCSS.timeline({ paused: true });
-              navItemHover_1.to(item, { y: "-0.5rem", duration: 0.5, ease: "sin.out" });
-              navItemHover_2.to(overlay, { opacity: 1, duration: 0.25, ease: "sin.in" }, "<");
-              navItemHover_2.to(
-                details,
-                { color: colors["darkGrey"], duration: 0.25, ease: "sin.in" },
-                "<"
-              );
-              navItemHover_2.to(name, { color: colors["dark"], duration: 0.25, ease: "sin.in" }, "<");
-              navItemHover_2.from(tagline, { opacity: 0, duration: 0.725, ease: "sin.in" }, ".25");
-              navItemHover_2.from(icon, { opacity: 0, duration: 0.25, ease: "sin.in" }, "<");
-              item.addEventListener("mouseenter", () => {
-                navItemHover_1.timeScale(1).play();
-                navItemHover_2.timeScale(1).play();
-              });
-              item.addEventListener("mouseleave", () => {
-                navItemHover_1.timeScale(2).reverse();
-                navItemHover_2.timeScale(4).reverse();
-              });
-            });
+    const humans = document.querySelector('[cs-el="humans"]');
+    if (humans) {
+      const humansListItems = gsapWithCSS.utils.toArray('[cs-el="humans-list-item"]');
+      if (humansListItems) {
+        gsapWithCSS.from(humansListItems, {
+          autoAlpha: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: "power1.in"
+        });
+        humansListItems.forEach((item) => {
+          const overlay = item.querySelector('[cs-el="hhp_humans-overlay"]');
+          const tagline = overlay.querySelector('[cs-el="hhp_humans-tagline"]');
+          const details = item.querySelector('[cs-el="hhp_humans-details"]');
+          const name = details.querySelector('[cs-el="hhp_humans-name"]');
+          const icon = details.querySelector('[cs-el="hhp_humans-icon"]');
+          const navItemHover_1 = gsapWithCSS.timeline({ paused: true });
+          const navItemHover_2 = gsapWithCSS.timeline({ paused: true });
+          navItemHover_1.to(item, { y: "-0.5rem", duration: 0.5, ease: "sin.out" });
+          navItemHover_2.to(overlay, { opacity: 1, duration: 0.25, ease: "sin.in" }, "<");
+          navItemHover_2.to(
+            details,
+            { color: colors["darkGrey"], duration: 0.25, ease: "sin.in" },
+            "<"
+          );
+          navItemHover_2.to(name, { color: colors["dark"], duration: 0.25, ease: "sin.in" }, "<");
+          navItemHover_2.from(tagline, { opacity: 0, duration: 0.725, ease: "sin.in" }, ".25");
+          navItemHover_2.from(icon, { opacity: 0, duration: 0.25, ease: "sin.in" }, "<");
+          item.addEventListener("mouseenter", () => {
+            navItemHover_1.timeScale(1).play();
+            navItemHover_2.timeScale(1).play();
+          });
+          item.addEventListener("mouseleave", () => {
+            navItemHover_1.timeScale(2).reverse();
+            navItemHover_2.timeScale(4).reverse();
+          });
+        });
+      }
+    }
+    function setRatingStars() {
+      const ratingContainers = document.querySelectorAll('[cs-el="rating-stars"]');
+      console.log(ratingContainers.length);
+      ratingContainers.forEach((container) => {
+        const rating = parseInt(container.getAttribute("rating") || "0", 10);
+        const color = container.getAttribute("color") || "green";
+        if (!isNaN(rating) && rating >= 1 && rating <= 5) {
+          const stars = container.querySelectorAll('[cs-el="rating-star"]');
+          if (stars.length === 0)
+            return;
+          for (let i = 0; i < rating; i++) {
+            stars[i].classList.add("is-active");
+            gsapWithCSS.set(stars[i], { color: colors[color] });
           }
         }
-        function setRatingStars() {
-          const ratingContainers = document.querySelectorAll('[cs-el="rating-stars"]');
-          console.log(ratingContainers.length);
-          ratingContainers.forEach((container) => {
-            const rating = parseInt(container.getAttribute("rating") || "0", 10);
-            const color = container.getAttribute("color") || "green";
-            if (!isNaN(rating) && rating >= 1 && rating <= 5) {
-              const stars = container.querySelectorAll('[cs-el="rating-star"]');
-              if (stars.length === 0)
-                return;
-              for (let i = 0; i < rating; i++) {
-                stars[i].classList.add("is-active");
-                gsapWithCSS.set(stars[i], { color: colors[color] });
-              }
-            }
-          });
-        }
-        setRatingStars();
-        function init4() {
-        }
-        window.addEventListener("resize", () => {
-          init4();
-        });
-        window.addEventListener("load", () => {
-          init4();
-        });
-        return () => {
-        };
-      }
-      // End: MM Context
-    );
+      });
+    }
+    setRatingStars();
+    function init4() {
+    }
+    window.addEventListener("resize", () => {
+      init4();
+    });
+    window.addEventListener("load", () => {
+      init4();
+    });
   });
 })();
 /*! Bundled license information:

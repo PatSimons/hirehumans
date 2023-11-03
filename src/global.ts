@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger, Draggable, SplitType);
 //import { initMarquees } from 'src/components/marquees';
 import { initSliders } from 'src/components/sliders';
 
-import { colorArray } from '$utils/colors';
+//import { colorArray } from '$utils/colors';
 import { loopLogoLetters } from '$utils/colors';
 
 //// Global Declarations
