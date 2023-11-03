@@ -49,7 +49,7 @@ window.Webflow.push(() => {
         });
       });
     }
-  } // End: Humans
+  } /// End: Humans
 
   function setRatingStars() {
     ratingContainers.forEach((container) => {
