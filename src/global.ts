@@ -1,10 +1,10 @@
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-//import { SplitText } from 'gsap/SplitText';
+import Sortable from 'sortablejs'; // Added "esModuleInterop": true to tsconfig.json
 import SplitType from 'split-type';
 
-gsap.registerPlugin(ScrollTrigger, Draggable, SplitType);
+gsap.registerPlugin(ScrollTrigger, Draggable, SplitType, Sortable);
 
 //import { initMarquees } from 'src/components/marquees';
 import { initSliders } from 'src/components/sliders';
@@ -26,6 +26,81 @@ window.Webflow.push(() => {
   const mm = gsap.matchMedia();
   const breakPoint = 800;
 
+  ///////////////////// Form Elements
+
+  // Add/remove class on click Form Checkboxes
+  const formCheckboxes = gsap.utils.toArray<HTMLElement>('.w-checkbox');
+  if (formCheckboxes.length > 0) {
+    formCheckboxes.forEach((el) => {
+      // Define the event handler function
+      function handleCheckboxClick() {
+        if (el.classList.contains('is-checked')) {
+          el.classList.remove('is-checked');
+        } else {
+          el.classList.add('is-checked');
+        }
+      }
+
+      // Add a different event type, such as 'mousedown', to handle the click
+      el.addEventListener('mousedown', handleCheckboxClick);
+    });
+  }
+
+  // Add/remove class on click Form Radio Buttons
+  const formRadioBtns = gsap.utils.toArray<HTMLElement>('.w-radio');
+  if (formRadioBtns.length > 0) {
+    formRadioBtns.forEach((el) => {
+      // Define the event handler function
+      function handleRadioClick() {
+        formRadioBtns.forEach((radio) => {
+          // Remove the 'is-checked' class from all radio buttons
+          radio.classList.remove('is-checked');
+        });
+
+        // Add the 'is-checked' class to the clicked radio button
+        el.classList.add('is-checked');
+      }
+
+      // Add a click event listener to the element
+      el.addEventListener('click', handleRadioClick);
+    });
+  }
+  // Sortable List
+  const sortableLists = document.querySelectorAll<HTMLElement>('[cs-el="sortable-list"]');
+  if (sortableLists.length > 0) {
+    const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
+    // Then, you can insert this class into a style tag in your HTML document.
+    const style = document.createElement('style');
+    style.innerHTML = sortableClasses;
+    document.head.appendChild(style);
+
+    sortableLists.forEach((list) => {
+      const sortable = Sortable.create(list, {
+        handle: '.hha_icon-btn',
+        ghostClass: 'ghost',
+        //dragClass: 'drag',
+        animation: 250,
+        forceFallback: false,
+      });
+    });
+  }
+  ///////////////////// Form Elements
+
+  const buttons = document.querySelectorAll<HTMLElement>('[cs-el="button"]');
+  if (buttons.length > 0) {
+    buttons.forEach((button) => {
+      const icon = button.lastChild;
+      const buttonHover = gsap.timeline({ paused: true });
+      buttonHover.to(icon, { x: '0.5rem', duration: 0.25, delay: 0.25, ease: 'sin.in' });
+      button.addEventListener('mouseenter', () => {
+        buttonHover.timeScale(1).play();
+      });
+      button.addEventListener('mouseleave', () => {
+        buttonHover.timeScale(2).reverse();
+      });
+    });
+  }
+
   mm.add(
     {
       isDesktop: `(min-width: ${breakPoint}px)`,
@@ -41,6 +116,7 @@ window.Webflow.push(() => {
       }
       if (reduceMotion) {
       }
+
       ///////////////////// Development Only
 
       // DEV: Check for wider DOM elements
@@ -155,15 +231,6 @@ window.Webflow.push(() => {
             stagger: 0.25,
           });
         }
-        // // Draggable elements
-        // const draggableElms = gsap.utils.toArray<HTMLElement>('[cs-tr="draggable"]');
-        // if (draggableElms.length > 0) {
-        //   //console.log(draggableElms.length);
-        //   draggableElms.forEach((el: any) => {
-        //     Draggable.create(el, { type: 'x,y' });
-        //   });
-        // }
-
         // Scrolltrigger elements On Enter Viewport
         const scrolltriggerOnEnterElms = gsap.utils.toArray<HTMLElement>('[cs-st*="scroll-in"]');
         if (scrolltriggerOnEnterElms.length > 0) {
@@ -188,7 +255,7 @@ window.Webflow.push(() => {
         st_paralaxBgElms.forEach((el) => {
           gsap.to(el, {
             yPercent: 20,
-            scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1 },
+            scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 2 },
           });
         });
       }

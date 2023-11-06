@@ -9087,51 +9087,6 @@
   gsapWithCSS.registerPlugin(Observer, Draggable, sortable_esm_default);
   window.Webflow ||= [];
   window.Webflow.push(() => {
-    const formCheckboxes = gsapWithCSS.utils.toArray(".w-checkbox");
-    if (formCheckboxes.length > 0) {
-      formCheckboxes.forEach((el2) => {
-        function handleCheckboxClick(event) {
-          if (el2.classList.contains("is-checked")) {
-            el2.classList.remove("is-checked");
-          } else {
-            el2.classList.add("is-checked");
-          }
-        }
-        el2.addEventListener("mousedown", handleCheckboxClick);
-      });
-    }
-    const formRadioBtns = gsapWithCSS.utils.toArray(".w-radio");
-    if (formRadioBtns.length > 0) {
-      formRadioBtns.forEach((el2) => {
-        function handleRadioClick(event) {
-          formRadioBtns.forEach((radio) => {
-            radio.classList.remove("is-checked");
-          });
-          el2.classList.add("is-checked");
-        }
-        el2.addEventListener("click", handleRadioClick);
-      });
-    }
-    const soratbleClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
-    const style = document.createElement("style");
-    style.innerHTML = soratbleClasses;
-    document.head.appendChild(style);
-    const el = document.querySelector('[cs-el="sortable-list"]');
-    const sortable = sortable_esm_default.create(el, {
-      handle: ".hha_icon-btn",
-      ghostClass: "ghost",
-      //dragClass: 'drag',
-      animation: 250,
-      forceFallback: false
-    });
-    function init4() {
-    }
-    window.addEventListener("resize", () => {
-      init4();
-    });
-    window.addEventListener("load", () => {
-      init4();
-    });
   });
 })();
 /*! Bundled license information:
