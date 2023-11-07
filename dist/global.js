@@ -12087,6 +12087,28 @@
             }
           });
         }
+        const animatedGradientBackgroundElms = gsapWithCSS.utils.toArray(
+          '[hh-background-color="gradient-loop"]'
+        );
+        if (animatedGradientBackgroundElms.length > 0) {
+          animatedGradientBackgroundElms.forEach((el) => {
+            let currentColorIndex = 0;
+            function changeGradientColor() {
+              currentColorIndex = (currentColorIndex + 1) % colorArray.length;
+              const color1 = colorArray[currentColorIndex];
+              const color2 = colorArray[(currentColorIndex + 1) % colorArray.length];
+              const color3 = colorArray[(currentColorIndex + 2) % colorArray.length];
+              const color4 = colorArray[(currentColorIndex + 3) % colorArray.length];
+              gsapWithCSS.to(el, {
+                duration: 2,
+                // Adjust the duration as needed
+                background: `linear-gradient(to right, ${color1}, ${color2}, ${color3}, ${color4})`,
+                onComplete: changeGradientColor
+              });
+            }
+            changeGradientColor();
+          });
+        }
         const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
         if (loginModal.length > 0) {
           gsapWithCSS.set(loginModal, { autoAlpha: 0 });

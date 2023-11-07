@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger, Draggable, SplitType, Sortable);
 //import { initMarquees } from 'src/components/marquees';
 import { initSliders } from 'src/components/sliders';
 
-//import { colorArray } from '$utils/colors';
+import { colorArray } from '$utils/colors';
 import { loopLogoLetters } from '$utils/colors';
 
 //// Global Declarations
@@ -165,31 +165,31 @@ window.Webflow.push(() => {
       }
 
       //// Loop Gradient Backsgrounds
-      // const animatedGradientBackgroundElms = gsap.utils.toArray(
-      //   '[hh-background-color="gradient-loop"]'
-      // );
-      // if (animatedGradientBackgroundElms.length > 0) {
-      //   animatedGradientBackgroundElms.forEach((el: any) => {
-      //     let currentColorIndex = 0;
+      const animatedGradientBackgroundElms = gsap.utils.toArray(
+        '[hh-background-color="gradient-loop"]'
+      );
+      if (animatedGradientBackgroundElms.length > 0) {
+        animatedGradientBackgroundElms.forEach((el: any) => {
+          let currentColorIndex = 0;
 
-      //     function changeGradientColor() {
-      //       currentColorIndex = (currentColorIndex + 1) % colorArray.length;
+          function changeGradientColor() {
+            currentColorIndex = (currentColorIndex + 1) % colorArray.length;
 
-      //       const color1 = colorArray[currentColorIndex];
-      //       const color2 = colorArray[(currentColorIndex + 1) % colorArray.length];
-      //       const color3 = colorArray[(currentColorIndex + 2) % colorArray.length];
-      //       const color4 = colorArray[(currentColorIndex + 3) % colorArray.length];
+            const color1 = colorArray[currentColorIndex];
+            const color2 = colorArray[(currentColorIndex + 1) % colorArray.length];
+            const color3 = colorArray[(currentColorIndex + 2) % colorArray.length];
+            const color4 = colorArray[(currentColorIndex + 3) % colorArray.length];
 
-      //       gsap.to(el, {
-      //         duration: 2, // Adjust the duration as needed
-      //         background: `linear-gradient(to right, ${color1}, ${color2}, ${color3}, ${color4})`,
-      //         onComplete: changeGradientColor,
-      //       });
-      //     }
-      //     // Start the animation
-      //     changeGradientColor();
-      //   });
-      // }
+            gsap.to(el, {
+              duration: 2, // Adjust the duration as needed
+              background: `linear-gradient(to right, ${color1}, ${color2}, ${color3}, ${color4})`,
+              onComplete: changeGradientColor,
+            });
+          }
+          // Start the animation
+          changeGradientColor();
+        });
+      }
       //// End: Loop Gradient Backsgrounds
 
       //// Login Modal

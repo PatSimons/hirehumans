@@ -6563,6 +6563,19 @@
     darkGrey,
     dark
   };
+  function darkenColor(color, factor) {
+    factor = Math.min(1, Math.max(0, factor));
+    let r = parseInt(color.slice(1, 3), 16);
+    let g = parseInt(color.slice(3, 5), 16);
+    let b = parseInt(color.slice(5, 7), 16);
+    r = Math.round(r * (1 - factor));
+    g = Math.round(g * (1 - factor));
+    b = Math.round(b * (1 - factor));
+    const hexR = r.toString(16).padStart(2, "0");
+    const hexG = g.toString(16).padStart(2, "0");
+    const hexB = b.toString(16).padStart(2, "0");
+    return `#${hexR}${hexG}${hexB}`;
+  }
 
   // src/humans.ts
   console.log("humans.ts");
@@ -6573,11 +6586,9 @@
     if (humans) {
       const humansListItems = gsapWithCSS.utils.toArray('[cs-el="humans-list-item"]');
       if (humansListItems) {
-        gsapWithCSS.from(humansListItems, {
-          autoAlpha: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: "power1.in"
+        ScrollTrigger2.batch(humansListItems, {
+          onEnter: (batch) => gsapWithCSS.from(batch, { y: "8px", opacity: 0, duration: 1, stagger: 0.1 })
+          //onEnter: (batch) => gsap.to(batch, { y: '0px', autoAlpha: 1, duration: 1, stagger: 0.1 }),
         });
         humansListItems.forEach((item) => {
           const overlay = item.querySelector('[cs-el="hhp_humans-overlay"]');
@@ -6610,14 +6621,14 @@
     const searchBar = document.querySelector('[cs-el="search-bar"]');
     const stSearchBar = ScrollTrigger2.create({
       trigger: humansSection,
-      start: "top 80px",
+      start: "top 79px",
       // Nav height
       end: "bottom top",
       markers: false,
       pin: searchBar,
       pinSpacing: false,
       invalidateOnRefresh: true,
-      onEnter: () => gsapWithCSS.to(searchBar, { backgroundColor: colors["grey"] }),
+      onEnter: () => gsapWithCSS.to(searchBar, { backgroundColor: darkenColor("#d8d3cd", 0.025) }),
       onLeaveBack: () => gsapWithCSS.to(searchBar, { backgroundColor: colors["lightGrey"] })
     });
     function setRatingStars() {

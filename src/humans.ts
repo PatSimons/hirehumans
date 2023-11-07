@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
-import { colors } from '$utils/colors';
+import { colors, darkenColor } from '$utils/colors';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -14,13 +14,46 @@ window.Webflow.push(() => {
   if (humans) {
     const humansListItems: string[] = gsap.utils.toArray('[cs-el="humans-list-item"]');
     if (humansListItems) {
-      // Fade in on page load
-      gsap.from(humansListItems, {
-        autoAlpha: 0,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power1.in',
+      //// Fade in on page load
+      // gsap.from(humansListItems, {
+      //   autoAlpha: 0,
+      //   duration: 0.5,
+      //   stagger: 0.1,
+      //   ease: 'power1.in',
+      // });
+
+      ScrollTrigger.batch(humansListItems, {
+        onEnter: (batch) => gsap.from(batch, { y: '8px', opacity: 0, duration: 1, stagger: 0.1 }),
+        //onEnter: (batch) => gsap.to(batch, { y: '0px', autoAlpha: 1, duration: 1, stagger: 0.1 }),
       });
+
+      // // Scrolltrigger - Batch Fade-In
+      // const batchElms: string[] = gsap.utils.toArray('[cs-st="batch-in"]');
+      // if (batchElms) {
+      //   ScrollTrigger.batch(batchElms, {
+      //     onEnter: (batch) => gsap.to(batch, { y: '0px', autoAlpha: 1, duration: 1, stagger: 0.1 }),
+      //     //onEnter: (batch) => gsap.to(batch, { y: '0px', autoAlpha: 1, duration: 1, stagger: 0.1 }),
+      //   });
+      // } // End: Scrolltrigger - Batch Fade-In
+      // // Scrolltrigger - On Enter
+      // if (document.querySelector('[cs-st="enter"]')) {
+      //   const scrollInElms: string[] = gsap.utils.toArray('[cs-st="enter"]');
+      //   scrollInElms.forEach((el: any) => {
+      //     gsap.from(el, {
+      //       opacity: 0,
+      //       y: '50px',
+      //       scrollTrigger: {
+      //         trigger: el,
+      //         start: 'top bottom',
+      //         end: 'bottom 90%',
+      //         scrub: true,
+      //         markers: false,
+      //         invalidateOnRefresh: true,
+      //       },
+      //     });
+      //   });
+      // } // End: Scrolltrigger - On Enter
+
       // Nav Hovers
       humansListItems.forEach((item: any) => {
         const overlay = item.querySelector('[cs-el="hhp_humans-overlay"]');
@@ -59,13 +92,13 @@ window.Webflow.push(() => {
 
   const stSearchBar = ScrollTrigger.create({
     trigger: humansSection,
-    start: 'top 80px', // Nav height
+    start: 'top 79px', // Nav height
     end: 'bottom top',
     markers: false,
     pin: searchBar,
     pinSpacing: false,
     invalidateOnRefresh: true,
-    onEnter: () => gsap.to(searchBar, { backgroundColor: colors['grey'] }),
+    onEnter: () => gsap.to(searchBar, { backgroundColor: darkenColor('#d8d3cd', 0.025) }),
     onLeaveBack: () => gsap.to(searchBar, { backgroundColor: colors['lightGrey'] }),
   });
   //// End: Search Bar

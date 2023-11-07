@@ -32,3 +32,25 @@ export function loopLogoLetters(letters: string[]) {
   gsap.utils.shuffle(colorArray);
   gsap.to(letters, { color: gsap.utils.wrap(colorArray), duration: 0.25 });
 }
+
+export function darkenColor(color: string, factor: number): string {
+  // Ensure the factor is between 0 and 1
+  factor = Math.min(1, Math.max(0, factor));
+
+  // Parse the input color
+  let r = parseInt(color.slice(1, 3), 16);
+  let g = parseInt(color.slice(3, 5), 16);
+  let b = parseInt(color.slice(5, 7), 16);
+
+  // Darken each channel
+  r = Math.round(r * (1 - factor));
+  g = Math.round(g * (1 - factor));
+  b = Math.round(b * (1 - factor));
+
+  // Convert back to hex format
+  const hexR = r.toString(16).padStart(2, '0');
+  const hexG = g.toString(16).padStart(2, '0');
+  const hexB = b.toString(16).padStart(2, '0');
+
+  return `#${hexR}${hexG}${hexB}`;
+}
