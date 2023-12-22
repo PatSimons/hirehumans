@@ -8,8 +8,10 @@ gsap.registerPlugin(Observer, Draggable, Sortable);
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  //HHA ColorPicker
+  ////// ColorPicker Main function ////////////////////////////////////////////////
+
   function customColorPicker(handle: HTMLElement, parent: HTMLElement): string {
+    // ColorPicker function: Return color from Background
     function getParentGradientColor(eventX: number): string {
       const parentWidth = parent.clientWidth;
       const gradientPercentage = (eventX / parentWidth) * 100;
@@ -36,6 +38,7 @@ window.Webflow.push(() => {
       return color;
     } // End: function getParentGradientColor()
 
+    // ColorPicker function: Convert RGB to HEX
     function rgbStringToHex(rgbString: string): string {
       // Extract the numeric RGB values from the string using a regular expression
       const match = rgbString.match(/\d+/g);
@@ -66,6 +69,7 @@ window.Webflow.push(() => {
       return hexColor;
     } // End: function rgbStringToHex(
 
+    // ColorPicker function: interpolate color
     function interpolateColor(startColor: string, endColor: string, percentage: number): string {
       const startRGB = startColor.match(/\d+/g)?.map(Number);
       const endRGB = endColor.match(/\d+/g)?.map(Number);
@@ -81,9 +85,15 @@ window.Webflow.push(() => {
       return `rgba(${interpolatedRGB.join(', ')})`;
     } // End: function interpolateColor()
 
+    // Array of all elements that have dynamic text color
     const hhColorElms = document.querySelectorAll('[hh-color], [hh-link-color]');
+    // Array of all elements that have dynamic backround color
     const hhBgColorElms = gsap.utils.toArray('[hh-background-color], [hh-button-color]');
+
+    // Text field that displays the selected Hex value
     const selectedColorHex = document.querySelector('[cs-el="hha-color-selected-hex"]');
+
+    // Drag handle function
     let color = '';
     Draggable.create(handle, {
       type: 'x',
@@ -106,16 +116,21 @@ window.Webflow.push(() => {
     }); // End: Draggable
 
     return color; // Return your color value here or remove the return statement.
-  } // End: export function customColorPicker()
+  } // End Colorpicker Main function: export function customColorPicker()
+
+  // Run
   const colorPicker = document.querySelector('[cs-el="hha-colorpicker"]');
   if (colorPicker) {
     const colorPickerGradient = colorPicker.querySelector('[cs-el="hha-colorpicker-gradient"]');
     const colorPickerHandle = colorPicker.querySelector('[cs-el="hha-colorpicker-handle"]');
+
+    // Run main colorpicker function
     customColorPicker(colorPickerHandle, colorPickerGradient);
   }
   // End: HHA ColorPicker
 
-  // HHU Tab/Panel
+  ////// HHU Tab/Panel ////////////////////////////////////////////////
+
   const hhuTab = document.querySelector('[cs-el="hhu-admin-tab"]');
   const hhuPanelWidth = '35rem';
 
