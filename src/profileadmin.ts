@@ -1,15 +1,68 @@
-import { gsap } from 'gsap';
-import { Draggable } from 'gsap/Draggable';
-import { Observer } from 'gsap/Observer';
-import Sortable from 'sortablejs'; // Added "esModuleInterop": true to tsconfig.json
+import './global';
+import './human';
 
-import { gsapDuration, gsapEaseType } from '$utils/globalvars';
-gsap.registerPlugin(Observer, Draggable, Sortable);
+import { Draggable } from 'gsap/Draggable';
+
+//import Sortable from 'sortablejs'; // Added "esModuleInterop": true to tsconfig.json
+//import { gsapDuration, gsapEaseType } from '$utils/globalvars';
+import { gsap } from './global';
+gsap.registerPlugin(Draggable);
+//gsap.registerPlugin(Sortable);
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  ////// ColorPicker Main function ////////////////////////////////////////////////
+  //_______________________________________________________________________________________________________ User Admin Drawer
+  const userAdmin = document.querySelector('[cs-el="userAdmin"]');
 
+  if (userAdmin) {
+    const userAdminTab = document.querySelector('[cs-el="userAdminTab"]');
+    if (userAdminTab) {
+      const tl_hoverTab = gsap.timeline({ paused: true });
+      tl_hoverTab.to(userAdminTab, { width: '+=0.5rem', paddingLeft: '0.5rem' });
+      userAdminTab.addEventListener('mouseenter', () => {
+        tl_hoverTab.timeScale(1).play();
+      });
+      userAdminTab.addEventListener('mouseleave', () => {
+        tl_hoverTab.timeScale(2).reverse();
+      });
+    }
+    const hhuPanelWidth = '45rem';
+    const userAdminDrawer = userAdmin.querySelector('[cs-el="userAdminDrawer"]');
+    const userAdminHeader = userAdminDrawer?.querySelector('[cs-el="userAdminHeader"]');
+    const userAdminContent = userAdminDrawer?.querySelector('[cs-el="userAdminMain"]');
+    const userAdminBackdrop = userAdmin?.querySelector('[cs-el="userAdminBackdrop"]');
+    const userCloseDrawer = userAdmin?.querySelector('[cs-el="adminCloseDrawer"]');
+
+    let isOpen = false;
+
+    const openPanel = gsap.timeline({ paused: true });
+
+    openPanel.to(userAdminDrawer, { width: hhuPanelWidth, ease: 'Power.out', duration: 0.375 });
+    openPanel.to(userAdminTab, { opacity: 0, duration: 0.375 }, '<');
+    openPanel.to([userAdminBackdrop], { autoAlpha: 1, duration: 0.375 }, '<');
+    openPanel.from([userAdminHeader, userAdminContent], { opacity: 0, duration: 0.25 });
+
+    userAdminTab.addEventListener('click', () => {
+      if (isOpen) {
+        isOpen = false;
+        openPanel.timeScale(1.5).reverse();
+      } else {
+        isOpen = true;
+        openPanel.timeScale(1).play();
+      }
+    });
+    // Close Drawer Const
+    const closeDrawer = () => {
+      if (isOpen) {
+        isOpen = false;
+        openPanel.timeScale(1.5).reverse();
+      }
+    };
+
+    userAdminBackdrop.addEventListener('click', closeDrawer);
+    userCloseDrawer.addEventListener('click', closeDrawer);
+  }
+  //_______________________________________________________________________________________________________ ColorPicker Main function
   function customColorPicker(handle: HTMLElement, parent: HTMLElement): string {
     // ColorPicker function: Return color from Background
     function getParentGradientColor(eventX: number): string {
@@ -86,9 +139,11 @@ window.Webflow.push(() => {
     } // End: function interpolateColor()
 
     // Array of all elements that have dynamic text color
-    const hhColorElms = document.querySelectorAll('[hh-color], [hh-link-color]');
+    const hhColorElms = gsap.utils.toArray<HTMLElement>('[hh-color], [hh-link-color]');
     // Array of all elements that have dynamic backround color
-    const hhBgColorElms = gsap.utils.toArray('[hh-background-color], [hh-button-color]');
+    const hhBgColorElms = gsap.utils.toArray<HTMLElement>(
+      '[hh-background-color], [hh-button-color]'
+    );
 
     // Text field that displays the selected Hex value
     const selectedColorHex = document.querySelector('[cs-el="hha-color-selected-hex"]');
@@ -98,7 +153,7 @@ window.Webflow.push(() => {
     Draggable.create(handle, {
       type: 'x',
       bounds: parent,
-      onClick: function () {},
+      //onClick: function () {},
       onDrag: function () {
         color = getParentGradientColor(
           handle.getBoundingClientRect().left - parent.getBoundingClientRect().left
@@ -106,10 +161,10 @@ window.Webflow.push(() => {
         const hexColor = rgbStringToHex(color);
         selectedColorHex.textContent = hexColor;
 
-        hhColorElms.forEach((el: any) => {
+        hhColorElms.forEach((el: HTMLElement) => {
           el.style.color = color;
         });
-        hhBgColorElms.forEach((el: any) => {
+        hhBgColorElms.forEach((el: HTMLElement) => {
           el.style.backgroundColor = color;
         });
       },
@@ -127,131 +182,85 @@ window.Webflow.push(() => {
     // Run main colorpicker function
     customColorPicker(colorPickerHandle, colorPickerGradient);
   }
-  // End: HHA ColorPicker
 
-  ////// HHU Tab/Panel ////////////////////////////////////////////////
+  //_______________________________________________________________________________________________________ On Page Editables
+  // const editables = gsap.utils.toArray('[cs-el="hha_editable"]');
+  // editables.forEach((el: any) => {
+  //   const tl_hoverEditable = gsap.timeline({ paused: true });
+  //   const tl_openCopyAsist = gsap.timeline({ paused: true });
+  //   const hoverWrap = el.querySelector('[cs-el="hha_editable-hover"]');
+  //   const openCopyAsist = el.querySelector('[cs-el="open-asist"]');
+  //   const closeCopyAsist = el.querySelectorAll('[cs-el="close-asist"]');
+  //   const copyAsist = el.querySelector('[cs-el="asist"]');
+  //   let isOpen = false;
 
-  const hhuTab = document.querySelector('[cs-el="hhu-admin-tab"]');
-  const hhuPanelWidth = '35rem';
+  //   gsap.set(hoverWrap, { opacity: 0, scale: 1.03 });
+  //   gsap.set(copyAsist, { autoAlpha: 0, scale: 1 });
+  //   gsap.set(openCopyAsist, { color: '#C3bdb7' });
+  //   tl_hoverEditable.to(hoverWrap, {
+  //     opacity: 1,
+  //     scale: 1,
+  //     duration: gsapDuration,
+  //     ease: gsapEaseType,
+  //   });
+  //   tl_openCopyAsist.to(copyAsist, {
+  //     autoAlpha: 1,
+  //     scale: 1,
+  //     duration: gsapDuration,
+  //     ease: gsapEaseType,
+  //   });
+  //   tl_openCopyAsist.to(
+  //     openCopyAsist,
+  //     {
+  //       color: '#70c278',
+  //       duration: gsapDuration,
+  //       ease: gsapEaseType,
+  //     },
+  //     '<'
+  //   );
 
-  if (hhuTab) {
-    const hhuAdminMain = document.querySelector('[cs-el="hhu-admin-main"]');
-    const hhuAdminContent = hhuAdminMain?.querySelector('[cs-el="hhu-admin-main-content"]');
-    //const hhaMain = document.querySelector('[cs-el="main-wrapper"]');
+  //   el.addEventListener('mouseenter', () => {
+  //     tl_hoverEditable.timeScale(1).play();
+  //   });
+  //   el.addEventListener('mouseleave', () => {
+  //     if (!isOpen) {
+  //       tl_hoverEditable.timeScale(2).reverse();
+  //     }
+  //   });
+  //   openCopyAsist.addEventListener('click', () => {
+  //     tl_openCopyAsist.timeScale(1).play();
+  //     isOpen = true;
+  //   });
+  //   closeCopyAsist.forEach((el: any) => {
+  //     el.addEventListener('click', () => {
+  //       tl_openCopyAsist.timeScale(2).reverse();
+  //       isOpen = false;
+  //     });
+  //   });
+  //   document.addEventListener('click', (event) => {
+  //     if (!el.contains(event.target)) {
+  //       tl_hoverEditable.timeScale(2).reverse();
+  //       if (isOpen) {
+  //         tl_openCopyAsist.timeScale(2).reverse();
+  //       }
+  //     }
+  //   });
+  // });
 
-    let isOpen = false;
+  //_______________________________________________________________________________________________________ Sortable Items
+  // const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
 
-    const openPanel = gsap.timeline({ paused: true });
-    openPanel.to(hhuAdminMain, { width: hhuPanelWidth, ease: 'Power2.out' });
-    //openPanel.to(hhaMain, { paddingLeft: hhaPanelWidth, ease: 'Power2.out' }, '<');
-    openPanel.to(hhuAdminContent, { opacity: 1 });
-    hhuTab.addEventListener('click', () => {
-      if (isOpen) {
-        isOpen = false;
-        openPanel.timeScale(1.75).reverse();
-      } else {
-        isOpen = true;
-        openPanel.timeScale(1).play();
-      }
-    });
-  }
-  // End: HHA Tab/Panel
+  // // Then, you can insert this class into a style tag in your HTML document.
+  // const style = document.createElement('style');
+  // style.innerHTML = sortableClasses;
+  // document.head.appendChild(style);
 
-  // HHA Draggable test
-  const drag = document.querySelector('[cs-el="hhu-admin-modal"]');
-  if (drag) {
-    Draggable.create(drag, {});
-  }
-  // End: HHA Draggable test
-
-  const editables = gsap.utils.toArray('[cs-el="hha_editable"]');
-  editables.forEach((el: any) => {
-    const tl_hoverEditable = gsap.timeline({ paused: true });
-    const tl_openCopyAsist = gsap.timeline({ paused: true });
-    const hoverWrap = el.querySelector('[cs-el="hha_editable-hover"]');
-    const openCopyAsist = el.querySelector('[cs-el="open-asist"]');
-    const closeCopyAsist = el.querySelectorAll('[cs-el="close-asist"]');
-    const copyAsist = el.querySelector('[cs-el="asist"]');
-    let isOpen = false;
-
-    gsap.set(hoverWrap, { opacity: 0, scale: 1.03 });
-    gsap.set(copyAsist, { autoAlpha: 0, scale: 1 });
-    gsap.set(openCopyAsist, { color: '#C3bdb7' });
-    tl_hoverEditable.to(hoverWrap, {
-      opacity: 1,
-      scale: 1,
-      duration: gsapDuration,
-      ease: gsapEaseType,
-    });
-    tl_openCopyAsist.to(copyAsist, {
-      autoAlpha: 1,
-      scale: 1,
-      duration: gsapDuration,
-      ease: gsapEaseType,
-    });
-    tl_openCopyAsist.to(
-      openCopyAsist,
-      {
-        color: '#70c278',
-        duration: gsapDuration,
-        ease: gsapEaseType,
-      },
-      '<'
-    );
-
-    el.addEventListener('mouseenter', () => {
-      tl_hoverEditable.timeScale(1).play();
-    });
-    el.addEventListener('mouseleave', () => {
-      if (!isOpen) {
-        tl_hoverEditable.timeScale(2).reverse();
-      }
-    });
-    openCopyAsist.addEventListener('click', () => {
-      tl_openCopyAsist.timeScale(1).play();
-      isOpen = true;
-    });
-    closeCopyAsist.forEach((el: any) => {
-      el.addEventListener('click', () => {
-        tl_openCopyAsist.timeScale(2).reverse();
-        isOpen = false;
-      });
-    });
-    document.addEventListener('click', (event) => {
-      if (!el.contains(event.target)) {
-        tl_hoverEditable.timeScale(2).reverse();
-        if (isOpen) {
-          tl_openCopyAsist.timeScale(2).reverse();
-        }
-      }
-    });
-  });
-  ////////////////////////////////////////////////////////////////////////////////////
-
-  const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
-
-  // Then, you can insert this class into a style tag in your HTML document.
-  const style = document.createElement('style');
-  style.innerHTML = sortableClasses;
-  document.head.appendChild(style);
-
-  const el = document.querySelector('[cs-el="sortable-list"]');
-  const sortable = Sortable.create(el, {
-    handle: '.hha_icon-btn',
-    ghostClass: 'ghost',
-    //dragClass: 'drag',
-    animation: 250,
-    forceFallback: false,
-  });
-
-  ////////////////////////////////////////////////////////////////////////////////////
-
-  function init() {} // End: function init()
-
-  window.addEventListener('resize', () => {
-    init();
-  });
-  window.addEventListener('load', () => {
-    init();
-  });
+  // const el = document.querySelector('[cs-el="sortable-list"]');
+  // const sortable = Sortable.create(el, {
+  //   handle: '.hha_icon-btn',
+  //   ghostClass: 'ghost',
+  //   //dragClass: 'drag',
+  //   animation: 250,
+  //   forceFallback: false,
+  // });
 }); // End: Webflow Push

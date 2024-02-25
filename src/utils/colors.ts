@@ -1,8 +1,10 @@
 import { gsap } from 'gsap';
+//export { gsap };
 
 export const light = '#fffefc';
 export const lightGrey = '#eee9e4';
 export const grey = '#c3bdb7';
+export const midGrey = '#e3e0dd';
 export const darkGrey = '#767676';
 export const dark = '#262626';
 
@@ -24,6 +26,7 @@ export const colors: { [key: string]: string } = {
   light,
   lightGrey,
   grey,
+  midGrey,
   darkGrey,
   dark,
 };

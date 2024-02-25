@@ -178,16 +178,16 @@
   var _passThrough = function _passThrough2(p) {
     return p;
   };
-  var _setDefaults = function _setDefaults2(obj, defaults2) {
-    for (var p in defaults2) {
-      p in obj || (obj[p] = defaults2[p]);
+  var _setDefaults = function _setDefaults2(obj, defaults3) {
+    for (var p in defaults3) {
+      p in obj || (obj[p] = defaults3[p]);
     }
     return obj;
   };
   var _setKeyframeDefaults = function _setKeyframeDefaults2(excludeDuration) {
-    return function(obj, defaults2) {
-      for (var p in defaults2) {
-        p in obj || p === "duration" && excludeDuration || p === "ease" || (obj[p] = defaults2[p]);
+    return function(obj, defaults3) {
+      for (var p in defaults3) {
+        p in obj || p === "duration" && excludeDuration || p === "ease" || (obj[p] = defaults3[p]);
       }
     };
   };
@@ -543,7 +543,7 @@
     }
     var vars = _isObject(v) ? v : {
       each: v
-    }, ease = _parseEase(vars.ease), from = vars.from || 0, base = parseFloat(vars.base) || 0, cache = {}, isDecimal = from > 0 && from < 1, ratios = isNaN(from) || isDecimal, axis = vars.axis, ratioX = from, ratioY = from;
+    }, ease = _parseEase(vars.ease), from = vars.from || 0, base = parseFloat(vars.base) || 0, cache2 = {}, isDecimal = from > 0 && from < 1, ratios = isNaN(from) || isDecimal, axis = vars.axis, ratioX = from, ratioY = from;
     if (_isString(from)) {
       ratioX = ratioY = {
         center: 0.5,
@@ -555,7 +555,7 @@
       ratioY = from[1];
     }
     return function(i, target, a) {
-      var l = (a || vars).length, distances = cache[l], originX, originY, x, y, d, j, max, min, wrapAt;
+      var l = (a || vars).length, distances = cache2[l], originX, originY, x, y, d, j, max, min, wrapAt;
       if (!distances) {
         wrapAt = vars.grid === "auto" ? 0 : (vars.grid || [1, _bigNum])[1];
         if (!wrapAt) {
@@ -564,7 +564,7 @@
           }
           wrapAt--;
         }
-        distances = cache[l] = [];
+        distances = cache2[l] = [];
         originX = ratios ? Math.min(wrapAt, l) * ratioX - 0.5 : from % wrapAt;
         originY = wrapAt === _bigNum ? 0 : ratios ? l * ratioY / wrapAt - 0.5 : from / wrapAt | 0;
         max = 0;
@@ -596,9 +596,9 @@
     };
   };
   var snap = function snap2(snapTo, value) {
-    var isArray = _isArray(snapTo), radius, is2D;
-    if (!isArray && _isObject(snapTo)) {
-      radius = isArray = snapTo.radius || _bigNum;
+    var isArray2 = _isArray(snapTo), radius, is2D;
+    if (!isArray2 && _isObject(snapTo)) {
+      radius = isArray2 = snapTo.radius || _bigNum;
       if (snapTo.values) {
         snapTo = toArray(snapTo.values);
         if (is2D = !_isNumber(snapTo[0])) {
@@ -608,7 +608,7 @@
         snapTo = _roundModifier(snapTo.increment);
       }
     }
-    return _conditionalReturn(value, !isArray ? _roundModifier(snapTo) : _isFunction(snapTo) ? function(raw) {
+    return _conditionalReturn(value, !isArray2 ? _roundModifier(snapTo) : _isFunction(snapTo) ? function(raw) {
       is2D = snapTo(raw);
       return Math.abs(is2D - raw) <= radius ? is2D : raw;
     } : function(raw) {
@@ -672,12 +672,12 @@
     });
   };
   var _replaceRandom = function _replaceRandom2(value) {
-    var prev = 0, s = "", i, nums, end, isArray;
+    var prev = 0, s = "", i, nums, end, isArray2;
     while (~(i = value.indexOf("random(", prev))) {
       end = value.indexOf(")", i);
-      isArray = value.charAt(i + 7) === "[";
-      nums = value.substr(i + 7, end - i - 7).match(isArray ? _delimitedValueExp : _strictNumExp);
-      s += value.substr(prev, i - prev) + random(isArray ? nums : +nums[0], isArray ? 0 : +nums[1], +nums[2] || 1e-5);
+      isArray2 = value.charAt(i + 7) === "[";
+      nums = value.substr(i + 7, end - i - 7).match(isArray2 ? _delimitedValueExp : _strictNumExp);
+      s += value.substr(prev, i - prev) + random(isArray2 ? nums : +nums[0], isArray2 ? 0 : +nums[1], +nums[2] || 1e-5);
       prev = end + 1;
     }
     return s + value.substr(prev, value.length - prev);
@@ -693,9 +693,9 @@
       return (1 - p2) * start + p2 * end;
     };
     if (!func) {
-      var isString = _isString(start), master = {}, p, i, interpolators, l, il;
+      var isString2 = _isString(start), master = {}, p, i, interpolators, l, il;
       progress === true && (mutate = 1) && (progress = null);
-      if (isString) {
+      if (isString2) {
         start = {
           p: start
         };
@@ -724,7 +724,7 @@
           _addPropTween.call(master, start, p, "get", end[p]);
         }
         func = function func2(p2) {
-          return _renderPropTweens(p2, master) || (isString ? start.p : start);
+          return _renderPropTweens(p2, master) || (isString2 ? start.p : start);
         };
       }
     }
@@ -893,14 +893,14 @@
     return a;
   };
   var _colorOrderData = function _colorOrderData2(v) {
-    var values = [], c = [], i = -1;
+    var values2 = [], c = [], i = -1;
     v.split(_colorExp).forEach(function(v2) {
       var a = v2.match(_numWithUnitExp) || [];
-      values.push.apply(values, a);
+      values2.push.apply(values2, a);
       c.push(i += a.length + 1);
     });
-    values.c = c;
-    return values;
+    values2.c = c;
+    return values2;
   };
   var _formatColors = function _formatColors2(s, toHSL, orderMatchData) {
     var result = "", colors = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
@@ -1021,7 +1021,7 @@
         _wake();
         return func;
       },
-      remove: function remove(callback, i) {
+      remove: function remove2(callback, i) {
         ~(i = _listeners3.indexOf(callback)) && _listeners3.splice(i, 1) && _i2 >= i && _i2--;
       },
       _listeners: _listeners3
@@ -1035,9 +1035,9 @@
   var _customEaseExp = /^[\d.\-M][\d.\-,\s]/;
   var _quotesExp = /["']/g;
   var _parseObjectInString = function _parseObjectInString2(value) {
-    var obj = {}, split = value.substr(1, value.length - 3).split(":"), key = split[0], i = 1, l = split.length, index, val, parsedVal;
+    var obj = {}, split2 = value.substr(1, value.length - 3).split(":"), key = split2[0], i = 1, l = split2.length, index, val, parsedVal;
     for (; i < l; i++) {
-      val = split[i];
+      val = split2[i];
       index = i !== l - 1 ? val.lastIndexOf(",") : val.length;
       parsedVal = val.substr(0, index);
       obj[key] = isNaN(parsedVal) ? parsedVal.replace(_quotesExp, "").trim() : +parsedVal;
@@ -1050,8 +1050,8 @@
     return value.substring(open, ~nested && nested < close ? value.indexOf(")", close + 1) : close);
   };
   var _configEaseFromString = function _configEaseFromString2(name) {
-    var split = (name + "").split("("), ease = _easeMap[split[0]];
-    return ease && split.length > 1 && ease.config ? ease.config.apply(null, ~name.indexOf("{") ? [_parseObjectInString(split[1])] : _valueInParentheses(name).split(",").map(_numericIfPossible)) : _easeMap._CE && _customEaseExp.test(name) ? _easeMap._CE("", name) : ease;
+    var split2 = (name + "").split("("), ease = _easeMap[split2[0]];
+    return ease && split2.length > 1 && ease.config ? ease.config.apply(null, ~name.indexOf("{") ? [_parseObjectInString(split2[1])] : _valueInParentheses(name).split(",").map(_numericIfPossible)) : _easeMap._CE && _customEaseExp.test(name) ? _easeMap._CE("", name) : ease;
   };
   var _invertEase = function _invertEase2(ease) {
     return function(p) {
@@ -1480,7 +1480,7 @@
       _createTweenType(2, arguments, this);
       return this;
     };
-    _proto2.set = function set(targets, vars, position) {
+    _proto2.set = function set2(targets, vars, position) {
       vars.duration = 0;
       vars.parent = this;
       _inheritDefaults(vars).repeatDelay || (vars.repeat = 0);
@@ -1714,7 +1714,7 @@
         }
       }
     };
-    _proto2.remove = function remove(child) {
+    _proto2.remove = function remove2(child) {
       if (_isString(child)) {
         return this.removeLabel(child);
       }
@@ -2232,7 +2232,7 @@
         position = null;
       }
       _this3 = _Animation2.call(this, skipInherit ? vars : _inheritDefaults(vars)) || this;
-      var _this3$vars = _this3.vars, duration = _this3$vars.duration, delay = _this3$vars.delay, immediateRender = _this3$vars.immediateRender, stagger = _this3$vars.stagger, overwrite = _this3$vars.overwrite, keyframes = _this3$vars.keyframes, defaults2 = _this3$vars.defaults, scrollTrigger = _this3$vars.scrollTrigger, yoyoEase = _this3$vars.yoyoEase, parent = vars.parent || _globalTimeline, parsedTargets = (_isArray(targets) || _isTypedArray(targets) ? _isNumber(targets[0]) : "length" in vars) ? [targets] : toArray(targets), tl, i, copy, l, p, curTarget, staggerFunc, staggerVarsToMerge;
+      var _this3$vars = _this3.vars, duration = _this3$vars.duration, delay = _this3$vars.delay, immediateRender = _this3$vars.immediateRender, stagger = _this3$vars.stagger, overwrite = _this3$vars.overwrite, keyframes = _this3$vars.keyframes, defaults3 = _this3$vars.defaults, scrollTrigger = _this3$vars.scrollTrigger, yoyoEase = _this3$vars.yoyoEase, parent = vars.parent || _globalTimeline, parsedTargets = (_isArray(targets) || _isTypedArray(targets) ? _isNumber(targets[0]) : "length" in vars) ? [targets] : toArray(targets), tl, i, copy, l, p, curTarget, staggerFunc, staggerVarsToMerge;
       _this3._targets = parsedTargets.length ? _harness(parsedTargets) : _warn("GSAP target " + targets + " not found. https://greensock.com", !_config.nullTargetWarn) || [];
       _this3._ptLookup = [];
       _this3._overwrite = overwrite;
@@ -2240,7 +2240,7 @@
         vars = _this3.vars;
         tl = _this3.timeline = new Timeline({
           data: "nested",
-          defaults: defaults2 || {},
+          defaults: defaults3 || {},
           targets: parent && parent.data === "nested" ? parent.vars.targets : parsedTargets
         });
         tl.kill();
@@ -2527,7 +2527,7 @@
     Tween2.fromTo = function fromTo(targets, fromVars, toVars) {
       return _createTweenType(2, arguments);
     };
-    Tween2.set = function set(targets, vars) {
+    Tween2.set = function set2(targets, vars) {
       vars.duration = 0;
       vars.repeatDelay || (vars.repeat = 0);
       return new Tween2(targets, vars);
@@ -2886,15 +2886,15 @@
         };
       }
       target = target[0] || {};
-      var Plugin = _plugins[property], cache = _getCache(target), p = cache.harness && (cache.harness.aliases || {})[property] || property, setter = Plugin ? function(value) {
+      var Plugin = _plugins[property], cache2 = _getCache(target), p = cache2.harness && (cache2.harness.aliases || {})[property] || property, setter = Plugin ? function(value) {
         var p2 = new Plugin();
         _quickTween._pt = 0;
         p2.init(target, unit ? value + unit : value, _quickTween, 0, [target]);
         p2.render(1, p2);
         _quickTween._pt && _renderPropTweens(1, _quickTween);
-      } : cache.set(target, p);
+      } : cache2.set(target, p);
       return Plugin ? setter : function(value) {
-        return setter(target, p, unit ? value + unit : value, cache, 1);
+        return setter(target, p, unit ? value + unit : value, cache2, 1);
       };
     },
     quickTo: function quickTo(target, property, vars) {
@@ -2916,12 +2916,12 @@
       return _mergeDeep(_config, value || {});
     },
     registerEffect: function registerEffect(_ref3) {
-      var name = _ref3.name, effect = _ref3.effect, plugins = _ref3.plugins, defaults2 = _ref3.defaults, extendTimeline = _ref3.extendTimeline;
+      var name = _ref3.name, effect = _ref3.effect, plugins = _ref3.plugins, defaults3 = _ref3.defaults, extendTimeline = _ref3.extendTimeline;
       (plugins || "").split(",").forEach(function(pluginName) {
         return pluginName && !_plugins[pluginName] && !_globals[pluginName] && _warn(name + " effect requires " + pluginName + " plugin.");
       });
       _effects[name] = function(targets, vars, tl) {
-        return effect(toArray(targets), _setDefaults(vars || {}, defaults2), tl);
+        return effect(toArray(targets), _setDefaults(vars || {}, defaults3), tl);
       };
       if (extendTimeline) {
         Timeline.prototype[name] = function(targets, vars, position) {
@@ -3195,14 +3195,14 @@
     return target._gsap.scaleX = target._gsap.scaleY = value;
   };
   var _setterScaleWithRender = function _setterScaleWithRender2(target, property, value, data, ratio) {
-    var cache = target._gsap;
-    cache.scaleX = cache.scaleY = value;
-    cache.renderTransform(ratio, cache);
+    var cache2 = target._gsap;
+    cache2.scaleX = cache2.scaleY = value;
+    cache2.renderTransform(ratio, cache2);
   };
   var _setterTransformWithRender = function _setterTransformWithRender2(target, property, value, data, ratio) {
-    var cache = target._gsap;
-    cache[property] = value;
-    cache.renderTransform(ratio, cache);
+    var cache2 = target._gsap;
+    cache2[property] = value;
+    cache2.renderTransform(ratio, cache2);
   };
   var _transformProp = "transform";
   var _transformOriginProp = _transformProp + "Origin";
@@ -3240,22 +3240,22 @@
     }
   };
   var _revertStyle = function _revertStyle2() {
-    var props = this.props, target = this.target, style = target.style, cache = target._gsap, i, p;
+    var props = this.props, target = this.target, style = target.style, cache2 = target._gsap, i, p;
     for (i = 0; i < props.length; i += 3) {
       props[i + 1] ? target[props[i]] = props[i + 2] : props[i + 2] ? style[props[i]] = props[i + 2] : style.removeProperty(props[i].substr(0, 2) === "--" ? props[i] : props[i].replace(_capsExp, "-$1").toLowerCase());
     }
     if (this.tfm) {
       for (p in this.tfm) {
-        cache[p] = this.tfm[p];
+        cache2[p] = this.tfm[p];
       }
-      if (cache.svg) {
-        cache.renderTransform();
+      if (cache2.svg) {
+        cache2.renderTransform();
         target.setAttribute("data-svg-origin", this.svgo || "");
       }
       i = _reverting2();
       if ((!i || !i.isStart) && !style[_transformProp]) {
         _removeIndependentTransforms(style);
-        cache.uncache = 1;
+        cache2.uncache = 1;
       }
     }
   };
@@ -3395,7 +3395,7 @@
     flex: 1
   };
   var _convertToUnit = function _convertToUnit2(target, property, value, unit) {
-    var curValue = parseFloat(value) || 0, curUnit = (value + "").trim().substr((curValue + "").length) || "px", style = _tempDiv.style, horizontal = _horizontalExp.test(property), isRootSVG = target.tagName.toLowerCase() === "svg", measureProperty = (isRootSVG ? "client" : "offset") + (horizontal ? "Width" : "Height"), amount = 100, toPixels = unit === "px", toPercent = unit === "%", px, parent, cache, isSVG;
+    var curValue = parseFloat(value) || 0, curUnit = (value + "").trim().substr((curValue + "").length) || "px", style = _tempDiv.style, horizontal = _horizontalExp.test(property), isRootSVG = target.tagName.toLowerCase() === "svg", measureProperty = (isRootSVG ? "client" : "offset") + (horizontal ? "Width" : "Height"), amount = 100, toPixels = unit === "px", toPercent = unit === "%", px, parent, cache2, isSVG;
     if (unit === curUnit || !curValue || _nonConvertibleUnits[unit] || _nonConvertibleUnits[curUnit]) {
       return curValue;
     }
@@ -3413,9 +3413,9 @@
     if (!parent || parent === _doc2 || !parent.appendChild) {
       parent = _doc2.body;
     }
-    cache = parent._gsap;
-    if (cache && toPercent && cache.width && horizontal && cache.time === _ticker.time && !cache.uncache) {
-      return _round(curValue / cache.width * amount);
+    cache2 = parent._gsap;
+    if (cache2 && toPercent && cache2.width && horizontal && cache2.time === _ticker.time && !cache2.uncache) {
+      return _round(curValue / cache2.width * amount);
     } else {
       (toPercent || curUnit === "%") && !_nonStandardLayouts[_getComputedProperty(parent, "display")] && (style.position = _getComputedProperty(target, "position"));
       parent === target && (style.position = "static");
@@ -3424,9 +3424,9 @@
       parent.removeChild(_tempDiv);
       style.position = "absolute";
       if (horizontal && toPercent) {
-        cache = _getCache(parent);
-        cache.time = _ticker.time;
-        cache.width = parent[measureProperty];
+        cache2 = _getCache(parent);
+        cache2.time = _ticker.time;
+        cache2.width = parent[measureProperty];
       }
     }
     return _round(toPixels ? px * curValue / amount : px && curValue ? amount / px * curValue : 0);
@@ -3529,19 +3529,19 @@
     center: "50%"
   };
   var _convertKeywordsToPercentages = function _convertKeywordsToPercentages2(value) {
-    var split = value.split(" "), x = split[0], y = split[1] || "50%";
+    var split2 = value.split(" "), x = split2[0], y = split2[1] || "50%";
     if (x === "top" || x === "bottom" || y === "left" || y === "right") {
       value = x;
       x = y;
       y = value;
     }
-    split[0] = _keywordToPercent[x] || x;
-    split[1] = _keywordToPercent[y] || y;
-    return split.join(" ");
+    split2[0] = _keywordToPercent[x] || x;
+    split2[1] = _keywordToPercent[y] || y;
+    return split2.join(" ");
   };
   var _renderClearProps = function _renderClearProps2(ratio, data) {
     if (data.tween && data.tween._time === data.tween._dur) {
-      var target = data.t, style = target.style, props = data.u, cache = target._gsap, prop, clearTransforms, i;
+      var target = data.t, style = target.style, props = data.u, cache2 = target._gsap, prop, clearTransforms, i;
       if (props === "all" || props === true) {
         style.cssText = "";
         clearTransforms = 1;
@@ -3559,10 +3559,10 @@
       }
       if (clearTransforms) {
         _removeProperty(target, _transformProp);
-        if (cache) {
-          cache.svg && target.removeAttribute("transform");
+        if (cache2) {
+          cache2.svg && target.removeAttribute("transform");
           _parseTransform(target, 1);
-          cache.uncache = 1;
+          cache2.uncache = 1;
           _removeIndependentTransforms(style);
         }
       }
@@ -3653,12 +3653,12 @@
     return _isNullTransform(matrixString) ? _identity2DMatrix : matrixString.substr(7).match(_numExp).map(_round);
   };
   var _getMatrix = function _getMatrix2(target, force2D) {
-    var cache = target._gsap || _getCache(target), style = target.style, matrix = _getComputedTransformMatrixAsArray(target), parent, nextSibling, temp, addedToDOM;
-    if (cache.svg && target.getAttribute("transform")) {
+    var cache2 = target._gsap || _getCache(target), style = target.style, matrix = _getComputedTransformMatrixAsArray(target), parent, nextSibling, temp, addedToDOM;
+    if (cache2.svg && target.getAttribute("transform")) {
       temp = target.transform.baseVal.consolidate().matrix;
       matrix = [temp.a, temp.b, temp.c, temp.d, temp.e, temp.f];
       return matrix.join(",") === "1,0,0,1,0,0" ? _identity2DMatrix : matrix;
-    } else if (matrix === _identity2DMatrix && !target.offsetParent && target !== _docElement && !cache.svg) {
+    } else if (matrix === _identity2DMatrix && !target.offsetParent && target !== _docElement && !cache2.svg) {
       temp = style.display;
       style.display = "block";
       parent = target.parentNode;
@@ -3676,7 +3676,7 @@
     return force2D && matrix.length > 6 ? [matrix[0], matrix[1], matrix[4], matrix[5], matrix[12], matrix[13]] : matrix;
   };
   var _applySVGOrigin = function _applySVGOrigin2(target, origin, originIsAbsolute, smooth, matrixArray, pluginToAddPropTweensTo) {
-    var cache = target._gsap, matrix = matrixArray || _getMatrix(target, true), xOriginOld = cache.xOrigin || 0, yOriginOld = cache.yOrigin || 0, xOffsetOld = cache.xOffset || 0, yOffsetOld = cache.yOffset || 0, a = matrix[0], b = matrix[1], c = matrix[2], d = matrix[3], tx = matrix[4], ty = matrix[5], originSplit = origin.split(" "), xOrigin = parseFloat(originSplit[0]) || 0, yOrigin = parseFloat(originSplit[1]) || 0, bounds, determinant, x, y;
+    var cache2 = target._gsap, matrix = matrixArray || _getMatrix(target, true), xOriginOld = cache2.xOrigin || 0, yOriginOld = cache2.yOrigin || 0, xOffsetOld = cache2.xOffset || 0, yOffsetOld = cache2.yOffset || 0, a = matrix[0], b = matrix[1], c = matrix[2], d = matrix[3], tx = matrix[4], ty = matrix[5], originSplit = origin.split(" "), xOrigin = parseFloat(originSplit[0]) || 0, yOrigin = parseFloat(originSplit[1]) || 0, bounds, determinant, x, y;
     if (!originIsAbsolute) {
       bounds = _getBBox(target);
       xOrigin = bounds.x + (~originSplit[0].indexOf("%") ? xOrigin / 100 * bounds.width : xOrigin);
@@ -3687,56 +3687,56 @@
       xOrigin = x;
       yOrigin = y;
     }
-    if (smooth || smooth !== false && cache.smooth) {
+    if (smooth || smooth !== false && cache2.smooth) {
       tx = xOrigin - xOriginOld;
       ty = yOrigin - yOriginOld;
-      cache.xOffset = xOffsetOld + (tx * a + ty * c) - tx;
-      cache.yOffset = yOffsetOld + (tx * b + ty * d) - ty;
+      cache2.xOffset = xOffsetOld + (tx * a + ty * c) - tx;
+      cache2.yOffset = yOffsetOld + (tx * b + ty * d) - ty;
     } else {
-      cache.xOffset = cache.yOffset = 0;
+      cache2.xOffset = cache2.yOffset = 0;
     }
-    cache.xOrigin = xOrigin;
-    cache.yOrigin = yOrigin;
-    cache.smooth = !!smooth;
-    cache.origin = origin;
-    cache.originIsAbsolute = !!originIsAbsolute;
+    cache2.xOrigin = xOrigin;
+    cache2.yOrigin = yOrigin;
+    cache2.smooth = !!smooth;
+    cache2.origin = origin;
+    cache2.originIsAbsolute = !!originIsAbsolute;
     target.style[_transformOriginProp] = "0px 0px";
     if (pluginToAddPropTweensTo) {
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "xOrigin", xOriginOld, xOrigin);
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "yOrigin", yOriginOld, yOrigin);
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "xOffset", xOffsetOld, cache.xOffset);
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "yOffset", yOffsetOld, cache.yOffset);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "xOrigin", xOriginOld, xOrigin);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "yOrigin", yOriginOld, yOrigin);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "xOffset", xOffsetOld, cache2.xOffset);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "yOffset", yOffsetOld, cache2.yOffset);
     }
     target.setAttribute("data-svg-origin", xOrigin + " " + yOrigin);
   };
   var _parseTransform = function _parseTransform2(target, uncache) {
-    var cache = target._gsap || new GSCache(target);
-    if ("x" in cache && !uncache && !cache.uncache) {
-      return cache;
+    var cache2 = target._gsap || new GSCache(target);
+    if ("x" in cache2 && !uncache && !cache2.uncache) {
+      return cache2;
     }
-    var style = target.style, invertedScaleX = cache.scaleX < 0, px = "px", deg = "deg", cs = getComputedStyle(target), origin = _getComputedProperty(target, _transformOriginProp) || "0", x, y, z, scaleX, scaleY, rotation, rotationX, rotationY, skewX, skewY, perspective, xOrigin, yOrigin, matrix, angle, cos, sin, a, b, c, d, a12, a22, t1, t2, t3, a13, a23, a33, a42, a43, a32;
+    var style = target.style, invertedScaleX = cache2.scaleX < 0, px = "px", deg = "deg", cs = getComputedStyle(target), origin = _getComputedProperty(target, _transformOriginProp) || "0", x, y, z, scaleX, scaleY, rotation, rotationX, rotationY, skewX, skewY, perspective, xOrigin, yOrigin, matrix, angle, cos, sin, a, b, c, d, a12, a22, t1, t2, t3, a13, a23, a33, a42, a43, a32;
     x = y = z = rotation = rotationX = rotationY = skewX = skewY = perspective = 0;
     scaleX = scaleY = 1;
-    cache.svg = !!(target.getCTM && _isSVG(target));
+    cache2.svg = !!(target.getCTM && _isSVG(target));
     if (cs.translate) {
       if (cs.translate !== "none" || cs.scale !== "none" || cs.rotate !== "none") {
         style[_transformProp] = (cs.translate !== "none" ? "translate3d(" + (cs.translate + " 0 0").split(" ").slice(0, 3).join(", ") + ") " : "") + (cs.rotate !== "none" ? "rotate(" + cs.rotate + ") " : "") + (cs.scale !== "none" ? "scale(" + cs.scale.split(" ").join(",") + ") " : "") + (cs[_transformProp] !== "none" ? cs[_transformProp] : "");
       }
       style.scale = style.rotate = style.translate = "none";
     }
-    matrix = _getMatrix(target, cache.svg);
-    if (cache.svg) {
-      if (cache.uncache) {
+    matrix = _getMatrix(target, cache2.svg);
+    if (cache2.svg) {
+      if (cache2.uncache) {
         t2 = target.getBBox();
-        origin = cache.xOrigin - t2.x + "px " + (cache.yOrigin - t2.y) + "px";
+        origin = cache2.xOrigin - t2.x + "px " + (cache2.yOrigin - t2.y) + "px";
         t1 = "";
       } else {
         t1 = !uncache && target.getAttribute("data-svg-origin");
       }
-      _applySVGOrigin(target, t1 || origin, !!t1 || cache.originIsAbsolute, cache.smooth !== false, matrix);
+      _applySVGOrigin(target, t1 || origin, !!t1 || cache2.originIsAbsolute, cache2.smooth !== false, matrix);
     }
-    xOrigin = cache.xOrigin || 0;
-    yOrigin = cache.yOrigin || 0;
+    xOrigin = cache2.xOrigin || 0;
+    yOrigin = cache2.yOrigin || 0;
     if (matrix !== _identity2DMatrix) {
       a = matrix[0];
       b = matrix[1];
@@ -3750,7 +3750,7 @@
         rotation = a || b ? _atan2(b, a) * _RAD2DEG : 0;
         skewX = c || d ? _atan2(c, d) * _RAD2DEG + rotation : 0;
         skewX && (scaleY *= Math.abs(Math.cos(skewX * _DEG2RAD)));
-        if (cache.svg) {
+        if (cache2.svg) {
           x -= xOrigin - (xOrigin * a + yOrigin * c);
           y -= yOrigin - (xOrigin * b + yOrigin * d);
         }
@@ -3815,9 +3815,9 @@
         skewX = Math.abs(angle) > 2e-4 ? angle * _RAD2DEG : 0;
         perspective = a43 ? 1 / (a43 < 0 ? -a43 : a43) : 0;
       }
-      if (cache.svg) {
+      if (cache2.svg) {
         t1 = target.getAttribute("transform");
-        cache.forceCSS = target.setAttribute("transform", "") || !_isNullTransform(_getComputedProperty(target, _transformProp));
+        cache2.forceCSS = target.setAttribute("transform", "") || !_isNullTransform(_getComputedProperty(target, _transformProp));
         t1 && target.setAttribute("transform", t1);
       }
     }
@@ -3831,26 +3831,26 @@
         skewX += skewX <= 0 ? 180 : -180;
       }
     }
-    uncache = uncache || cache.uncache;
-    cache.x = x - ((cache.xPercent = x && (!uncache && cache.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache.xPercent / 100 : 0) + px;
-    cache.y = y - ((cache.yPercent = y && (!uncache && cache.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache.yPercent / 100 : 0) + px;
-    cache.z = z + px;
-    cache.scaleX = _round(scaleX);
-    cache.scaleY = _round(scaleY);
-    cache.rotation = _round(rotation) + deg;
-    cache.rotationX = _round(rotationX) + deg;
-    cache.rotationY = _round(rotationY) + deg;
-    cache.skewX = skewX + deg;
-    cache.skewY = skewY + deg;
-    cache.transformPerspective = perspective + px;
-    if (cache.zOrigin = parseFloat(origin.split(" ")[2]) || 0) {
+    uncache = uncache || cache2.uncache;
+    cache2.x = x - ((cache2.xPercent = x && (!uncache && cache2.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache2.xPercent / 100 : 0) + px;
+    cache2.y = y - ((cache2.yPercent = y && (!uncache && cache2.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache2.yPercent / 100 : 0) + px;
+    cache2.z = z + px;
+    cache2.scaleX = _round(scaleX);
+    cache2.scaleY = _round(scaleY);
+    cache2.rotation = _round(rotation) + deg;
+    cache2.rotationX = _round(rotationX) + deg;
+    cache2.rotationY = _round(rotationY) + deg;
+    cache2.skewX = skewX + deg;
+    cache2.skewY = skewY + deg;
+    cache2.transformPerspective = perspective + px;
+    if (cache2.zOrigin = parseFloat(origin.split(" ")[2]) || 0) {
       style[_transformOriginProp] = _firstTwoOnly(origin);
     }
-    cache.xOffset = cache.yOffset = 0;
-    cache.force3D = _config.force3D;
-    cache.renderTransform = cache.svg ? _renderSVGTransforms : _supports3D ? _renderCSSTransforms : _renderNon3DTransforms;
-    cache.uncache = 0;
-    return cache;
+    cache2.xOffset = cache2.yOffset = 0;
+    cache2.force3D = _config.force3D;
+    cache2.renderTransform = cache2.svg ? _renderSVGTransforms : _supports3D ? _renderCSSTransforms : _renderNon3DTransforms;
+    cache2.uncache = 0;
+    return cache2;
   };
   var _firstTwoOnly = function _firstTwoOnly2(value) {
     return (value = value.split(" "))[0] + " " + value[1];
@@ -3859,17 +3859,17 @@
     var unit = getUnit(start);
     return _round(parseFloat(start) + parseFloat(_convertToUnit(target, "x", value + "px", unit))) + unit;
   };
-  var _renderNon3DTransforms = function _renderNon3DTransforms2(ratio, cache) {
-    cache.z = "0px";
-    cache.rotationY = cache.rotationX = "0deg";
-    cache.force3D = 0;
-    _renderCSSTransforms(ratio, cache);
+  var _renderNon3DTransforms = function _renderNon3DTransforms2(ratio, cache2) {
+    cache2.z = "0px";
+    cache2.rotationY = cache2.rotationX = "0deg";
+    cache2.force3D = 0;
+    _renderCSSTransforms(ratio, cache2);
   };
   var _zeroDeg = "0deg";
   var _zeroPx = "0px";
   var _endParenthesis = ") ";
-  var _renderCSSTransforms = function _renderCSSTransforms2(ratio, cache) {
-    var _ref = cache || this, xPercent = _ref.xPercent, yPercent = _ref.yPercent, x = _ref.x, y = _ref.y, z = _ref.z, rotation = _ref.rotation, rotationY = _ref.rotationY, rotationX = _ref.rotationX, skewX = _ref.skewX, skewY = _ref.skewY, scaleX = _ref.scaleX, scaleY = _ref.scaleY, transformPerspective = _ref.transformPerspective, force3D = _ref.force3D, target = _ref.target, zOrigin = _ref.zOrigin, transforms = "", use3D = force3D === "auto" && ratio && ratio !== 1 || force3D === true;
+  var _renderCSSTransforms = function _renderCSSTransforms2(ratio, cache2) {
+    var _ref = cache2 || this, xPercent = _ref.xPercent, yPercent = _ref.yPercent, x = _ref.x, y = _ref.y, z = _ref.z, rotation = _ref.rotation, rotationY = _ref.rotationY, rotationX = _ref.rotationX, skewX = _ref.skewX, skewY = _ref.skewY, scaleX = _ref.scaleX, scaleY = _ref.scaleY, transformPerspective = _ref.transformPerspective, force3D = _ref.force3D, target = _ref.target, zOrigin = _ref.zOrigin, transforms = "", use3D = force3D === "auto" && ratio && ratio !== 1 || force3D === true;
     if (zOrigin && (rotationX !== _zeroDeg || rotationY !== _zeroDeg)) {
       var angle = parseFloat(rotationY) * _DEG2RAD, a13 = Math.sin(angle), a33 = Math.cos(angle), cos;
       angle = parseFloat(rotationX) * _DEG2RAD;
@@ -3904,8 +3904,8 @@
     }
     target.style[_transformProp] = transforms || "translate(0, 0)";
   };
-  var _renderSVGTransforms = function _renderSVGTransforms2(ratio, cache) {
-    var _ref2 = cache || this, xPercent = _ref2.xPercent, yPercent = _ref2.yPercent, x = _ref2.x, y = _ref2.y, rotation = _ref2.rotation, skewX = _ref2.skewX, skewY = _ref2.skewY, scaleX = _ref2.scaleX, scaleY = _ref2.scaleY, target = _ref2.target, xOrigin = _ref2.xOrigin, yOrigin = _ref2.yOrigin, xOffset = _ref2.xOffset, yOffset = _ref2.yOffset, forceCSS = _ref2.forceCSS, tx = parseFloat(x), ty = parseFloat(y), a11, a21, a12, a22, temp;
+  var _renderSVGTransforms = function _renderSVGTransforms2(ratio, cache2) {
+    var _ref2 = cache2 || this, xPercent = _ref2.xPercent, yPercent = _ref2.yPercent, x = _ref2.x, y = _ref2.y, rotation = _ref2.rotation, skewX = _ref2.skewX, skewY = _ref2.skewY, scaleX = _ref2.scaleX, scaleY = _ref2.scaleY, target = _ref2.target, xOrigin = _ref2.xOrigin, yOrigin = _ref2.yOrigin, xOffset = _ref2.xOffset, yOffset = _ref2.yOffset, forceCSS = _ref2.forceCSS, tx = parseFloat(x), ty = parseFloat(y), a11, a21, a12, a22, temp;
     rotation = parseFloat(rotation);
     skewX = parseFloat(skewX);
     skewY = parseFloat(skewY);
@@ -3961,8 +3961,8 @@
     forceCSS && (target.style[_transformProp] = temp);
   };
   var _addRotationalPropTween = function _addRotationalPropTween2(plugin, target, property, startNum, endValue) {
-    var cap = 360, isString = _isString(endValue), endNum = parseFloat(endValue) * (isString && ~endValue.indexOf("rad") ? _RAD2DEG : 1), change = endNum - startNum, finalValue = startNum + change + "deg", direction, pt;
-    if (isString) {
+    var cap = 360, isString2 = _isString(endValue), endNum = parseFloat(endValue) * (isString2 && ~endValue.indexOf("rad") ? _RAD2DEG : 1), change = endNum - startNum, finalValue = startNum + change + "deg", direction, pt;
+    if (isString2) {
       direction = endValue.split("_")[1];
       if (direction === "short") {
         change %= cap;
@@ -4046,7 +4046,7 @@
       return target.style && target.nodeType;
     },
     init: function init3(target, vars, tween, index, targets) {
-      var props = this._props, style = target.style, startAt = tween.vars.startAt, startValue, endValue, endNum, startNum, type, specialProp, p, startUnit, endUnit, relative, isTransformRelated, transformPropTween, cache, smooth, hasPriority, inlineProps;
+      var props = this._props, style = target.style, startAt = tween.vars.startAt, startValue, endValue, endNum, startNum, type, specialProp, p, startUnit, endUnit, relative, isTransformRelated, transformPropTween, cache2, smooth, hasPriority, inlineProps;
       _pluginInitted || _initCore();
       this.styles = this.styles || _getStyleSaver(target);
       inlineProps = this.styles.props;
@@ -4112,25 +4112,25 @@
           if (isTransformRelated) {
             this.styles.save(p);
             if (!transformPropTween) {
-              cache = target._gsap;
-              cache.renderTransform && !vars.parseTransform || _parseTransform(target, vars.parseTransform);
-              smooth = vars.smoothOrigin !== false && cache.smooth;
-              transformPropTween = this._pt = new PropTween(this._pt, style, _transformProp, 0, 1, cache.renderTransform, cache, 0, -1);
+              cache2 = target._gsap;
+              cache2.renderTransform && !vars.parseTransform || _parseTransform(target, vars.parseTransform);
+              smooth = vars.smoothOrigin !== false && cache2.smooth;
+              transformPropTween = this._pt = new PropTween(this._pt, style, _transformProp, 0, 1, cache2.renderTransform, cache2, 0, -1);
               transformPropTween.dep = 1;
             }
             if (p === "scale") {
-              this._pt = new PropTween(this._pt, cache, "scaleY", cache.scaleY, (relative ? _parseRelative(cache.scaleY, relative + endNum) : endNum) - cache.scaleY || 0, _renderCSSProp);
+              this._pt = new PropTween(this._pt, cache2, "scaleY", cache2.scaleY, (relative ? _parseRelative(cache2.scaleY, relative + endNum) : endNum) - cache2.scaleY || 0, _renderCSSProp);
               this._pt.u = 0;
               props.push("scaleY", p);
               p += "X";
             } else if (p === "transformOrigin") {
               inlineProps.push(_transformOriginProp, 0, style[_transformOriginProp]);
               endValue = _convertKeywordsToPercentages(endValue);
-              if (cache.svg) {
+              if (cache2.svg) {
                 _applySVGOrigin(target, endValue, 0, smooth, 0, this);
               } else {
                 endUnit = parseFloat(endValue.split(" ")[2]) || 0;
-                endUnit !== cache.zOrigin && _addNonTweeningPT(this, cache, "zOrigin", cache.zOrigin, endUnit);
+                endUnit !== cache2.zOrigin && _addNonTweeningPT(this, cache2, "zOrigin", cache2.zOrigin, endUnit);
                 _addNonTweeningPT(this, style, p, _firstTwoOnly(startValue), _firstTwoOnly(endValue));
               }
               continue;
@@ -4138,13 +4138,13 @@
               _applySVGOrigin(target, endValue, 1, smooth, 0, this);
               continue;
             } else if (p in _rotationalProperties) {
-              _addRotationalPropTween(this, cache, p, startNum, relative ? _parseRelative(startNum, relative + endValue) : endValue);
+              _addRotationalPropTween(this, cache2, p, startNum, relative ? _parseRelative(startNum, relative + endValue) : endValue);
               continue;
             } else if (p === "smoothOrigin") {
-              _addNonTweeningPT(this, cache, "smooth", cache.smooth, endValue);
+              _addNonTweeningPT(this, cache2, "smooth", cache2.smooth, endValue);
               continue;
             } else if (p === "force3D") {
-              cache[p] = endValue;
+              cache2[p] = endValue;
               continue;
             } else if (p === "transform") {
               _addRawTransformPTs(this, endValue, target);
@@ -4158,7 +4158,7 @@
             endNum || (endNum = 0);
             endUnit = getUnit(endValue) || (p in _config.units ? _config.units[p] : startUnit);
             startUnit !== endUnit && (startNum = _convertToUnit(target, p, startValue, endUnit));
-            this._pt = new PropTween(this._pt, isTransformRelated ? cache : style, p, startNum, (relative ? _parseRelative(startNum, relative + endNum) : endNum) - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
+            this._pt = new PropTween(this._pt, isTransformRelated ? cache2 : style, p, startNum, (relative ? _parseRelative(startNum, relative + endNum) : endNum) - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
             this._pt.u = endUnit || 0;
             if (startUnit !== endUnit && endUnit !== "%") {
               this._pt.b = startValue;
@@ -4215,8 +4215,8 @@
     });
     _propertyAliases[all[13]] = positionAndScale + "," + rotation;
     _forEachName(aliases, function(name) {
-      var split = name.split(":");
-      _propertyAliases[split[1]] = all[split[0]];
+      var split2 = name.split(":");
+      _propertyAliases[split2[1]] = all[split2[0]];
     });
   })("x,y,z,scale,scaleX,scaleY,xPercent,yPercent", "rotation,rotationX,rotationY,skewX,skewY", "transform,transformOrigin,svgOrigin,force3D,smoothOrigin,transformPerspective", "0:translateX,1:translateY,2:translateZ,8:rotate,8:rotationZ,8:rotateZ,9:rotateX,10:rotateY");
   _forEachName("x,y,z,top,right,bottom,left,width,height,fontSize,padding,margin,perspective", function(name) {
@@ -4267,14 +4267,14 @@
     return doc;
   };
   var _forceNonZeroScale = function _forceNonZeroScale2(e) {
-    var a, cache;
+    var a, cache2;
     while (e && e !== _body) {
-      cache = e._gsap;
-      cache && cache.uncache && cache.get(e, "x");
-      if (cache && !cache.scaleX && !cache.scaleY && cache.renderTransform) {
-        cache.scaleX = cache.scaleY = 1e-4;
-        cache.renderTransform(1, cache);
-        a ? a.push(cache) : a = [cache];
+      cache2 = e._gsap;
+      cache2 && cache2.uncache && cache2.get(e, "x");
+      if (cache2 && !cache2.scaleX && !cache2.scaleY && cache2.renderTransform) {
+        cache2.scaleX = cache2.scaleY = 1e-4;
+        cache2.renderTransform(1, cache2);
+        a ? a.push(cache2) : a = [cache2];
       }
       e = e.parentNode;
     }
@@ -4558,10 +4558,10 @@
     }
     return copy;
   };
-  var _extend = function _extend2(obj, defaults2) {
-    for (var p in defaults2) {
+  var _extend = function _extend2(obj, defaults3) {
+    for (var p in defaults3) {
       if (!(p in obj)) {
-        obj[p] = defaults2[p];
+        obj[p] = defaults3[p];
       }
     }
     return obj;
@@ -4603,10 +4603,10 @@
       data: "_draggable"
     });
   };
-  var _setDefaults3 = function _setDefaults4(obj, defaults2) {
-    for (var p in defaults2) {
+  var _setDefaults3 = function _setDefaults4(obj, defaults3) {
+    for (var p in defaults3) {
       if (!(p in obj)) {
-        obj[p] = defaults2[p];
+        obj[p] = defaults3[p];
       }
     }
     return obj;
@@ -5121,7 +5121,7 @@
         }
         try {
           _docElement3.addEventListener("test", null, Object.defineProperty({}, "passive", {
-            get: function get() {
+            get: function get2() {
               _supportsPassive = 1;
             }
           }));
@@ -6354,7 +6354,7 @@
         return new Draggable2(target, vars);
       });
     };
-    Draggable2.get = function get(target) {
+    Draggable2.get = function get2(target) {
       return _lookup[(_toArray(target)[0] || {})._gsDragID];
     };
     Draggable2.timeSinceDrag = function timeSinceDrag() {
@@ -6846,12 +6846,12 @@
     };
     _createClass(Observer2, [{
       key: "velocityX",
-      get: function get() {
+      get: function get2() {
         return this._vx.getVelocity();
       }
     }, {
       key: "velocityY",
-      get: function get() {
+      get: function get2() {
         return this._vy.getVelocity();
       }
     }]);
@@ -7020,9 +7020,9 @@
     var position = _getComputedStyle3(element).position;
     element.style.position = position === "absolute" || position === "fixed" ? position : "relative";
   };
-  var _setDefaults5 = function _setDefaults6(obj, defaults2) {
-    for (var p in defaults2) {
-      p in obj || (obj[p] = defaults2[p]);
+  var _setDefaults5 = function _setDefaults6(obj, defaults3) {
+    for (var p in defaults3) {
+      p in obj || (obj[p] = defaults3[p]);
     }
     return obj;
   };
@@ -7355,9 +7355,9 @@
   var _stateProps = _propNamesToCopy.concat([_width, _height, "boxSizing", "max" + _Width, "max" + _Height, "position", _margin, _padding, _padding + _Top, _padding + _Right, _padding + _Bottom, _padding + _Left]);
   var _swapPinOut = function _swapPinOut2(pin, spacer, state) {
     _setState(state);
-    var cache = pin._gsap;
-    if (cache.spacerIsNative) {
-      _setState(cache.spacerState);
+    var cache2 = pin._gsap;
+    if (cache2.spacerIsNative) {
+      _setState(cache2.spacerState);
     } else if (pin._gsap.swappedIn) {
       var parent = spacer.parentNode;
       if (parent) {
@@ -8217,7 +8217,7 @@
       }
       return _coreInitted4;
     };
-    ScrollTrigger3.defaults = function defaults2(config3) {
+    ScrollTrigger3.defaults = function defaults3(config3) {
       if (config3) {
         for (var p in config3) {
           _defaults2[p] = config3[p];
@@ -8486,15 +8486,15 @@
   };
   var _nestedScroll = function _nestedScroll2(_ref5) {
     var event = _ref5.event, target = _ref5.target, axis = _ref5.axis;
-    var node = (event.changedTouches ? event.changedTouches[0] : event).target, cache = node._gsap || gsap4.core.getCache(node), time = _getTime3(), cs;
-    if (!cache._isScrollT || time - cache._isScrollT > 2e3) {
+    var node = (event.changedTouches ? event.changedTouches[0] : event).target, cache2 = node._gsap || gsap4.core.getCache(node), time = _getTime3(), cs;
+    if (!cache2._isScrollT || time - cache2._isScrollT > 2e3) {
       while (node && node !== _body4 && (node.scrollHeight <= node.clientHeight && node.scrollWidth <= node.clientWidth || !(_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]))) {
         node = node.parentNode;
       }
-      cache._isScroll = node && node !== target && !_isViewport3(node) && (_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]);
-      cache._isScrollT = time;
+      cache2._isScroll = node && node !== target && !_isViewport3(node) && (_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]);
+      cache2._isScrollT = time;
     }
-    if (cache._isScroll || axis === "x") {
+    if (cache2._isScroll || axis === "x") {
       event.stopPropagation();
       event._gsapAllow = true;
     }
@@ -8712,89 +8712,1269 @@
   };
   _getGSAP5() && gsap4.registerPlugin(ScrollTrigger2);
 
-  // src/human.ts
-  gsapWithCSS.registerPlugin(ScrollTrigger2);
-  gsapWithCSS.registerPlugin(Observer);
-  gsapWithCSS.registerPlugin(Draggable);
-  var globalEase = "back.out";
-  window.Webflow ||= [];
-  window.Webflow.push(() => {
-    const mm = gsapWithCSS.matchMedia();
-    const breakPoint = 800;
-    mm.add(
-      {
-        isDesktop: `(min-width: ${breakPoint}px)`,
-        isMobile: `(max-width: ${breakPoint - 1}px)`,
-        reduceMotion: "(prefers-reduced-motion: reduce)"
-      },
-      (context3) => {
-        const { isDesktop, isMobile, reduceMotion } = context3.conditions;
-        const hhpSections = gsapWithCSS.utils.toArray('[cs-el="hhp-profile-section"]');
-        if (hhpSections.length > 0) {
-          hhpSections.forEach((el) => {
-            gsapWithCSS.from(el, {
-              opacity: 0,
-              xPercent: 15,
-              ease: "sin.out",
-              scrollTrigger: {
-                trigger: el,
-                start: "top bottom",
-                end: "top 75%",
-                scrub: 1
-              }
-            });
-          });
+  // node_modules/split-type/dist/index.js
+  (() => {
+    function append(...nodes) {
+      const length = nodes.length;
+      for (let i = 0; i < length; i++) {
+        const node = nodes[i];
+        if (node.nodeType === 1 || node.nodeType === 11)
+          this.appendChild(node);
+        else
+          this.appendChild(document.createTextNode(String(node)));
+      }
+    }
+    function replaceChildren(...nodes) {
+      while (this.lastChild) {
+        this.removeChild(this.lastChild);
+      }
+      if (nodes.length)
+        this.append(...nodes);
+    }
+    function replaceWith(...nodes) {
+      const parent = this.parentNode;
+      let i = nodes.length;
+      if (!parent)
+        return;
+      if (!i)
+        parent.removeChild(this);
+      while (i--) {
+        let node = nodes[i];
+        if (typeof node !== "object") {
+          node = this.ownerDocument.createTextNode(node);
+        } else if (node.parentNode) {
+          node.parentNode.removeChild(node);
         }
-        const hhpAside = document.querySelector('[cs-el="hhp-aside"]');
-        const hhpUserCard = document.querySelector('[cs-el="hhp-user-card"]');
-        const hhpBody = document.querySelector('[cs-el="hhp-body"]');
-        const toggleNav = gsapWithCSS.timeline({ paused: true });
-        const stNav = ScrollTrigger2.create({
-          trigger: hhpAside,
-          start: "top 34rem",
-          endTrigger: hhpBody,
-          end: () => `bottom ${hhpUserCard.offsetHeight + 64}`,
-          markers: false,
-          pin: hhpUserCard,
-          pinSpacing: true,
-          invalidateOnRefresh: true,
-          onEnter: () => toggleNav.delay(2).timeScale(1).play(),
-          onLeaveBack: () => toggleNav.timeScale(4).reverse()
-        });
-        const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
-        if (hhpNav) {
-          const navItems = gsapWithCSS.utils.toArray('[cs-el="hhp-nav-item"]');
-          toggleNav.from(navItems, {
-            autoAlpha: 0,
-            duration: 0.3,
-            y: "-2rem",
-            ease: globalEase,
-            stagger: 0.1
-          });
-          navItems.forEach((item) => {
-            const navItemHover = gsapWithCSS.timeline({ paused: true });
-            navItemHover.to(item, { x: "0.25rem", duration: 1, ease: globalEase });
-            item.addEventListener("mouseenter", () => {
-              navItemHover.timeScale(0.5).play();
-            });
-            item.addEventListener("mouseleave", () => {
-              navItemHover.timeScale(1.5).reverse();
-            });
-          });
+        if (!i) {
+          parent.replaceChild(node, this);
+        } else {
+          parent.insertBefore(this.previousSibling, node);
         }
-        function init4() {
-        }
-        window.addEventListener("resize", () => {
-          init4();
-        });
-        window.addEventListener("load", () => {
-          init4();
-        });
-        return () => {
+      }
+    }
+    if (typeof Element !== "undefined") {
+      if (!Element.prototype.append) {
+        Element.prototype.append = append;
+        DocumentFragment.prototype.append = append;
+      }
+      if (!Element.prototype.replaceChildren) {
+        Element.prototype.replaceChildren = replaceChildren;
+        DocumentFragment.prototype.replaceChildren = replaceChildren;
+      }
+      if (!Element.prototype.replaceWith) {
+        Element.prototype.replaceWith = replaceWith;
+        DocumentFragment.prototype.replaceWith = replaceWith;
+      }
+    }
+  })();
+  function extend(target, object) {
+    return Object.getOwnPropertyNames(Object(target)).reduce((extended, key) => {
+      const currentValue = Object.getOwnPropertyDescriptor(Object(target), key);
+      const newValue = Object.getOwnPropertyDescriptor(Object(object), key);
+      return Object.defineProperty(extended, key, newValue || currentValue);
+    }, {});
+  }
+  function isString(value) {
+    return typeof value === "string";
+  }
+  function isArray(value) {
+    return Array.isArray(value);
+  }
+  function parseSettings(settings = {}) {
+    const object = extend(settings);
+    let types;
+    if (object.types !== void 0) {
+      types = object.types;
+    } else if (object.split !== void 0) {
+      types = object.split;
+    }
+    if (types !== void 0) {
+      object.types = (isString(types) || isArray(types) ? String(types) : "").split(",").map((type) => String(type).trim()).filter((type) => /((line)|(word)|(char))/i.test(type));
+    }
+    if (object.absolute || object.position) {
+      object.absolute = object.absolute || /absolute/.test(settings.position);
+    }
+    return object;
+  }
+  function parseTypes(value) {
+    const types = isString(value) || isArray(value) ? String(value) : "";
+    return {
+      none: !types,
+      lines: /line/i.test(types),
+      words: /word/i.test(types),
+      chars: /char/i.test(types)
+    };
+  }
+  function isObject(value) {
+    return value !== null && typeof value === "object";
+  }
+  function isNode(input) {
+    return isObject(input) && /^(1|3|11)$/.test(input.nodeType);
+  }
+  function isLength(value) {
+    return typeof value === "number" && value > -1 && value % 1 === 0;
+  }
+  function isArrayLike(value) {
+    return isObject(value) && isLength(value.length);
+  }
+  function toArray3(value) {
+    if (isArray(value))
+      return value;
+    if (value == null)
+      return [];
+    return isArrayLike(value) ? Array.prototype.slice.call(value) : [value];
+  }
+  function getTargetElements(target) {
+    let elements = target;
+    if (isString(target)) {
+      if (/^(#[a-z]\w+)$/.test(target.trim())) {
+        elements = document.getElementById(target.trim().slice(1));
+      } else {
+        elements = document.querySelectorAll(target);
+      }
+    }
+    return toArray3(elements).reduce((result, element) => {
+      return [...result, ...toArray3(element).filter(isNode)];
+    }, []);
+  }
+  var {
+    entries,
+    keys,
+    values
+  } = Object;
+  var expando = `_splittype`;
+  var cache = {};
+  var uid = 0;
+  function set(owner, key, value) {
+    if (!isObject(owner)) {
+      console.warn("[data.set] owner is not an object");
+      return null;
+    }
+    const id = owner[expando] || (owner[expando] = ++uid);
+    const data = cache[id] || (cache[id] = {});
+    if (value === void 0) {
+      if (!!key && Object.getPrototypeOf(key) === Object.prototype) {
+        cache[id] = {
+          ...data,
+          ...key
         };
       }
-      // End: MM Context
+    } else if (key !== void 0) {
+      data[key] = value;
+    }
+    return value;
+  }
+  function get(owner, key) {
+    const id = isObject(owner) ? owner[expando] : null;
+    const data = id && cache[id] || {};
+    if (key === void 0) {
+      return data;
+    }
+    return data[key];
+  }
+  function remove(element) {
+    const id = element && element[expando];
+    if (id) {
+      delete element[id];
+      delete cache[id];
+    }
+  }
+  function cleanup() {
+    entries(cache).forEach(([id, {
+      isRoot,
+      isSplit
+    }]) => {
+      if (!isRoot || !isSplit) {
+        cache[id] = null;
+        delete cache[id];
+      }
+    });
+  }
+  function toWords(value, separator = " ") {
+    const string = value ? String(value) : "";
+    return string.trim().replace(/\s+/g, " ").split(separator);
+  }
+  var rsAstralRange = "\\ud800-\\udfff";
+  var rsComboMarksRange = "\\u0300-\\u036f\\ufe20-\\ufe23";
+  var rsComboSymbolsRange = "\\u20d0-\\u20f0";
+  var rsVarRange = "\\ufe0e\\ufe0f";
+  var rsAstral = `[${rsAstralRange}]`;
+  var rsCombo = `[${rsComboMarksRange}${rsComboSymbolsRange}]`;
+  var rsFitz = "\\ud83c[\\udffb-\\udfff]";
+  var rsModifier = `(?:${rsCombo}|${rsFitz})`;
+  var rsNonAstral = `[^${rsAstralRange}]`;
+  var rsRegional = "(?:\\ud83c[\\udde6-\\uddff]){2}";
+  var rsSurrPair = "[\\ud800-\\udbff][\\udc00-\\udfff]";
+  var rsZWJ = "\\u200d";
+  var reOptMod = `${rsModifier}?`;
+  var rsOptVar = `[${rsVarRange}]?`;
+  var rsOptJoin = "(?:" + rsZWJ + "(?:" + [rsNonAstral, rsRegional, rsSurrPair].join("|") + ")" + rsOptVar + reOptMod + ")*";
+  var rsSeq = rsOptVar + reOptMod + rsOptJoin;
+  var rsSymbol = `(?:${[`${rsNonAstral}${rsCombo}?`, rsCombo, rsRegional, rsSurrPair, rsAstral].join("|")}
+)`;
+  var reUnicode = RegExp(`${rsFitz}(?=${rsFitz})|${rsSymbol}${rsSeq}`, "g");
+  var unicodeRange = [rsZWJ, rsAstralRange, rsComboMarksRange, rsComboSymbolsRange, rsVarRange];
+  var reHasUnicode = RegExp(`[${unicodeRange.join("")}]`);
+  function asciiToArray(string) {
+    return string.split("");
+  }
+  function hasUnicode(string) {
+    return reHasUnicode.test(string);
+  }
+  function unicodeToArray(string) {
+    return string.match(reUnicode) || [];
+  }
+  function stringToArray(string) {
+    return hasUnicode(string) ? unicodeToArray(string) : asciiToArray(string);
+  }
+  function toString(value) {
+    return value == null ? "" : String(value);
+  }
+  function toChars(string, separator = "") {
+    string = toString(string);
+    if (string && isString(string)) {
+      if (!separator && hasUnicode(string)) {
+        return stringToArray(string);
+      }
+    }
+    return string.split(separator);
+  }
+  function createElement(name, attributes) {
+    const element = document.createElement(name);
+    if (!attributes) {
+      return element;
+    }
+    Object.keys(attributes).forEach((attribute) => {
+      const rawValue = attributes[attribute];
+      const value = isString(rawValue) ? rawValue.trim() : rawValue;
+      if (value === null || value === "")
+        return;
+      if (attribute === "children") {
+        element.append(...toArray3(value));
+      } else {
+        element.setAttribute(attribute, value);
+      }
+    });
+    return element;
+  }
+  var defaults2 = {
+    splitClass: "",
+    lineClass: "line",
+    wordClass: "word",
+    charClass: "char",
+    types: ["lines", "words", "chars"],
+    absolute: false,
+    tagName: "div"
+  };
+  function splitWordsAndChars(textNode, settings) {
+    settings = extend(defaults2, settings);
+    const types = parseTypes(settings.types);
+    const TAG_NAME = settings.tagName;
+    const VALUE = textNode.nodeValue;
+    const splitText = document.createDocumentFragment();
+    let words = [];
+    let chars = [];
+    if (/^\s/.test(VALUE)) {
+      splitText.append(" ");
+    }
+    words = toWords(VALUE).reduce((result, WORD, idx, arr) => {
+      let wordElement;
+      let characterElementsForCurrentWord;
+      if (types.chars) {
+        characterElementsForCurrentWord = toChars(WORD).map((CHAR) => {
+          const characterElement = createElement(TAG_NAME, {
+            class: `${settings.splitClass} ${settings.charClass}`,
+            style: "display: inline-block;",
+            children: CHAR
+          });
+          set(characterElement, "isChar", true);
+          chars = [...chars, characterElement];
+          return characterElement;
+        });
+      }
+      if (types.words || types.lines) {
+        wordElement = createElement(TAG_NAME, {
+          class: `${settings.wordClass} ${settings.splitClass}`,
+          style: `display: inline-block; ${types.words && settings.absolute ? `position: relative;` : ""}`,
+          children: types.chars ? characterElementsForCurrentWord : WORD
+        });
+        set(wordElement, {
+          isWord: true,
+          isWordStart: true,
+          isWordEnd: true
+        });
+        splitText.appendChild(wordElement);
+      } else {
+        characterElementsForCurrentWord.forEach((characterElement) => {
+          splitText.appendChild(characterElement);
+        });
+      }
+      if (idx < arr.length - 1) {
+        splitText.append(" ");
+      }
+      return types.words ? result.concat(wordElement) : result;
+    }, []);
+    if (/\s$/.test(VALUE)) {
+      splitText.append(" ");
+    }
+    textNode.replaceWith(splitText);
+    return {
+      words,
+      chars
+    };
+  }
+  function split(node, settings) {
+    const type = node.nodeType;
+    const wordsAndChars = {
+      words: [],
+      chars: []
+    };
+    if (!/(1|3|11)/.test(type)) {
+      return wordsAndChars;
+    }
+    if (type === 3 && /\S/.test(node.nodeValue)) {
+      return splitWordsAndChars(node, settings);
+    }
+    const childNodes = toArray3(node.childNodes);
+    if (childNodes.length) {
+      set(node, "isSplit", true);
+      if (!get(node).isRoot) {
+        node.style.display = "inline-block";
+        node.style.position = "relative";
+        const nextSibling = node.nextSibling;
+        const prevSibling = node.previousSibling;
+        const text = node.textContent || "";
+        const textAfter = nextSibling ? nextSibling.textContent : " ";
+        const textBefore = prevSibling ? prevSibling.textContent : " ";
+        set(node, {
+          isWordEnd: /\s$/.test(text) || /^\s/.test(textAfter),
+          isWordStart: /^\s/.test(text) || /\s$/.test(textBefore)
+        });
+      }
+    }
+    return childNodes.reduce((result, child) => {
+      const {
+        words,
+        chars
+      } = split(child, settings);
+      return {
+        words: [...result.words, ...words],
+        chars: [...result.chars, ...chars]
+      };
+    }, wordsAndChars);
+  }
+  function getPosition(node, isWord, settings, scrollPos) {
+    if (!settings.absolute) {
+      return {
+        top: isWord ? node.offsetTop : null
+      };
+    }
+    const parent = node.offsetParent;
+    const [scrollX, scrollY] = scrollPos;
+    let parentX = 0;
+    let parentY = 0;
+    if (parent && parent !== document.body) {
+      const parentRect = parent.getBoundingClientRect();
+      parentX = parentRect.x + scrollX;
+      parentY = parentRect.y + scrollY;
+    }
+    const {
+      width,
+      height,
+      x,
+      y
+    } = node.getBoundingClientRect();
+    const top = y + scrollY - parentY;
+    const left = x + scrollX - parentX;
+    return {
+      width,
+      height,
+      top,
+      left
+    };
+  }
+  function unSplitWords(element) {
+    if (!get(element).isWord) {
+      toArray3(element.children).forEach((child) => unSplitWords(child));
+    } else {
+      remove(element);
+      element.replaceWith(...element.childNodes);
+    }
+  }
+  var createFragment = () => document.createDocumentFragment();
+  function repositionAfterSplit(element, settings, scrollPos) {
+    const types = parseTypes(settings.types);
+    const TAG_NAME = settings.tagName;
+    const nodes = element.getElementsByTagName("*");
+    const wordsInEachLine = [];
+    let wordsInCurrentLine = [];
+    let lineOffsetY = null;
+    let elementHeight;
+    let elementWidth;
+    let contentBox;
+    let lines = [];
+    const parent = element.parentElement;
+    const nextSibling = element.nextElementSibling;
+    const splitText = createFragment();
+    const cs = window.getComputedStyle(element);
+    const align = cs.textAlign;
+    const fontSize = parseFloat(cs.fontSize);
+    const lineThreshold = fontSize * 0.2;
+    if (settings.absolute) {
+      contentBox = {
+        left: element.offsetLeft,
+        top: element.offsetTop,
+        width: element.offsetWidth
+      };
+      elementWidth = element.offsetWidth;
+      elementHeight = element.offsetHeight;
+      set(element, {
+        cssWidth: element.style.width,
+        cssHeight: element.style.height
+      });
+    }
+    toArray3(nodes).forEach((node) => {
+      const isWordLike = node.parentElement === element;
+      const {
+        width,
+        height,
+        top,
+        left
+      } = getPosition(node, isWordLike, settings, scrollPos);
+      if (/^br$/i.test(node.nodeName))
+        return;
+      if (types.lines && isWordLike) {
+        if (lineOffsetY === null || top - lineOffsetY >= lineThreshold) {
+          lineOffsetY = top;
+          wordsInEachLine.push(wordsInCurrentLine = []);
+        }
+        wordsInCurrentLine.push(node);
+      }
+      if (settings.absolute) {
+        set(node, {
+          top,
+          left,
+          width,
+          height
+        });
+      }
+    });
+    if (parent) {
+      parent.removeChild(element);
+    }
+    if (types.lines) {
+      lines = wordsInEachLine.map((wordsInThisLine) => {
+        const lineElement = createElement(TAG_NAME, {
+          class: `${settings.splitClass} ${settings.lineClass}`,
+          style: `display: block; text-align: ${align}; width: 100%;`
+        });
+        set(lineElement, "isLine", true);
+        const lineDimensions = {
+          height: 0,
+          top: 1e4
+        };
+        splitText.appendChild(lineElement);
+        wordsInThisLine.forEach((wordOrElement, idx, arr) => {
+          const {
+            isWordEnd,
+            top,
+            height
+          } = get(wordOrElement);
+          const next = arr[idx + 1];
+          lineDimensions.height = Math.max(lineDimensions.height, height);
+          lineDimensions.top = Math.min(lineDimensions.top, top);
+          lineElement.appendChild(wordOrElement);
+          if (isWordEnd && get(next).isWordStart) {
+            lineElement.append(" ");
+          }
+        });
+        if (settings.absolute) {
+          set(lineElement, {
+            height: lineDimensions.height,
+            top: lineDimensions.top
+          });
+        }
+        return lineElement;
+      });
+      if (!types.words) {
+        unSplitWords(splitText);
+      }
+      element.replaceChildren(splitText);
+    }
+    if (settings.absolute) {
+      element.style.width = `${element.style.width || elementWidth}px`;
+      element.style.height = `${elementHeight}px`;
+      toArray3(nodes).forEach((node) => {
+        const {
+          isLine,
+          top,
+          left,
+          width,
+          height
+        } = get(node);
+        const parentData = get(node.parentElement);
+        const isChildOfLineNode = !isLine && parentData.isLine;
+        node.style.top = `${isChildOfLineNode ? top - parentData.top : top}px`;
+        node.style.left = isLine ? `${contentBox.left}px` : `${left - (isChildOfLineNode ? contentBox.left : 0)}px`;
+        node.style.height = `${height}px`;
+        node.style.width = isLine ? `${contentBox.width}px` : `${width}px`;
+        node.style.position = "absolute";
+      });
+    }
+    if (parent) {
+      if (nextSibling)
+        parent.insertBefore(element, nextSibling);
+      else
+        parent.appendChild(element);
+    }
+    return lines;
+  }
+  var _defaults3 = extend(defaults2, {});
+  var SplitType = class {
+    /**
+     * The internal data store
+     */
+    static get data() {
+      return cache;
+    }
+    /**
+     * The default settings for all splitType instances
+     * @static
+     */
+    static get defaults() {
+      return _defaults3;
+    }
+    /**
+     * Sets the default settings for all SplitType instances.
+     *
+     * Setting `SplitType.defaults` to an object will merge that object with the
+     * existing defaults.
+     *
+     * @param {Object} settings an object containing the settings to override
+     * @deprecated
+     * @static
+     * @example
+     * SplitType.defaults = { "position": "absolute" }
+     */
+    static set defaults(options) {
+      _defaults3 = extend(_defaults3, parseSettings(options));
+    }
+    /**
+     * Sets the default settings for all SplitType instances.
+     * The provided object will be merged with the existing defaults objects.
+     *
+     * @param {Object} settings an object containing the settings to override
+     * @returns {Object} the new default settings
+     * @public
+     * @static
+     * @example
+     * SplitType.setDefaults({ "position": "absolute" })
+     */
+    static setDefaults(options) {
+      _defaults3 = extend(_defaults3, parseSettings(options));
+      return defaults2;
+    }
+    /**
+     * Revert target elements to their original html content
+     * Has no effect on that
+     *
+     * @param {any} elements The target elements to revert. One of:
+     *  - {string} A css selector
+     *  - {HTMLElement} A single element
+     * -  {NodeList} A NodeList or collection
+     *  - {HTMLElement[]} An array of Elements
+     * -  {Array<HTMLElement|NodeList|HTMLElement[]>} A nested array of elements
+     * @static
+     */
+    static revert(elements) {
+      getTargetElements(elements).forEach((element) => {
+        const {
+          isSplit,
+          html,
+          cssWidth,
+          cssHeight
+        } = get(element);
+        if (isSplit) {
+          element.innerHTML = html;
+          element.style.width = cssWidth || "";
+          element.style.height = cssHeight || "";
+          remove(element);
+        }
+      });
+    }
+    /**
+     * Creates a new SplitType instance
+     * This static method provides a way to create a `SplitType` instance without
+     * using the `new` keyword.
+     *
+     * @param {any} target The target elements to split. One of:
+     *  - {string} A css selector
+     *  - {HTMLElement} A single element
+     * -  {NodeList} A NodeList or collection
+     *  - {HTMLElement[]} An array of Elements
+     * -  {Array<HTMLElement|NodeList|HTMLElement[]>} A nested array of elements
+     * @param {Object} [options] Settings for the SplitType instance
+     * @return {SplitType} the SplitType instance
+     * @static
+     */
+    static create(target, options) {
+      return new SplitType(target, options);
+    }
+    /**
+     * Creates a new `SplitType` instance
+     *
+     * @param {any} elements The target elements to split. One of:
+     *  - {string} A css selector
+     *  - {HTMLElement} A single element
+     * -  {NodeList} A NodeList or collection
+     *  - {HTMLElement[]} An array of Elements
+     * -  {Array<HTMLElement|NodeList|HTMLElement[]>} A nested array of elements
+     * @param {Object} [options] Settings for the SplitType instance
+     */
+    constructor(elements, options) {
+      this.isSplit = false;
+      this.settings = extend(_defaults3, parseSettings(options));
+      this.elements = getTargetElements(elements);
+      this.split();
+    }
+    /**
+     * Splits the text in all target elements. This method is called
+     * automatically when a new SplitType instance is created. It can also be
+     * called manually to re-split text with new options.
+     * @param {Object} options
+     * @public
+     */
+    split(options) {
+      this.revert();
+      this.elements.forEach((element) => {
+        set(element, "html", element.innerHTML);
+      });
+      this.lines = [];
+      this.words = [];
+      this.chars = [];
+      const scrollPos = [window.pageXOffset, window.pageYOffset];
+      if (options !== void 0) {
+        this.settings = extend(this.settings, parseSettings(options));
+      }
+      const types = parseTypes(this.settings.types);
+      if (types.none) {
+        return;
+      }
+      this.elements.forEach((element) => {
+        set(element, "isRoot", true);
+        const {
+          words,
+          chars
+        } = split(element, this.settings);
+        this.words = [...this.words, ...words];
+        this.chars = [...this.chars, ...chars];
+      });
+      this.elements.forEach((element) => {
+        if (types.lines || this.settings.absolute) {
+          const lines = repositionAfterSplit(element, this.settings, scrollPos);
+          this.lines = [...this.lines, ...lines];
+        }
+      });
+      this.isSplit = true;
+      window.scrollTo(scrollPos[0], scrollPos[1]);
+      cleanup();
+    }
+    /**
+     * Reverts target element(s) back to their original html content
+     * Deletes all stored data associated with the target elements
+     * Resets the properties on the splitType instance
+     *
+     * @public
+     */
+    revert() {
+      if (this.isSplit) {
+        this.lines = null;
+        this.words = null;
+        this.chars = null;
+        this.isSplit = false;
+      }
+      SplitType.revert(this.elements);
+    }
+  };
+
+  // src/utils/globalvars.ts
+  var gsapEaseType = "back.out";
+  var gsapDuration = 0.75;
+
+  // src/components/sliders.ts
+  gsapWithCSS.registerPlugin(Observer);
+  function initSliders() {
+    const sliders = gsapWithCSS.utils.toArray('[cs-el="slider"]');
+    sliders.forEach((slider) => {
+      if (slider) {
+        initSlider(slider);
+      }
+    });
+  }
+  function initSlider(slider) {
+    const slides = slider.querySelectorAll('[cs-el="slide"]');
+    const slidesLength = slides.length;
+    if (slidesLength === 0)
+      return;
+    if (slidesLength === 1) {
+      removeElementsByAttribute("slider-nav");
+      removeElementsByAttribute("slider-indicators");
+      removeElementsByAttribute("slider-cover");
+      return;
+    }
+    function removeElementsByAttribute(attributeValue) {
+      const elements = document.querySelectorAll(`[cs-el="${attributeValue}"]`);
+      elements.forEach((element) => {
+        element.remove();
+      });
+    }
+    let sliderType = slider.getAttribute("slider-type");
+    if (!sliderType)
+      sliderType = "fade";
+    let count;
+    const transitionDuration = 0.5;
+    const sliderEaseIn = "power2.out";
+    const sliderEaseOut = "power2.out";
+    let next;
+    let prev;
+    let isFirstSlide = false;
+    let isLastSlide = false;
+    const playDuration = 3e3;
+    const tl_slideIn = gsapWithCSS.timeline({ paused: true });
+    const tl_slideOut = gsapWithCSS.timeline({ paused: true });
+    let initialSlide = true;
+    const allowNext = true;
+    const allowPrev = true;
+    const tl_toggleControls = gsapWithCSS.timeline({ paused: true });
+    const nav = slider.querySelector('[cs-el="slider-nav"]');
+    if (nav)
+      setupNav(nav);
+    const indicators = slider.querySelector('[cs-el="slider-indicators"]');
+    let allIndicators = [];
+    if (indicators)
+      allIndicators = setupIndicators();
+    const cover = slider.querySelector('[cs-el="slider-cover"]');
+    const getLoop = slider.getAttribute("slider-loop");
+    let loop = false;
+    if (getLoop === "loop") {
+      loop = true;
+    }
+    const GetToggleControls = slider.getAttribute("slider-controls");
+    let toggleControls = false;
+    if (GetToggleControls === "toggle") {
+      toggleControls = true;
+      setupToggleControls();
+    }
+    const getAutoPlay = slider.getAttribute("slider-autoplay");
+    let isPlaying;
+    if (getAutoPlay === "play") {
+      playSlider();
+    }
+    gsapWithCSS.set(slides, { opacity: 0 });
+    function initAllPrevNextButtons() {
+      const allNextButtons = slider.querySelectorAll('[cs-el="slider-next"]');
+      const allPrevButtons = slider.querySelectorAll('[cs-el="slider-prev"]');
+      if (allNextButtons.length > 0) {
+        allNextButtons.forEach((el) => {
+          el.addEventListener("click", goNext);
+        });
+      }
+      if (allPrevButtons.length > 0) {
+        allPrevButtons.forEach((el) => {
+          el.addEventListener("click", goPrev);
+        });
+      }
+    }
+    initAllPrevNextButtons();
+    function setupNav(nav2) {
+      next = nav2.querySelector('[cs-el="slider-nav_next"]');
+      prev = nav2.querySelector('[cs-el="slider-nav_prev"]');
+      nav2.style.pointerEvents = "none";
+      if (next)
+        next.style.pointerEvents = "auto";
+      if (prev)
+        prev.style.pointerEvents = "auto";
+      navAddEventListeners(null);
+    }
+    function playSlider() {
+      isPlaying = setInterval(() => slideAction("next"), playDuration);
+    }
+    function stopSlider(ap) {
+      clearInterval(ap);
+    }
+    function setupIndicators() {
+      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+      if (!sliderIndicators) {
+        console.log("no sliderIndicators found");
+        return [];
+      }
+      const indicator = sliderIndicators.querySelectorAll('[cs-el="slider-indicator"]');
+      if (indicator.length === 0) {
+        console.log("no indicator found");
+        return [];
+      }
+      if (indicator.length === 1) {
+        const slideArray = Array.from(slides);
+        slideArray.slice(0, -1).forEach(() => {
+          const clonedIndicator = indicator[0].cloneNode(true);
+          indicator[0].parentNode?.appendChild(clonedIndicator);
+        });
+      }
+      const indicatorsArray = sliderIndicators.querySelectorAll(
+        '[cs-el="slider-indicator"]'
+      );
+      indicatorsArray.forEach((indicator2, i) => {
+        indicator2.addEventListener("click", () => goIndex(i));
+      });
+      return indicatorsArray;
+    }
+    function setupToggleControls() {
+      tl_toggleControls.from(next, {
+        autoAlpha: 0,
+        duration: gsapDuration,
+        ease: gsapEaseType,
+        x: "-100%"
+      });
+      tl_toggleControls.from(
+        prev,
+        { autoAlpha: 0, duration: gsapDuration, ease: gsapEaseType, x: "100%" },
+        "<"
+      );
+      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+      tl_toggleControls.from(
+        sliderIndicators,
+        {
+          autoAlpha: 0,
+          delay: 0.25,
+          duration: gsapDuration,
+          ease: gsapEaseType
+        },
+        "<"
+      );
+      if (!cover) {
+        slider.addEventListener("mouseenter", aL_mouseEnter);
+        slider.addEventListener("mouseleave", aL_mouseLeave);
+      }
+    }
+    function aL_mouseEnter() {
+      tl_toggleControls.timeScale(1).play();
+    }
+    function aL_mouseLeave() {
+      tl_toggleControls.timeScale(2).reverse();
+    }
+    function setSwipe() {
+      console.log("Fnc setSwipe called");
+      Observer.create({
+        target: slider,
+        type: "touch",
+        dragMinimum: 100,
+        onLeft: () => goNext(),
+        onRight: () => goPrev()
+      });
+    }
+    function slideAction(dir, index) {
+      console.log("Fnc slideAction called");
+      if (index && index > count && !allowNext)
+        return;
+      if (index && index < count && !allowPrev)
+        return;
+      const transitionType = sliderType;
+      if (!initialSlide)
+        gsapSlideOut(count);
+      initialSlide = false;
+      if (typeof index === "number" && index >= 0 && index < slidesLength) {
+        if (count > index) {
+          dir = "prev";
+        }
+        if (count < index) {
+          dir = "next";
+        }
+        count = index;
+        gsapSlideIn(count);
+      } else {
+        if (dir === "next") {
+          count = count < slidesLength - 1 ? count + 1 : loop ? 0 : count;
+          gsapSlideIn(count);
+        } else if (dir === "prev") {
+          count = count > 0 ? count - 1 : loop ? slidesLength - 1 : count;
+          gsapSlideIn(count);
+        }
+      }
+      checkSlideIndex(count);
+      if (!loop) {
+        next?.classList.remove("is-muted");
+        prev?.classList.remove("is-muted");
+        navAddEventListeners(null);
+        if (isFirstSlide)
+          ifIsFirstSlide();
+        if (isLastSlide)
+          ifIsLastSlide();
+      }
+      if (indicators) {
+        setActiveindicator(count);
+      }
+      function gsapSlideIn(i) {
+        if (transitionType === "fade") {
+          tl_slideIn.fromTo(slides[i], { opacity: 0 }, { duration: transitionDuration, opacity: 1 });
+        } else if (transitionType === "slide") {
+          const xPercent = dir === "next" ? 50 : dir === "prev" ? -50 : 0;
+          tl_slideIn.fromTo(
+            slides[i],
+            { opacity: 0, xPercent },
+            { duration: transitionDuration, opacity: 1, xPercent: 0, ease: sliderEaseIn }
+          );
+        } else if (transitionType === "updown") {
+          const yPercent = dir === "next" ? 50 : dir === "prev" ? -50 : 0;
+          tl_slideIn.fromTo(
+            slides[i],
+            { opacity: 0, yPercent },
+            { duration: transitionDuration, opacity: 1, yPercent: 0, ease: sliderEaseIn }
+          );
+        }
+        gsapWithCSS.set(slides, { zIndex: 1 });
+        slides[i].style.zIndex = "2";
+        tl_slideIn.timeScale(1).play();
+      }
+      function gsapSlideOut(i) {
+        if (transitionType === "fade") {
+          tl_slideOut.to(slides[i], { duration: transitionDuration, opacity: 0 });
+        } else if (transitionType === "slide") {
+          const xPercent = dir === "next" ? -50 : dir === "prev" ? 50 : 0;
+          tl_slideOut.fromTo(
+            slides[i],
+            { opacity: 1, xPercent: 0 },
+            { duration: transitionDuration, opacity: 0, xPercent, ease: sliderEaseOut }
+          );
+        } else if (transitionType === "updown") {
+          const yPercent = dir === "next" ? -50 : dir === "prev" ? 50 : 0;
+          tl_slideOut.fromTo(
+            slides[i],
+            { opacity: 1, yPercent: 0 },
+            { duration: transitionDuration, opacity: 0, yPercent, ease: sliderEaseOut }
+          );
+        }
+        gsapWithCSS.set(slides, { zIndex: 1 });
+        slides[i].style.zIndex = "2";
+        tl_slideOut.timeScale(1).play();
+      }
+    }
+    function checkSlideIndex(count2) {
+      isFirstSlide = count2 === 0;
+      isLastSlide = count2 === slidesLength - 1;
+    }
+    function ifIsFirstSlide() {
+      navRemoveEventListeners("prev");
+      prev?.classList.add("is-muted");
+    }
+    function ifIsLastSlide() {
+      navRemoveEventListeners("next");
+      next?.classList.add("is-muted");
+      if (isPlaying)
+        stopSlider(isPlaying);
+    }
+    function setActiveindicator(index) {
+      allIndicators.forEach((indicator, i) => {
+        if (i === index) {
+          if (indicator.firstChild instanceof Element) {
+            indicator.firstChild.classList.add("is-active");
+          }
+        } else {
+          if (indicator.firstChild instanceof Element) {
+            indicator.firstChild.classList.remove("is-active");
+          }
+        }
+      });
+    }
+    function goNext() {
+      if (!tl_slideIn.isActive() && allowNext) {
+        gsapWithCSS.killTweensOf(slideAction);
+        slideAction("next");
+        if (isPlaying)
+          stopSlider(isPlaying);
+      }
+    }
+    function goPrev() {
+      if (!tl_slideOut.isActive() && allowPrev) {
+        gsapWithCSS.killTweensOf(slideAction);
+        slideAction("prev");
+        if (isPlaying)
+          stopSlider(isPlaying);
+      }
+    }
+    function goIndex(i) {
+      gsapWithCSS.killTweensOf(slideAction);
+      slideAction(null, i);
+      if (isPlaying)
+        stopSlider(isPlaying);
+    }
+    function navAddEventListeners(variable) {
+      if (!variable) {
+        next?.addEventListener("click", goNext);
+        prev?.addEventListener("click", goPrev);
+      } else if (variable === "next") {
+        next?.addEventListener("click", goNext);
+      } else if (variable === "prev") {
+        prev?.addEventListener("click", goPrev);
+      }
+    }
+    function navRemoveEventListeners(variable) {
+      if (variable === "next") {
+        next?.removeEventListener("click", goNext);
+      }
+      if (variable === "prev") {
+        prev?.removeEventListener("click", goPrev);
+      }
+    }
+    function setCover(cover2) {
+      console.log("Fnc setCover called");
+      gsapWithCSS.to(cover2, { autoAlpha: 1 });
+      if (!toggleControls) {
+        setupToggleControls();
+      }
+      tl_toggleControls.progress(0);
+      const startSliderBtn = slider.querySelector('[cs-el="slider-start"]');
+      startSliderBtn?.addEventListener("click", () => {
+        startSlider(cover2);
+      });
+    }
+    function startSlider(cover2) {
+      console.log("Fnc startSlider called");
+      gsapWithCSS.to(cover2, { autoAlpha: 0 });
+      slideAction(null, 0);
+      tl_toggleControls.timeScale(1).play();
+      if (toggleControls) {
+        slider.addEventListener("mouseenter", aL_mouseEnter);
+        slider.addEventListener("mouseleave", aL_mouseLeave);
+      }
+    }
+    setSwipe();
+    if (!cover) {
+      slideAction(null, 0);
+    } else {
+      setCover(cover);
+    }
+  }
+
+  // src/utils/colors.ts
+  var green = "#9ccca1";
+  var aqua = "#96c1d4";
+  var marine = "#729dad";
+  var purple = "#c092b6";
+  var red = "#ea958f";
+  var yellow = "#f4d791";
+  var colorArray = [green, aqua, marine, purple, yellow, red];
+  function loopLogoLetters(letters) {
+    gsapWithCSS.utils.shuffle(colorArray);
+    gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colorArray), duration: 0.25 });
+  }
+
+  // src/global.ts
+  gsapWithCSS.registerPlugin(ScrollTrigger2, Draggable, SplitType);
+  var globalEase = "back.out";
+  var globalDuration = 0.75;
+  window.Webflow ||= [];
+  window.Webflow.push(() => {
+    const buttons = document.querySelectorAll('[cs-el="button"]');
+    if (buttons.length > 0) {
+      buttons.forEach((button) => {
+        const icon = button.lastChild;
+        const buttonHover = gsapWithCSS.timeline({ paused: true });
+        buttonHover.to(icon, { x: "0.5rem", duration: 0.25, delay: 0.25, ease: "sin.in" });
+        button.addEventListener("mouseenter", () => {
+          buttonHover.timeScale(1).play();
+        });
+        button.addEventListener("mouseleave", () => {
+          buttonHover.timeScale(2).reverse();
+        });
+      });
+    }
+    const logo = document.querySelector('[cs-el="logo"]');
+    if (logo) {
+      const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
+      if (logoLetters.length > 0) {
+        setInterval(() => loopLogoLetters(logoLetters), 1e3);
+      }
+    }
+    const splitTextElms = gsapWithCSS.utils.toArray("[txt-split]");
+    if (splitTextElms.length > 0) {
+      splitTextElms.forEach((el) => {
+        const splitTextType = el.getAttribute("txt-split");
+        if (splitTextType === "words") {
+          const typeSplit = new SplitType(el, {
+            types: "words",
+            tagName: "div",
+            wordClass: "el"
+          });
+        }
+        if (splitTextType === "chars") {
+          const typeSplit = new SplitType(el, {
+            types: "chars",
+            tagName: "div",
+            charClass: "el"
+          });
+        }
+        const letters = el.querySelectorAll(".el");
+        if (letters.length > 0) {
+          setInterval(() => loopLogoLetters(letters), 1e3);
+        }
+      });
+    }
+    const animatedGradientBackgroundElms = gsapWithCSS.utils.toArray(
+      '[hh-background-color="gradient-loop"]'
     );
+    if (animatedGradientBackgroundElms.length > 0) {
+      animatedGradientBackgroundElms.forEach((el) => {
+        let currentColorIndex = 0;
+        function changeGradientColor() {
+          currentColorIndex = (currentColorIndex + 1) % colorArray.length;
+          const color1 = colorArray[currentColorIndex];
+          const color2 = colorArray[(currentColorIndex + 1) % colorArray.length];
+          const color3 = colorArray[(currentColorIndex + 2) % colorArray.length];
+          const color4 = colorArray[(currentColorIndex + 3) % colorArray.length];
+          gsapWithCSS.to(el, {
+            duration: 2,
+            // Adjust the duration as needed
+            background: `linear-gradient(to right, ${color1}, ${color2}, ${color3}, ${color4})`,
+            onComplete: changeGradientColor
+          });
+        }
+        changeGradientColor();
+      });
+    }
+    const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
+    if (loginModal.length > 0) {
+      gsapWithCSS.set(loginModal, { autoAlpha: 0 });
+      let isOpen = false;
+      const body = document.querySelector("body");
+      const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
+      const loginModalTriggers = gsapWithCSS.utils.toArray('[cs-el="login-modal-toggle"]');
+      const openModal = gsapWithCSS.timeline({ paused: true });
+      openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
+      openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: "back.out" }, "<.25");
+      loginModalTriggers.forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          if (isOpen) {
+            openModal.timeScale(2).reverse();
+            body?.classList.toggle("overflow-hidden");
+            isOpen = false;
+          } else {
+            openModal.timeScale(1).play();
+            body?.classList.toggle("overflow-hidden");
+            isOpen = true;
+          }
+        });
+      });
+    }
+    function init4() {
+      const onPageLoadElms = gsapWithCSS.utils.toArray('[cs-tr="pageload"]');
+      if (onPageLoadElms.length > 0) {
+        gsapWithCSS.to(onPageLoadElms, {
+          autoAlpha: 1,
+          duration: globalDuration,
+          ease: globalEase,
+          stagger: 0.25
+        });
+      }
+      const scrolltriggerOnEnterElms = gsapWithCSS.utils.toArray('[cs-st*="scroll-in"]');
+      if (scrolltriggerOnEnterElms.length > 0) {
+        scrolltriggerOnEnterElms.forEach((el) => {
+          gsapWithCSS.from(el, {
+            opacity: 0,
+            yPercent: 10,
+            ease: "sin.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top bottom",
+              end: "top 70%",
+              scrub: 1
+            }
+          });
+        });
+      }
+      const st_paralaxBgElms = gsapWithCSS.utils.toArray('[cs-st*="paralax-bg"]');
+      if (st_paralaxBgElms.length > 0) {
+        st_paralaxBgElms.forEach((el) => {
+          gsapWithCSS.to(el, {
+            yPercent: 20,
+            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 2 }
+          });
+        });
+      }
+      initSliders();
+    }
+    window.addEventListener("resize", () => {
+      init4();
+    });
+    window.addEventListener("load", () => {
+      init4();
+    });
+  });
+
+  // src/human.ts
+  var globalEase2 = "back.out";
+  window.Webflow ||= [];
+  window.Webflow.push(() => {
+    const hhpHeroImg = document.querySelector('[cs-el="userHeroImg"]');
+    if (hhpHeroImg) {
+      gsapWithCSS.to(hhpHeroImg, {
+        yPercent: 20,
+        scrollTrigger: { trigger: hhpHeroImg, start: "top top", end: "bottom top", scrub: 1 }
+      });
+    }
+    const hhpSections = gsapWithCSS.utils.toArray('[cs-el="userBodySection"]');
+    if (hhpSections.length > 0) {
+      hhpSections.forEach((el) => {
+        gsapWithCSS.from(el, {
+          opacity: 0,
+          yPercent: 20,
+          ease: "sin.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top bottom",
+            end: "top 75%",
+            scrub: 1,
+            markers: false
+          }
+        });
+      });
+    }
+    const hhpAside = document.querySelector('[cs-el="hhp-aside"]');
+    const hhpUserCard = document.querySelector('[cs-el="hhp-user-card"]');
+    const hhpBody = document.querySelector('[cs-el="hhp-body"]');
+    const toggleNav = gsapWithCSS.timeline({ paused: true });
+    const stNav = ScrollTrigger2.create({
+      trigger: hhpAside,
+      start: "top 34rem",
+      endTrigger: hhpBody,
+      end: () => `bottom ${hhpUserCard.offsetHeight + 64}`,
+      markers: false,
+      pin: hhpUserCard,
+      pinSpacing: true,
+      invalidateOnRefresh: true,
+      onEnter: () => toggleNav.delay(2).timeScale(1).play(),
+      onLeaveBack: () => toggleNav.timeScale(4).reverse()
+    });
+    const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
+    if (hhpNav) {
+      const navItems = gsapWithCSS.utils.toArray('[cs-el="hhp-nav-item"]');
+      toggleNav.from(navItems, {
+        autoAlpha: 0,
+        duration: 0.3,
+        y: "-2rem",
+        ease: globalEase2,
+        stagger: 0.1
+      });
+      navItems.forEach((item) => {
+        const navItemHover = gsapWithCSS.timeline({ paused: true });
+        navItemHover.to(item, { x: "0.25rem", duration: 1, ease: globalEase2 });
+        item.addEventListener("mouseenter", () => {
+          navItemHover.timeScale(1).play();
+        });
+        item.addEventListener("mouseleave", () => {
+          navItemHover.timeScale(1.5).reverse();
+        });
+      });
+    }
   });
 })();
 /*! Bundled license information:

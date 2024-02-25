@@ -543,7 +543,7 @@
     }
     var vars = _isObject(v) ? v : {
       each: v
-    }, ease = _parseEase(vars.ease), from = vars.from || 0, base = parseFloat(vars.base) || 0, cache = {}, isDecimal = from > 0 && from < 1, ratios = isNaN(from) || isDecimal, axis = vars.axis, ratioX = from, ratioY = from;
+    }, ease = _parseEase(vars.ease), from = vars.from || 0, base = parseFloat(vars.base) || 0, cache2 = {}, isDecimal = from > 0 && from < 1, ratios = isNaN(from) || isDecimal, axis = vars.axis, ratioX = from, ratioY = from;
     if (_isString(from)) {
       ratioX = ratioY = {
         center: 0.5,
@@ -555,7 +555,7 @@
       ratioY = from[1];
     }
     return function(i, target, a) {
-      var l = (a || vars).length, distances = cache[l], originX, originY, x, y, d, j, max, min, wrapAt;
+      var l = (a || vars).length, distances = cache2[l], originX, originY, x, y, d, j, max, min, wrapAt;
       if (!distances) {
         wrapAt = vars.grid === "auto" ? 0 : (vars.grid || [1, _bigNum])[1];
         if (!wrapAt) {
@@ -564,7 +564,7 @@
           }
           wrapAt--;
         }
-        distances = cache[l] = [];
+        distances = cache2[l] = [];
         originX = ratios ? Math.min(wrapAt, l) * ratioX - 0.5 : from % wrapAt;
         originY = wrapAt === _bigNum ? 0 : ratios ? l * ratioY / wrapAt - 0.5 : from / wrapAt | 0;
         max = 0;
@@ -596,9 +596,9 @@
     };
   };
   var snap = function snap2(snapTo, value) {
-    var isArray = _isArray(snapTo), radius, is2D;
-    if (!isArray && _isObject(snapTo)) {
-      radius = isArray = snapTo.radius || _bigNum;
+    var isArray2 = _isArray(snapTo), radius, is2D;
+    if (!isArray2 && _isObject(snapTo)) {
+      radius = isArray2 = snapTo.radius || _bigNum;
       if (snapTo.values) {
         snapTo = toArray(snapTo.values);
         if (is2D = !_isNumber(snapTo[0])) {
@@ -608,11 +608,11 @@
         snapTo = _roundModifier(snapTo.increment);
       }
     }
-    return _conditionalReturn(value, !isArray ? _roundModifier(snapTo) : _isFunction(snapTo) ? function(raw) {
+    return _conditionalReturn(value, !isArray2 ? _roundModifier(snapTo) : _isFunction(snapTo) ? function(raw) {
       is2D = snapTo(raw);
       return Math.abs(is2D - raw) <= radius ? is2D : raw;
     } : function(raw) {
-      var x = parseFloat(is2D ? raw.x : raw), y = parseFloat(is2D ? raw.y : 0), min = _bigNum, closest2 = 0, i = snapTo.length, dx, dy;
+      var x = parseFloat(is2D ? raw.x : raw), y = parseFloat(is2D ? raw.y : 0), min = _bigNum, closest = 0, i = snapTo.length, dx, dy;
       while (i--) {
         if (is2D) {
           dx = snapTo[i].x - x;
@@ -623,11 +623,11 @@
         }
         if (dx < min) {
           min = dx;
-          closest2 = i;
+          closest = i;
         }
       }
-      closest2 = !radius || min <= radius ? snapTo[closest2] : raw;
-      return is2D || closest2 === raw || _isNumber(raw) ? closest2 : closest2 + getUnit(raw);
+      closest = !radius || min <= radius ? snapTo[closest] : raw;
+      return is2D || closest === raw || _isNumber(raw) ? closest : closest + getUnit(raw);
     });
   };
   var random = function random2(min, max, roundingIncrement, returnFunction) {
@@ -654,8 +654,8 @@
     return mapRange(min, max, 0, 1, value);
   };
   var _wrapArray = function _wrapArray2(a, wrapper, value) {
-    return _conditionalReturn(value, function(index2) {
-      return a[~~wrapper(index2)];
+    return _conditionalReturn(value, function(index) {
+      return a[~~wrapper(index)];
     });
   };
   var wrap = function wrap2(min, max, value) {
@@ -672,12 +672,12 @@
     });
   };
   var _replaceRandom = function _replaceRandom2(value) {
-    var prev = 0, s = "", i, nums, end, isArray;
+    var prev = 0, s = "", i, nums, end, isArray2;
     while (~(i = value.indexOf("random(", prev))) {
       end = value.indexOf(")", i);
-      isArray = value.charAt(i + 7) === "[";
-      nums = value.substr(i + 7, end - i - 7).match(isArray ? _delimitedValueExp : _strictNumExp);
-      s += value.substr(prev, i - prev) + random(isArray ? nums : +nums[0], isArray ? 0 : +nums[1], +nums[2] || 1e-5);
+      isArray2 = value.charAt(i + 7) === "[";
+      nums = value.substr(i + 7, end - i - 7).match(isArray2 ? _delimitedValueExp : _strictNumExp);
+      s += value.substr(prev, i - prev) + random(isArray2 ? nums : +nums[0], isArray2 ? 0 : +nums[1], +nums[2] || 1e-5);
       prev = end + 1;
     }
     return s + value.substr(prev, value.length - prev);
@@ -693,9 +693,9 @@
       return (1 - p2) * start + p2 * end;
     };
     if (!func) {
-      var isString = _isString(start), master = {}, p, i, interpolators, l, il;
+      var isString2 = _isString(start), master = {}, p, i, interpolators, l, il;
       progress === true && (mutate = 1) && (progress = null);
-      if (isString) {
+      if (isString2) {
         start = {
           p: start
         };
@@ -724,7 +724,7 @@
           _addPropTween.call(master, start, p, "get", end[p]);
         }
         func = function func2(p2) {
-          return _renderPropTweens(p2, master) || (isString ? start.p : start);
+          return _renderPropTweens(p2, master) || (isString2 ? start.p : start);
         };
       }
     }
@@ -893,14 +893,14 @@
     return a;
   };
   var _colorOrderData = function _colorOrderData2(v) {
-    var values = [], c = [], i = -1;
+    var values2 = [], c = [], i = -1;
     v.split(_colorExp).forEach(function(v2) {
       var a = v2.match(_numWithUnitExp) || [];
-      values.push.apply(values, a);
+      values2.push.apply(values2, a);
       c.push(i += a.length + 1);
     });
-    values.c = c;
-    return values;
+    values2.c = c;
+    return values2;
   };
   var _formatColors = function _formatColors2(s, toHSL, orderMatchData) {
     var result = "", colors = (s + result).match(_colorExp), type = toHSL ? "hsla(" : "rgba(", i = 0, c, shell, d, l;
@@ -950,8 +950,8 @@
   };
   var _tickerActive;
   var _ticker = function() {
-    var _getTime3 = Date.now, _lagThreshold = 500, _adjustedLag = 33, _startTime = _getTime3(), _lastUpdate = _startTime, _gap = 1e3 / 240, _nextTime = _gap, _listeners2 = [], _id, _req, _raf, _self, _delta, _i, _tick = function _tick2(v) {
-      var elapsed = _getTime3() - _lastUpdate, manual = v === true, overlap, dispatch, time, frame;
+    var _getTime4 = Date.now, _lagThreshold = 500, _adjustedLag = 33, _startTime = _getTime4(), _lastUpdate = _startTime, _gap = 1e3 / 240, _nextTime = _gap, _listeners3 = [], _id, _req, _raf, _self, _delta, _i2, _tick = function _tick2(v) {
+      var elapsed = _getTime4() - _lastUpdate, manual = v === true, overlap, dispatch, time, frame;
       elapsed > _lagThreshold && (_startTime += elapsed - _adjustedLag);
       _lastUpdate += elapsed;
       time = _lastUpdate - _startTime;
@@ -965,8 +965,8 @@
       }
       manual || (_id = _req(_tick2));
       if (dispatch) {
-        for (_i = 0; _i < _listeners2.length; _i++) {
-          _listeners2[_i](time, _delta, frame, v);
+        for (_i2 = 0; _i2 < _listeners3.length; _i2++) {
+          _listeners3[_i2](time, _delta, frame, v);
         }
       }
     };
@@ -1017,14 +1017,14 @@
           _self.remove(func);
         } : callback;
         _self.remove(callback);
-        _listeners2[prioritize ? "unshift" : "push"](func);
+        _listeners3[prioritize ? "unshift" : "push"](func);
         _wake();
         return func;
       },
-      remove: function remove(callback, i) {
-        ~(i = _listeners2.indexOf(callback)) && _listeners2.splice(i, 1) && _i >= i && _i--;
+      remove: function remove2(callback, i) {
+        ~(i = _listeners3.indexOf(callback)) && _listeners3.splice(i, 1) && _i2 >= i && _i2--;
       },
-      _listeners: _listeners2
+      _listeners: _listeners3
     };
     return _self;
   }();
@@ -1035,13 +1035,13 @@
   var _customEaseExp = /^[\d.\-M][\d.\-,\s]/;
   var _quotesExp = /["']/g;
   var _parseObjectInString = function _parseObjectInString2(value) {
-    var obj = {}, split = value.substr(1, value.length - 3).split(":"), key = split[0], i = 1, l = split.length, index2, val, parsedVal;
+    var obj = {}, split2 = value.substr(1, value.length - 3).split(":"), key = split2[0], i = 1, l = split2.length, index, val, parsedVal;
     for (; i < l; i++) {
-      val = split[i];
-      index2 = i !== l - 1 ? val.lastIndexOf(",") : val.length;
-      parsedVal = val.substr(0, index2);
+      val = split2[i];
+      index = i !== l - 1 ? val.lastIndexOf(",") : val.length;
+      parsedVal = val.substr(0, index);
       obj[key] = isNaN(parsedVal) ? parsedVal.replace(_quotesExp, "").trim() : +parsedVal;
-      key = val.substr(index2 + 1).trim();
+      key = val.substr(index + 1).trim();
     }
     return obj;
   };
@@ -1050,8 +1050,8 @@
     return value.substring(open, ~nested && nested < close ? value.indexOf(")", close + 1) : close);
   };
   var _configEaseFromString = function _configEaseFromString2(name) {
-    var split = (name + "").split("("), ease = _easeMap[split[0]];
-    return ease && split.length > 1 && ease.config ? ease.config.apply(null, ~name.indexOf("{") ? [_parseObjectInString(split[1])] : _valueInParentheses(name).split(",").map(_numericIfPossible)) : _easeMap._CE && _customEaseExp.test(name) ? _easeMap._CE("", name) : ease;
+    var split2 = (name + "").split("("), ease = _easeMap[split2[0]];
+    return ease && split2.length > 1 && ease.config ? ease.config.apply(null, ~name.indexOf("{") ? [_parseObjectInString(split2[1])] : _valueInParentheses(name).split(",").map(_numericIfPossible)) : _easeMap._CE && _customEaseExp.test(name) ? _easeMap._CE("", name) : ease;
   };
   var _invertEase = function _invertEase2(ease) {
     return function(p) {
@@ -1480,7 +1480,7 @@
       _createTweenType(2, arguments, this);
       return this;
     };
-    _proto2.set = function set(targets, vars, position) {
+    _proto2.set = function set2(targets, vars, position) {
       vars.duration = 0;
       vars.parent = this;
       _inheritDefaults(vars).repeatDelay || (vars.repeat = 0);
@@ -1714,7 +1714,7 @@
         }
       }
     };
-    _proto2.remove = function remove(child) {
+    _proto2.remove = function remove2(child) {
       if (_isString(child)) {
         return this.removeLabel(child);
       }
@@ -1935,7 +1935,7 @@
     _forcing: 0
   });
   var _addComplexStringPropTween = function _addComplexStringPropTween2(target, prop, start, end, setter, stringFilter, funcParam) {
-    var pt = new PropTween(this._pt, target, prop, 0, 1, _renderComplexString, null, setter), index2 = 0, matchIndex = 0, result, startNums, color, endNum, chunk, startNum, hasRandom, a;
+    var pt = new PropTween(this._pt, target, prop, 0, 1, _renderComplexString, null, setter), index = 0, matchIndex = 0, result, startNums, color, endNum, chunk, startNum, hasRandom, a;
     pt.b = start;
     pt.e = end;
     start += "";
@@ -1952,7 +1952,7 @@
     startNums = start.match(_complexStringNumExp) || [];
     while (result = _complexStringNumExp.exec(end)) {
       endNum = result[0];
-      chunk = end.substring(index2, result.index);
+      chunk = end.substring(index, result.index);
       if (color) {
         color = (color + 1) % 5;
       } else if (chunk.substr(-5) === "rgba(") {
@@ -1968,10 +1968,10 @@
           c: endNum.charAt(1) === "=" ? _parseRelative(startNum, endNum) - startNum : parseFloat(endNum) - startNum,
           m: color && color < 4 ? Math.round : 0
         };
-        index2 = _complexStringNumExp.lastIndex;
+        index = _complexStringNumExp.lastIndex;
       }
     }
-    pt.c = index2 < end.length ? end.substring(index2, end.length) : "";
+    pt.c = index < end.length ? end.substring(index, end.length) : "";
     pt.fp = funcParam;
     if (_relExp.test(end) || hasRandom) {
       pt.e = 0;
@@ -1979,8 +1979,8 @@
     this._pt = pt;
     return pt;
   };
-  var _addPropTween = function _addPropTween2(target, prop, start, end, index2, targets, modifier, stringFilter, funcParam, optional) {
-    _isFunction(end) && (end = end(index2 || 0, target, targets));
+  var _addPropTween = function _addPropTween2(target, prop, start, end, index, targets, modifier, stringFilter, funcParam, optional) {
+    _isFunction(end) && (end = end(index || 0, target, targets));
     var currentValue = target[prop], parsedStart = start !== "get" ? start : !_isFunction(currentValue) ? currentValue : funcParam ? target[prop.indexOf("set") || !_isFunction(target["get" + prop.substr(3)]) ? prop : "get" + prop.substr(3)](funcParam) : target[prop](), setter = !_isFunction(currentValue) ? _setterPlain : funcParam ? _setterFuncWithParam : _setterFunc, pt;
     if (_isString(end)) {
       if (~end.indexOf("random(")) {
@@ -2004,20 +2004,20 @@
       return _addComplexStringPropTween.call(this, target, prop, parsedStart, end, setter, stringFilter || _config.stringFilter, funcParam);
     }
   };
-  var _processVars = function _processVars2(vars, index2, target, targets, tween) {
-    _isFunction(vars) && (vars = _parseFuncOrString(vars, tween, index2, target, targets));
+  var _processVars = function _processVars2(vars, index, target, targets, tween) {
+    _isFunction(vars) && (vars = _parseFuncOrString(vars, tween, index, target, targets));
     if (!_isObject(vars) || vars.style && vars.nodeType || _isArray(vars) || _isTypedArray(vars)) {
-      return _isString(vars) ? _parseFuncOrString(vars, tween, index2, target, targets) : vars;
+      return _isString(vars) ? _parseFuncOrString(vars, tween, index, target, targets) : vars;
     }
     var copy = {}, p;
     for (p in vars) {
-      copy[p] = _parseFuncOrString(vars[p], tween, index2, target, targets);
+      copy[p] = _parseFuncOrString(vars[p], tween, index, target, targets);
     }
     return copy;
   };
-  var _checkPlugin = function _checkPlugin2(property, vars, tween, index2, target, targets) {
+  var _checkPlugin = function _checkPlugin2(property, vars, tween, index, target, targets) {
     var plugin, pt, ptLookup, i;
-    if (_plugins[property] && (plugin = new _plugins[property]()).init(target, plugin.rawVars ? vars[property] : _processVars(vars[property], index2, target, targets, tween), tween, index2, targets) !== false) {
+    if (_plugins[property] && (plugin = new _plugins[property]()).init(target, plugin.rawVars ? vars[property] : _processVars(vars[property], index, target, targets, tween), tween, index, targets) !== false) {
       tween._pt = pt = new PropTween(tween._pt, target, property, 0, 1, plugin.render, plugin, 0, plugin.priority);
       if (tween !== _quickTween) {
         ptLookup = tween._ptLookup[tween._targets.indexOf(target)];
@@ -2032,7 +2032,7 @@
   var _overwritingTween;
   var _forceAllPropTweens;
   var _initTween = function _initTween2(tween, time, tTime) {
-    var vars = tween.vars, ease = vars.ease, startAt = vars.startAt, immediateRender = vars.immediateRender, lazy = vars.lazy, onUpdate = vars.onUpdate, onUpdateParams = vars.onUpdateParams, callbackScope = vars.callbackScope, runBackwards = vars.runBackwards, yoyoEase = vars.yoyoEase, keyframes = vars.keyframes, autoRevert = vars.autoRevert, dur = tween._dur, prevStartAt = tween._startAt, targets = tween._targets, parent = tween.parent, fullTargets = parent && parent.data === "nested" ? parent.vars.targets : targets, autoOverwrite = tween._overwrite === "auto" && !_suppressOverwrites, tl = tween.timeline, cleanVars, i, p, pt, target, hasPriority, gsData, harness, plugin, ptLookup, index2, harnessVars, overwritten;
+    var vars = tween.vars, ease = vars.ease, startAt = vars.startAt, immediateRender = vars.immediateRender, lazy = vars.lazy, onUpdate = vars.onUpdate, onUpdateParams = vars.onUpdateParams, callbackScope = vars.callbackScope, runBackwards = vars.runBackwards, yoyoEase = vars.yoyoEase, keyframes = vars.keyframes, autoRevert = vars.autoRevert, dur = tween._dur, prevStartAt = tween._startAt, targets = tween._targets, parent = tween.parent, fullTargets = parent && parent.data === "nested" ? parent.vars.targets : targets, autoOverwrite = tween._overwrite === "auto" && !_suppressOverwrites, tl = tween.timeline, cleanVars, i, p, pt, target, hasPriority, gsData, harness, plugin, ptLookup, index, harnessVars, overwritten;
     tl && (!keyframes || !ease) && (ease = "none");
     tween._ease = _parseEase(ease, _defaults.ease);
     tween._yEase = yoyoEase ? _invertEase(_parseEase(yoyoEase === true ? ease : yoyoEase, _defaults.ease)) : 0;
@@ -2108,8 +2108,8 @@
         gsData = target._gsap || _harness(targets)[i]._gsap;
         tween._ptLookup[i] = ptLookup = {};
         _lazyLookup[gsData.id] && _lazyTweens.length && _lazyRender();
-        index2 = fullTargets === targets ? i : fullTargets.indexOf(target);
-        if (harness && (plugin = new harness()).init(target, harnessVars || cleanVars, tween, index2, fullTargets) !== false) {
+        index = fullTargets === targets ? i : fullTargets.indexOf(target);
+        if (harness && (plugin = new harness()).init(target, harnessVars || cleanVars, tween, index, fullTargets) !== false) {
           tween._pt = pt = new PropTween(tween._pt, target, plugin.name, 0, 1, plugin.render, plugin, 0, plugin.priority);
           plugin._props.forEach(function(name) {
             ptLookup[name] = pt;
@@ -2118,10 +2118,10 @@
         }
         if (!harness || harnessVars) {
           for (p in cleanVars) {
-            if (_plugins[p] && (plugin = _checkPlugin(p, cleanVars, tween, index2, target, fullTargets))) {
+            if (_plugins[p] && (plugin = _checkPlugin(p, cleanVars, tween, index, target, fullTargets))) {
               plugin.priority && (hasPriority = 1);
             } else {
-              ptLookup[p] = pt = _addPropTween.call(tween, target, p, "get", cleanVars[p], index2, fullTargets, 0, vars.stringFilter);
+              ptLookup[p] = pt = _addPropTween.call(tween, target, p, "get", cleanVars[p], index, fullTargets, 0, vars.stringFilter);
             }
           }
         }
@@ -2527,7 +2527,7 @@
     Tween2.fromTo = function fromTo(targets, fromVars, toVars) {
       return _createTweenType(2, arguments);
     };
-    Tween2.set = function set(targets, vars) {
+    Tween2.set = function set2(targets, vars) {
       vars.duration = 0;
       vars.repeatDelay || (vars.repeat = 0);
       return new Tween2(targets, vars);
@@ -2689,7 +2689,7 @@
     });
   };
   var _onMediaChange = function _onMediaChange2() {
-    var time = Date.now(), matches2 = [];
+    var time = Date.now(), matches = [];
     if (time - _lastMediaTime > 2) {
       _dispatch("matchMediaInit");
       _media.forEach(function(c) {
@@ -2704,11 +2704,11 @@
         }
         if (toggled) {
           c.revert();
-          anyMatch && matches2.push(c);
+          anyMatch && matches.push(c);
         }
       });
       _dispatch("matchMediaRevert");
-      matches2.forEach(function(c) {
+      matches.forEach(function(c) {
         return c.onMatch(c);
       });
       _lastMediaTime = time;
@@ -2886,15 +2886,15 @@
         };
       }
       target = target[0] || {};
-      var Plugin = _plugins[property], cache = _getCache(target), p = cache.harness && (cache.harness.aliases || {})[property] || property, setter = Plugin ? function(value) {
+      var Plugin = _plugins[property], cache2 = _getCache(target), p = cache2.harness && (cache2.harness.aliases || {})[property] || property, setter = Plugin ? function(value) {
         var p2 = new Plugin();
         _quickTween._pt = 0;
         p2.init(target, unit ? value + unit : value, _quickTween, 0, [target]);
         p2.render(1, p2);
         _quickTween._pt && _renderPropTweens(1, _quickTween);
-      } : cache.set(target, p);
+      } : cache2.set(target, p);
       return Plugin ? setter : function(value) {
-        return setter(target, p, unit ? value + unit : value, cache, 1);
+        return setter(target, p, unit ? value + unit : value, cache2, 1);
       };
     },
     quickTo: function quickTo(target, property, vars) {
@@ -2916,8 +2916,8 @@
       return _mergeDeep(_config, value || {});
     },
     registerEffect: function registerEffect(_ref3) {
-      var name = _ref3.name, effect = _ref3.effect, plugins2 = _ref3.plugins, defaults3 = _ref3.defaults, extendTimeline = _ref3.extendTimeline;
-      (plugins2 || "").split(",").forEach(function(pluginName) {
+      var name = _ref3.name, effect = _ref3.effect, plugins = _ref3.plugins, defaults3 = _ref3.defaults, extendTimeline = _ref3.extendTimeline;
+      (plugins || "").split(",").forEach(function(pluginName) {
         return pluginName && !_plugins[pluginName] && !_globals[pluginName] && _warn(name + " effect requires " + pluginName + " plugin.");
       });
       _effects[name] = function(targets, vars, tl) {
@@ -3089,12 +3089,12 @@
   };
   var gsap = _gsap.registerPlugin({
     name: "attr",
-    init: function init(target, vars, tween, index2, targets) {
+    init: function init(target, vars, tween, index, targets) {
       var p, pt, v;
       this.tween = tween;
       for (p in vars) {
         v = target.getAttribute(p) || "";
-        pt = this.add(target, "setAttribute", (v || 0) + "", vars[p], index2, targets, 0, 0, p);
+        pt = this.add(target, "setAttribute", (v || 0) + "", vars[p], index, targets, 0, 0, p);
         pt.op = p;
         pt.b = v;
         this._props.push(p);
@@ -3195,14 +3195,14 @@
     return target._gsap.scaleX = target._gsap.scaleY = value;
   };
   var _setterScaleWithRender = function _setterScaleWithRender2(target, property, value, data, ratio) {
-    var cache = target._gsap;
-    cache.scaleX = cache.scaleY = value;
-    cache.renderTransform(ratio, cache);
+    var cache2 = target._gsap;
+    cache2.scaleX = cache2.scaleY = value;
+    cache2.renderTransform(ratio, cache2);
   };
   var _setterTransformWithRender = function _setterTransformWithRender2(target, property, value, data, ratio) {
-    var cache = target._gsap;
-    cache[property] = value;
-    cache.renderTransform(ratio, cache);
+    var cache2 = target._gsap;
+    cache2[property] = value;
+    cache2.renderTransform(ratio, cache2);
   };
   var _transformProp = "transform";
   var _transformOriginProp = _transformProp + "Origin";
@@ -3240,22 +3240,22 @@
     }
   };
   var _revertStyle = function _revertStyle2() {
-    var props = this.props, target = this.target, style = target.style, cache = target._gsap, i, p;
+    var props = this.props, target = this.target, style = target.style, cache2 = target._gsap, i, p;
     for (i = 0; i < props.length; i += 3) {
       props[i + 1] ? target[props[i]] = props[i + 2] : props[i + 2] ? style[props[i]] = props[i + 2] : style.removeProperty(props[i].substr(0, 2) === "--" ? props[i] : props[i].replace(_capsExp, "-$1").toLowerCase());
     }
     if (this.tfm) {
       for (p in this.tfm) {
-        cache[p] = this.tfm[p];
+        cache2[p] = this.tfm[p];
       }
-      if (cache.svg) {
-        cache.renderTransform();
+      if (cache2.svg) {
+        cache2.renderTransform();
         target.setAttribute("data-svg-origin", this.svgo || "");
       }
       i = _reverting2();
       if ((!i || !i.isStart) && !style[_transformProp]) {
         _removeIndependentTransforms(style);
-        cache.uncache = 1;
+        cache2.uncache = 1;
       }
     }
   };
@@ -3395,7 +3395,7 @@
     flex: 1
   };
   var _convertToUnit = function _convertToUnit2(target, property, value, unit) {
-    var curValue = parseFloat(value) || 0, curUnit = (value + "").trim().substr((curValue + "").length) || "px", style = _tempDiv.style, horizontal = _horizontalExp.test(property), isRootSVG = target.tagName.toLowerCase() === "svg", measureProperty = (isRootSVG ? "client" : "offset") + (horizontal ? "Width" : "Height"), amount = 100, toPixels = unit === "px", toPercent = unit === "%", px, parent, cache, isSVG;
+    var curValue = parseFloat(value) || 0, curUnit = (value + "").trim().substr((curValue + "").length) || "px", style = _tempDiv.style, horizontal = _horizontalExp.test(property), isRootSVG = target.tagName.toLowerCase() === "svg", measureProperty = (isRootSVG ? "client" : "offset") + (horizontal ? "Width" : "Height"), amount = 100, toPixels = unit === "px", toPercent = unit === "%", px, parent, cache2, isSVG;
     if (unit === curUnit || !curValue || _nonConvertibleUnits[unit] || _nonConvertibleUnits[curUnit]) {
       return curValue;
     }
@@ -3413,9 +3413,9 @@
     if (!parent || parent === _doc2 || !parent.appendChild) {
       parent = _doc2.body;
     }
-    cache = parent._gsap;
-    if (cache && toPercent && cache.width && horizontal && cache.time === _ticker.time && !cache.uncache) {
-      return _round(curValue / cache.width * amount);
+    cache2 = parent._gsap;
+    if (cache2 && toPercent && cache2.width && horizontal && cache2.time === _ticker.time && !cache2.uncache) {
+      return _round(curValue / cache2.width * amount);
     } else {
       (toPercent || curUnit === "%") && !_nonStandardLayouts[_getComputedProperty(parent, "display")] && (style.position = _getComputedProperty(target, "position"));
       parent === target && (style.position = "static");
@@ -3424,9 +3424,9 @@
       parent.removeChild(_tempDiv);
       style.position = "absolute";
       if (horizontal && toPercent) {
-        cache = _getCache(parent);
-        cache.time = _ticker.time;
-        cache.width = parent[measureProperty];
+        cache2 = _getCache(parent);
+        cache2.time = _ticker.time;
+        cache2.width = parent[measureProperty];
       }
     }
     return _round(toPixels ? px * curValue / amount : px && curValue ? amount / px * curValue : 0);
@@ -3461,7 +3461,7 @@
         start = _getComputedProperty(target, "borderTopColor");
       }
     }
-    var pt = new PropTween(this._pt, target.style, prop, 0, 1, _renderComplexString), index2 = 0, matchIndex = 0, a, result, startValues, startNum, color, startValue, endValue, endNum, chunk, endUnit, startUnit, endValues;
+    var pt = new PropTween(this._pt, target.style, prop, 0, 1, _renderComplexString), index = 0, matchIndex = 0, a, result, startValues, startNum, color, startValue, endValue, endNum, chunk, endUnit, startUnit, endValues;
     pt.b = start;
     pt.e = end;
     start += "";
@@ -3480,7 +3480,7 @@
     if (endValues.length) {
       while (result = _numWithUnitExp.exec(end)) {
         endValue = result[0];
-        chunk = end.substring(index2, result.index);
+        chunk = end.substring(index, result.index);
         if (color) {
           color = (color + 1) % 5;
         } else if (chunk.substr(-5) === "rgba(" || chunk.substr(-5) === "hsla(") {
@@ -3492,10 +3492,10 @@
           endValue.charAt(1) === "=" && (endValue = _parseRelative(startNum, endValue) + startUnit);
           endNum = parseFloat(endValue);
           endUnit = endValue.substr((endNum + "").length);
-          index2 = _numWithUnitExp.lastIndex - endUnit.length;
+          index = _numWithUnitExp.lastIndex - endUnit.length;
           if (!endUnit) {
             endUnit = endUnit || _config.units[prop] || startUnit;
-            if (index2 === end.length) {
+            if (index === end.length) {
               end += endUnit;
               pt.e += endUnit;
             }
@@ -3513,7 +3513,7 @@
           };
         }
       }
-      pt.c = index2 < end.length ? end.substring(index2, end.length) : "";
+      pt.c = index < end.length ? end.substring(index, end.length) : "";
     } else {
       pt.r = prop === "display" && end === "none" ? _renderNonTweeningValueOnlyAtEnd : _renderNonTweeningValue;
     }
@@ -3529,19 +3529,19 @@
     center: "50%"
   };
   var _convertKeywordsToPercentages = function _convertKeywordsToPercentages2(value) {
-    var split = value.split(" "), x = split[0], y = split[1] || "50%";
+    var split2 = value.split(" "), x = split2[0], y = split2[1] || "50%";
     if (x === "top" || x === "bottom" || y === "left" || y === "right") {
       value = x;
       x = y;
       y = value;
     }
-    split[0] = _keywordToPercent[x] || x;
-    split[1] = _keywordToPercent[y] || y;
-    return split.join(" ");
+    split2[0] = _keywordToPercent[x] || x;
+    split2[1] = _keywordToPercent[y] || y;
+    return split2.join(" ");
   };
   var _renderClearProps = function _renderClearProps2(ratio, data) {
     if (data.tween && data.tween._time === data.tween._dur) {
-      var target = data.t, style = target.style, props = data.u, cache = target._gsap, prop, clearTransforms, i;
+      var target = data.t, style = target.style, props = data.u, cache2 = target._gsap, prop, clearTransforms, i;
       if (props === "all" || props === true) {
         style.cssText = "";
         clearTransforms = 1;
@@ -3559,10 +3559,10 @@
       }
       if (clearTransforms) {
         _removeProperty(target, _transformProp);
-        if (cache) {
-          cache.svg && target.removeAttribute("transform");
+        if (cache2) {
+          cache2.svg && target.removeAttribute("transform");
           _parseTransform(target, 1);
-          cache.uncache = 1;
+          cache2.uncache = 1;
           _removeIndependentTransforms(style);
         }
       }
@@ -3653,12 +3653,12 @@
     return _isNullTransform(matrixString) ? _identity2DMatrix : matrixString.substr(7).match(_numExp).map(_round);
   };
   var _getMatrix = function _getMatrix2(target, force2D) {
-    var cache = target._gsap || _getCache(target), style = target.style, matrix2 = _getComputedTransformMatrixAsArray(target), parent, nextSibling, temp, addedToDOM;
-    if (cache.svg && target.getAttribute("transform")) {
+    var cache2 = target._gsap || _getCache(target), style = target.style, matrix = _getComputedTransformMatrixAsArray(target), parent, nextSibling, temp, addedToDOM;
+    if (cache2.svg && target.getAttribute("transform")) {
       temp = target.transform.baseVal.consolidate().matrix;
-      matrix2 = [temp.a, temp.b, temp.c, temp.d, temp.e, temp.f];
-      return matrix2.join(",") === "1,0,0,1,0,0" ? _identity2DMatrix : matrix2;
-    } else if (matrix2 === _identity2DMatrix && !target.offsetParent && target !== _docElement && !cache.svg) {
+      matrix = [temp.a, temp.b, temp.c, temp.d, temp.e, temp.f];
+      return matrix.join(",") === "1,0,0,1,0,0" ? _identity2DMatrix : matrix;
+    } else if (matrix === _identity2DMatrix && !target.offsetParent && target !== _docElement && !cache2.svg) {
       temp = style.display;
       style.display = "block";
       parent = target.parentNode;
@@ -3667,103 +3667,103 @@
         nextSibling = target.nextElementSibling;
         _docElement.appendChild(target);
       }
-      matrix2 = _getComputedTransformMatrixAsArray(target);
+      matrix = _getComputedTransformMatrixAsArray(target);
       temp ? style.display = temp : _removeProperty(target, "display");
       if (addedToDOM) {
         nextSibling ? parent.insertBefore(target, nextSibling) : parent ? parent.appendChild(target) : _docElement.removeChild(target);
       }
     }
-    return force2D && matrix2.length > 6 ? [matrix2[0], matrix2[1], matrix2[4], matrix2[5], matrix2[12], matrix2[13]] : matrix2;
+    return force2D && matrix.length > 6 ? [matrix[0], matrix[1], matrix[4], matrix[5], matrix[12], matrix[13]] : matrix;
   };
   var _applySVGOrigin = function _applySVGOrigin2(target, origin, originIsAbsolute, smooth, matrixArray, pluginToAddPropTweensTo) {
-    var cache = target._gsap, matrix2 = matrixArray || _getMatrix(target, true), xOriginOld = cache.xOrigin || 0, yOriginOld = cache.yOrigin || 0, xOffsetOld = cache.xOffset || 0, yOffsetOld = cache.yOffset || 0, a = matrix2[0], b = matrix2[1], c = matrix2[2], d = matrix2[3], tx = matrix2[4], ty = matrix2[5], originSplit = origin.split(" "), xOrigin = parseFloat(originSplit[0]) || 0, yOrigin = parseFloat(originSplit[1]) || 0, bounds, determinant, x, y;
+    var cache2 = target._gsap, matrix = matrixArray || _getMatrix(target, true), xOriginOld = cache2.xOrigin || 0, yOriginOld = cache2.yOrigin || 0, xOffsetOld = cache2.xOffset || 0, yOffsetOld = cache2.yOffset || 0, a = matrix[0], b = matrix[1], c = matrix[2], d = matrix[3], tx = matrix[4], ty = matrix[5], originSplit = origin.split(" "), xOrigin = parseFloat(originSplit[0]) || 0, yOrigin = parseFloat(originSplit[1]) || 0, bounds, determinant, x, y;
     if (!originIsAbsolute) {
       bounds = _getBBox(target);
       xOrigin = bounds.x + (~originSplit[0].indexOf("%") ? xOrigin / 100 * bounds.width : xOrigin);
       yOrigin = bounds.y + (~(originSplit[1] || originSplit[0]).indexOf("%") ? yOrigin / 100 * bounds.height : yOrigin);
-    } else if (matrix2 !== _identity2DMatrix && (determinant = a * d - b * c)) {
+    } else if (matrix !== _identity2DMatrix && (determinant = a * d - b * c)) {
       x = xOrigin * (d / determinant) + yOrigin * (-c / determinant) + (c * ty - d * tx) / determinant;
       y = xOrigin * (-b / determinant) + yOrigin * (a / determinant) - (a * ty - b * tx) / determinant;
       xOrigin = x;
       yOrigin = y;
     }
-    if (smooth || smooth !== false && cache.smooth) {
+    if (smooth || smooth !== false && cache2.smooth) {
       tx = xOrigin - xOriginOld;
       ty = yOrigin - yOriginOld;
-      cache.xOffset = xOffsetOld + (tx * a + ty * c) - tx;
-      cache.yOffset = yOffsetOld + (tx * b + ty * d) - ty;
+      cache2.xOffset = xOffsetOld + (tx * a + ty * c) - tx;
+      cache2.yOffset = yOffsetOld + (tx * b + ty * d) - ty;
     } else {
-      cache.xOffset = cache.yOffset = 0;
+      cache2.xOffset = cache2.yOffset = 0;
     }
-    cache.xOrigin = xOrigin;
-    cache.yOrigin = yOrigin;
-    cache.smooth = !!smooth;
-    cache.origin = origin;
-    cache.originIsAbsolute = !!originIsAbsolute;
+    cache2.xOrigin = xOrigin;
+    cache2.yOrigin = yOrigin;
+    cache2.smooth = !!smooth;
+    cache2.origin = origin;
+    cache2.originIsAbsolute = !!originIsAbsolute;
     target.style[_transformOriginProp] = "0px 0px";
     if (pluginToAddPropTweensTo) {
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "xOrigin", xOriginOld, xOrigin);
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "yOrigin", yOriginOld, yOrigin);
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "xOffset", xOffsetOld, cache.xOffset);
-      _addNonTweeningPT(pluginToAddPropTweensTo, cache, "yOffset", yOffsetOld, cache.yOffset);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "xOrigin", xOriginOld, xOrigin);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "yOrigin", yOriginOld, yOrigin);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "xOffset", xOffsetOld, cache2.xOffset);
+      _addNonTweeningPT(pluginToAddPropTweensTo, cache2, "yOffset", yOffsetOld, cache2.yOffset);
     }
     target.setAttribute("data-svg-origin", xOrigin + " " + yOrigin);
   };
   var _parseTransform = function _parseTransform2(target, uncache) {
-    var cache = target._gsap || new GSCache(target);
-    if ("x" in cache && !uncache && !cache.uncache) {
-      return cache;
+    var cache2 = target._gsap || new GSCache(target);
+    if ("x" in cache2 && !uncache && !cache2.uncache) {
+      return cache2;
     }
-    var style = target.style, invertedScaleX = cache.scaleX < 0, px = "px", deg = "deg", cs = getComputedStyle(target), origin = _getComputedProperty(target, _transformOriginProp) || "0", x, y, z, scaleX, scaleY, rotation, rotationX, rotationY, skewX, skewY, perspective, xOrigin, yOrigin, matrix2, angle, cos, sin, a, b, c, d, a12, a22, t1, t2, t3, a13, a23, a33, a42, a43, a32;
+    var style = target.style, invertedScaleX = cache2.scaleX < 0, px = "px", deg = "deg", cs = getComputedStyle(target), origin = _getComputedProperty(target, _transformOriginProp) || "0", x, y, z, scaleX, scaleY, rotation, rotationX, rotationY, skewX, skewY, perspective, xOrigin, yOrigin, matrix, angle, cos, sin, a, b, c, d, a12, a22, t1, t2, t3, a13, a23, a33, a42, a43, a32;
     x = y = z = rotation = rotationX = rotationY = skewX = skewY = perspective = 0;
     scaleX = scaleY = 1;
-    cache.svg = !!(target.getCTM && _isSVG(target));
+    cache2.svg = !!(target.getCTM && _isSVG(target));
     if (cs.translate) {
       if (cs.translate !== "none" || cs.scale !== "none" || cs.rotate !== "none") {
         style[_transformProp] = (cs.translate !== "none" ? "translate3d(" + (cs.translate + " 0 0").split(" ").slice(0, 3).join(", ") + ") " : "") + (cs.rotate !== "none" ? "rotate(" + cs.rotate + ") " : "") + (cs.scale !== "none" ? "scale(" + cs.scale.split(" ").join(",") + ") " : "") + (cs[_transformProp] !== "none" ? cs[_transformProp] : "");
       }
       style.scale = style.rotate = style.translate = "none";
     }
-    matrix2 = _getMatrix(target, cache.svg);
-    if (cache.svg) {
-      if (cache.uncache) {
+    matrix = _getMatrix(target, cache2.svg);
+    if (cache2.svg) {
+      if (cache2.uncache) {
         t2 = target.getBBox();
-        origin = cache.xOrigin - t2.x + "px " + (cache.yOrigin - t2.y) + "px";
+        origin = cache2.xOrigin - t2.x + "px " + (cache2.yOrigin - t2.y) + "px";
         t1 = "";
       } else {
         t1 = !uncache && target.getAttribute("data-svg-origin");
       }
-      _applySVGOrigin(target, t1 || origin, !!t1 || cache.originIsAbsolute, cache.smooth !== false, matrix2);
+      _applySVGOrigin(target, t1 || origin, !!t1 || cache2.originIsAbsolute, cache2.smooth !== false, matrix);
     }
-    xOrigin = cache.xOrigin || 0;
-    yOrigin = cache.yOrigin || 0;
-    if (matrix2 !== _identity2DMatrix) {
-      a = matrix2[0];
-      b = matrix2[1];
-      c = matrix2[2];
-      d = matrix2[3];
-      x = a12 = matrix2[4];
-      y = a22 = matrix2[5];
-      if (matrix2.length === 6) {
+    xOrigin = cache2.xOrigin || 0;
+    yOrigin = cache2.yOrigin || 0;
+    if (matrix !== _identity2DMatrix) {
+      a = matrix[0];
+      b = matrix[1];
+      c = matrix[2];
+      d = matrix[3];
+      x = a12 = matrix[4];
+      y = a22 = matrix[5];
+      if (matrix.length === 6) {
         scaleX = Math.sqrt(a * a + b * b);
         scaleY = Math.sqrt(d * d + c * c);
         rotation = a || b ? _atan2(b, a) * _RAD2DEG : 0;
         skewX = c || d ? _atan2(c, d) * _RAD2DEG + rotation : 0;
         skewX && (scaleY *= Math.abs(Math.cos(skewX * _DEG2RAD)));
-        if (cache.svg) {
+        if (cache2.svg) {
           x -= xOrigin - (xOrigin * a + yOrigin * c);
           y -= yOrigin - (xOrigin * b + yOrigin * d);
         }
       } else {
-        a32 = matrix2[6];
-        a42 = matrix2[7];
-        a13 = matrix2[8];
-        a23 = matrix2[9];
-        a33 = matrix2[10];
-        a43 = matrix2[11];
-        x = matrix2[12];
-        y = matrix2[13];
-        z = matrix2[14];
+        a32 = matrix[6];
+        a42 = matrix[7];
+        a13 = matrix[8];
+        a23 = matrix[9];
+        a33 = matrix[10];
+        a43 = matrix[11];
+        x = matrix[12];
+        y = matrix[13];
+        z = matrix[14];
         angle = _atan2(a32, a33);
         rotationX = angle * _RAD2DEG;
         if (angle) {
@@ -3815,9 +3815,9 @@
         skewX = Math.abs(angle) > 2e-4 ? angle * _RAD2DEG : 0;
         perspective = a43 ? 1 / (a43 < 0 ? -a43 : a43) : 0;
       }
-      if (cache.svg) {
+      if (cache2.svg) {
         t1 = target.getAttribute("transform");
-        cache.forceCSS = target.setAttribute("transform", "") || !_isNullTransform(_getComputedProperty(target, _transformProp));
+        cache2.forceCSS = target.setAttribute("transform", "") || !_isNullTransform(_getComputedProperty(target, _transformProp));
         t1 && target.setAttribute("transform", t1);
       }
     }
@@ -3831,26 +3831,26 @@
         skewX += skewX <= 0 ? 180 : -180;
       }
     }
-    uncache = uncache || cache.uncache;
-    cache.x = x - ((cache.xPercent = x && (!uncache && cache.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache.xPercent / 100 : 0) + px;
-    cache.y = y - ((cache.yPercent = y && (!uncache && cache.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache.yPercent / 100 : 0) + px;
-    cache.z = z + px;
-    cache.scaleX = _round(scaleX);
-    cache.scaleY = _round(scaleY);
-    cache.rotation = _round(rotation) + deg;
-    cache.rotationX = _round(rotationX) + deg;
-    cache.rotationY = _round(rotationY) + deg;
-    cache.skewX = skewX + deg;
-    cache.skewY = skewY + deg;
-    cache.transformPerspective = perspective + px;
-    if (cache.zOrigin = parseFloat(origin.split(" ")[2]) || 0) {
+    uncache = uncache || cache2.uncache;
+    cache2.x = x - ((cache2.xPercent = x && (!uncache && cache2.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache2.xPercent / 100 : 0) + px;
+    cache2.y = y - ((cache2.yPercent = y && (!uncache && cache2.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache2.yPercent / 100 : 0) + px;
+    cache2.z = z + px;
+    cache2.scaleX = _round(scaleX);
+    cache2.scaleY = _round(scaleY);
+    cache2.rotation = _round(rotation) + deg;
+    cache2.rotationX = _round(rotationX) + deg;
+    cache2.rotationY = _round(rotationY) + deg;
+    cache2.skewX = skewX + deg;
+    cache2.skewY = skewY + deg;
+    cache2.transformPerspective = perspective + px;
+    if (cache2.zOrigin = parseFloat(origin.split(" ")[2]) || 0) {
       style[_transformOriginProp] = _firstTwoOnly(origin);
     }
-    cache.xOffset = cache.yOffset = 0;
-    cache.force3D = _config.force3D;
-    cache.renderTransform = cache.svg ? _renderSVGTransforms : _supports3D ? _renderCSSTransforms : _renderNon3DTransforms;
-    cache.uncache = 0;
-    return cache;
+    cache2.xOffset = cache2.yOffset = 0;
+    cache2.force3D = _config.force3D;
+    cache2.renderTransform = cache2.svg ? _renderSVGTransforms : _supports3D ? _renderCSSTransforms : _renderNon3DTransforms;
+    cache2.uncache = 0;
+    return cache2;
   };
   var _firstTwoOnly = function _firstTwoOnly2(value) {
     return (value = value.split(" "))[0] + " " + value[1];
@@ -3859,17 +3859,17 @@
     var unit = getUnit(start);
     return _round(parseFloat(start) + parseFloat(_convertToUnit(target, "x", value + "px", unit))) + unit;
   };
-  var _renderNon3DTransforms = function _renderNon3DTransforms2(ratio, cache) {
-    cache.z = "0px";
-    cache.rotationY = cache.rotationX = "0deg";
-    cache.force3D = 0;
-    _renderCSSTransforms(ratio, cache);
+  var _renderNon3DTransforms = function _renderNon3DTransforms2(ratio, cache2) {
+    cache2.z = "0px";
+    cache2.rotationY = cache2.rotationX = "0deg";
+    cache2.force3D = 0;
+    _renderCSSTransforms(ratio, cache2);
   };
   var _zeroDeg = "0deg";
   var _zeroPx = "0px";
   var _endParenthesis = ") ";
-  var _renderCSSTransforms = function _renderCSSTransforms2(ratio, cache) {
-    var _ref = cache || this, xPercent = _ref.xPercent, yPercent = _ref.yPercent, x = _ref.x, y = _ref.y, z = _ref.z, rotation = _ref.rotation, rotationY = _ref.rotationY, rotationX = _ref.rotationX, skewX = _ref.skewX, skewY = _ref.skewY, scaleX = _ref.scaleX, scaleY = _ref.scaleY, transformPerspective = _ref.transformPerspective, force3D = _ref.force3D, target = _ref.target, zOrigin = _ref.zOrigin, transforms = "", use3D = force3D === "auto" && ratio && ratio !== 1 || force3D === true;
+  var _renderCSSTransforms = function _renderCSSTransforms2(ratio, cache2) {
+    var _ref = cache2 || this, xPercent = _ref.xPercent, yPercent = _ref.yPercent, x = _ref.x, y = _ref.y, z = _ref.z, rotation = _ref.rotation, rotationY = _ref.rotationY, rotationX = _ref.rotationX, skewX = _ref.skewX, skewY = _ref.skewY, scaleX = _ref.scaleX, scaleY = _ref.scaleY, transformPerspective = _ref.transformPerspective, force3D = _ref.force3D, target = _ref.target, zOrigin = _ref.zOrigin, transforms = "", use3D = force3D === "auto" && ratio && ratio !== 1 || force3D === true;
     if (zOrigin && (rotationX !== _zeroDeg || rotationY !== _zeroDeg)) {
       var angle = parseFloat(rotationY) * _DEG2RAD, a13 = Math.sin(angle), a33 = Math.cos(angle), cos;
       angle = parseFloat(rotationX) * _DEG2RAD;
@@ -3904,8 +3904,8 @@
     }
     target.style[_transformProp] = transforms || "translate(0, 0)";
   };
-  var _renderSVGTransforms = function _renderSVGTransforms2(ratio, cache) {
-    var _ref2 = cache || this, xPercent = _ref2.xPercent, yPercent = _ref2.yPercent, x = _ref2.x, y = _ref2.y, rotation = _ref2.rotation, skewX = _ref2.skewX, skewY = _ref2.skewY, scaleX = _ref2.scaleX, scaleY = _ref2.scaleY, target = _ref2.target, xOrigin = _ref2.xOrigin, yOrigin = _ref2.yOrigin, xOffset = _ref2.xOffset, yOffset = _ref2.yOffset, forceCSS = _ref2.forceCSS, tx = parseFloat(x), ty = parseFloat(y), a11, a21, a12, a22, temp;
+  var _renderSVGTransforms = function _renderSVGTransforms2(ratio, cache2) {
+    var _ref2 = cache2 || this, xPercent = _ref2.xPercent, yPercent = _ref2.yPercent, x = _ref2.x, y = _ref2.y, rotation = _ref2.rotation, skewX = _ref2.skewX, skewY = _ref2.skewY, scaleX = _ref2.scaleX, scaleY = _ref2.scaleY, target = _ref2.target, xOrigin = _ref2.xOrigin, yOrigin = _ref2.yOrigin, xOffset = _ref2.xOffset, yOffset = _ref2.yOffset, forceCSS = _ref2.forceCSS, tx = parseFloat(x), ty = parseFloat(y), a11, a21, a12, a22, temp;
     rotation = parseFloat(rotation);
     skewX = parseFloat(skewX);
     skewY = parseFloat(skewY);
@@ -3961,8 +3961,8 @@
     forceCSS && (target.style[_transformProp] = temp);
   };
   var _addRotationalPropTween = function _addRotationalPropTween2(plugin, target, property, startNum, endValue) {
-    var cap = 360, isString = _isString(endValue), endNum = parseFloat(endValue) * (isString && ~endValue.indexOf("rad") ? _RAD2DEG : 1), change = endNum - startNum, finalValue = startNum + change + "deg", direction, pt;
-    if (isString) {
+    var cap = 360, isString2 = _isString(endValue), endNum = parseFloat(endValue) * (isString2 && ~endValue.indexOf("rad") ? _RAD2DEG : 1), change = endNum - startNum, finalValue = startNum + change + "deg", direction, pt;
+    if (isString2) {
       direction = endValue.split("_")[1];
       if (direction === "short") {
         change %= cap;
@@ -4018,11 +4018,11 @@
     }
     _assign(endCache, startCache);
   };
-  _forEachName("padding,margin,Width,Radius", function(name, index2) {
-    var t = "Top", r = "Right", b = "Bottom", l = "Left", props = (index2 < 3 ? [t, r, b, l] : [t + l, t + r, b + r, b + l]).map(function(side) {
-      return index2 < 2 ? name + side : "border" + side + name;
+  _forEachName("padding,margin,Width,Radius", function(name, index) {
+    var t = "Top", r = "Right", b = "Bottom", l = "Left", props = (index < 3 ? [t, r, b, l] : [t + l, t + r, b + r, b + l]).map(function(side) {
+      return index < 2 ? name + side : "border" + side + name;
     });
-    _specialProps[index2 > 1 ? "border" + name : name] = function(plugin, target, property, endValue, tween) {
+    _specialProps[index > 1 ? "border" + name : name] = function(plugin, target, property, endValue, tween) {
       var a, vars;
       if (arguments.length < 4) {
         a = props.map(function(prop) {
@@ -4045,8 +4045,8 @@
     targetTest: function targetTest(target) {
       return target.style && target.nodeType;
     },
-    init: function init3(target, vars, tween, index2, targets) {
-      var props = this._props, style = target.style, startAt = tween.vars.startAt, startValue, endValue, endNum, startNum, type, specialProp, p, startUnit, endUnit, relative, isTransformRelated, transformPropTween, cache, smooth, hasPriority, inlineProps;
+    init: function init3(target, vars, tween, index, targets) {
+      var props = this._props, style = target.style, startAt = tween.vars.startAt, startValue, endValue, endNum, startNum, type, specialProp, p, startUnit, endUnit, relative, isTransformRelated, transformPropTween, cache2, smooth, hasPriority, inlineProps;
       _pluginInitted || _initCore();
       this.styles = this.styles || _getStyleSaver(target);
       inlineProps = this.styles.props;
@@ -4056,13 +4056,13 @@
           continue;
         }
         endValue = vars[p];
-        if (_plugins[p] && _checkPlugin(p, vars, tween, index2, target, targets)) {
+        if (_plugins[p] && _checkPlugin(p, vars, tween, index, target, targets)) {
           continue;
         }
         type = typeof endValue;
         specialProp = _specialProps[p];
         if (type === "function") {
-          endValue = endValue.call(tween, index2, target, targets);
+          endValue = endValue.call(tween, index, target, targets);
           type = typeof endValue;
         }
         if (type === "string" && ~endValue.indexOf("random(")) {
@@ -4079,12 +4079,12 @@
             endUnit = getUnit(endValue);
           }
           endUnit ? startUnit !== endUnit && (startValue = _convertToUnit(target, p, startValue, endUnit) + endUnit) : startUnit && (endValue += startUnit);
-          this.add(style, "setProperty", startValue, endValue, index2, targets, 0, 0, p);
+          this.add(style, "setProperty", startValue, endValue, index, targets, 0, 0, p);
           props.push(p);
           inlineProps.push(p, 0, style[p]);
         } else if (type !== "undefined") {
           if (startAt && p in startAt) {
-            startValue = typeof startAt[p] === "function" ? startAt[p].call(tween, index2, target, targets) : startAt[p];
+            startValue = typeof startAt[p] === "function" ? startAt[p].call(tween, index, target, targets) : startAt[p];
             _isString(startValue) && ~startValue.indexOf("random(") && (startValue = _replaceRandom(startValue));
             getUnit(startValue + "") || (startValue += _config.units[p] || getUnit(_get(target, p)) || "");
             (startValue + "").charAt(1) === "=" && (startValue = _get(target, p));
@@ -4112,25 +4112,25 @@
           if (isTransformRelated) {
             this.styles.save(p);
             if (!transformPropTween) {
-              cache = target._gsap;
-              cache.renderTransform && !vars.parseTransform || _parseTransform(target, vars.parseTransform);
-              smooth = vars.smoothOrigin !== false && cache.smooth;
-              transformPropTween = this._pt = new PropTween(this._pt, style, _transformProp, 0, 1, cache.renderTransform, cache, 0, -1);
+              cache2 = target._gsap;
+              cache2.renderTransform && !vars.parseTransform || _parseTransform(target, vars.parseTransform);
+              smooth = vars.smoothOrigin !== false && cache2.smooth;
+              transformPropTween = this._pt = new PropTween(this._pt, style, _transformProp, 0, 1, cache2.renderTransform, cache2, 0, -1);
               transformPropTween.dep = 1;
             }
             if (p === "scale") {
-              this._pt = new PropTween(this._pt, cache, "scaleY", cache.scaleY, (relative ? _parseRelative(cache.scaleY, relative + endNum) : endNum) - cache.scaleY || 0, _renderCSSProp);
+              this._pt = new PropTween(this._pt, cache2, "scaleY", cache2.scaleY, (relative ? _parseRelative(cache2.scaleY, relative + endNum) : endNum) - cache2.scaleY || 0, _renderCSSProp);
               this._pt.u = 0;
               props.push("scaleY", p);
               p += "X";
             } else if (p === "transformOrigin") {
               inlineProps.push(_transformOriginProp, 0, style[_transformOriginProp]);
               endValue = _convertKeywordsToPercentages(endValue);
-              if (cache.svg) {
+              if (cache2.svg) {
                 _applySVGOrigin(target, endValue, 0, smooth, 0, this);
               } else {
                 endUnit = parseFloat(endValue.split(" ")[2]) || 0;
-                endUnit !== cache.zOrigin && _addNonTweeningPT(this, cache, "zOrigin", cache.zOrigin, endUnit);
+                endUnit !== cache2.zOrigin && _addNonTweeningPT(this, cache2, "zOrigin", cache2.zOrigin, endUnit);
                 _addNonTweeningPT(this, style, p, _firstTwoOnly(startValue), _firstTwoOnly(endValue));
               }
               continue;
@@ -4138,13 +4138,13 @@
               _applySVGOrigin(target, endValue, 1, smooth, 0, this);
               continue;
             } else if (p in _rotationalProperties) {
-              _addRotationalPropTween(this, cache, p, startNum, relative ? _parseRelative(startNum, relative + endValue) : endValue);
+              _addRotationalPropTween(this, cache2, p, startNum, relative ? _parseRelative(startNum, relative + endValue) : endValue);
               continue;
             } else if (p === "smoothOrigin") {
-              _addNonTweeningPT(this, cache, "smooth", cache.smooth, endValue);
+              _addNonTweeningPT(this, cache2, "smooth", cache2.smooth, endValue);
               continue;
             } else if (p === "force3D") {
-              cache[p] = endValue;
+              cache2[p] = endValue;
               continue;
             } else if (p === "transform") {
               _addRawTransformPTs(this, endValue, target);
@@ -4158,7 +4158,7 @@
             endNum || (endNum = 0);
             endUnit = getUnit(endValue) || (p in _config.units ? _config.units[p] : startUnit);
             startUnit !== endUnit && (startNum = _convertToUnit(target, p, startValue, endUnit));
-            this._pt = new PropTween(this._pt, isTransformRelated ? cache : style, p, startNum, (relative ? _parseRelative(startNum, relative + endNum) : endNum) - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
+            this._pt = new PropTween(this._pt, isTransformRelated ? cache2 : style, p, startNum, (relative ? _parseRelative(startNum, relative + endNum) : endNum) - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
             this._pt.u = endUnit || 0;
             if (startUnit !== endUnit && endUnit !== "%") {
               this._pt.b = startValue;
@@ -4166,7 +4166,7 @@
             }
           } else if (!(p in style)) {
             if (p in target) {
-              this.add(target, p, startValue || target[p], relative ? relative + endValue : endValue, index2, targets);
+              this.add(target, p, startValue || target[p], relative ? relative + endValue : endValue, index, targets);
             } else if (p !== "parseTransform") {
               _missingPlugin(p, endValue);
               continue;
@@ -4215,8 +4215,8 @@
     });
     _propertyAliases[all[13]] = positionAndScale + "," + rotation;
     _forEachName(aliases, function(name) {
-      var split = name.split(":");
-      _propertyAliases[split[1]] = all[split[0]];
+      var split2 = name.split(":");
+      _propertyAliases[split2[1]] = all[split2[0]];
     });
   })("x,y,z,scale,scaleX,scaleY,xPercent,yPercent", "rotation,rotationX,rotationY,skewX,skewY", "transform,transformOrigin,svgOrigin,force3D,smoothOrigin,transformPerspective", "0:translateX,1:translateY,2:translateZ,8:rotate,8:rotationZ,8:rotateZ,9:rotateX,10:rotateY");
   _forEachName("x,y,z,top,right,bottom,left,width,height,fontSize,padding,margin,perspective", function(name) {
@@ -4267,14 +4267,14 @@
     return doc;
   };
   var _forceNonZeroScale = function _forceNonZeroScale2(e) {
-    var a, cache;
+    var a, cache2;
     while (e && e !== _body) {
-      cache = e._gsap;
-      cache && cache.uncache && cache.get(e, "x");
-      if (cache && !cache.scaleX && !cache.scaleY && cache.renderTransform) {
-        cache.scaleX = cache.scaleY = 1e-4;
-        cache.renderTransform(1, cache);
-        a ? a.push(cache) : a = [cache];
+      cache2 = e._gsap;
+      cache2 && cache2.uncache && cache2.get(e, "x");
+      if (cache2 && !cache2.scaleX && !cache2.scaleY && cache2.renderTransform) {
+        cache2.scaleX = cache2.scaleY = 1e-4;
+        cache2.renderTransform(1, cache2);
+        a ? a.push(cache2) : a = [cache2];
       }
       e = e.parentNode;
     }
@@ -4302,14 +4302,14 @@
   };
   var _createSibling = function _createSibling2(element, i) {
     if (element.parentNode && (_doc3 || _setDoc(element))) {
-      var svg = _svgOwner(element), ns = svg ? svg.getAttribute("xmlns") || "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", type = svg ? i ? "rect" : "g" : "div", x = i !== 2 ? 0 : 100, y = i === 3 ? 100 : 0, css2 = "position:absolute;display:block;pointer-events:none;margin:0;padding:0;", e = _doc3.createElementNS ? _doc3.createElementNS(ns.replace(/^https/, "http"), type) : _doc3.createElement(type);
+      var svg = _svgOwner(element), ns = svg ? svg.getAttribute("xmlns") || "http://www.w3.org/2000/svg" : "http://www.w3.org/1999/xhtml", type = svg ? i ? "rect" : "g" : "div", x = i !== 2 ? 0 : 100, y = i === 3 ? 100 : 0, css = "position:absolute;display:block;pointer-events:none;margin:0;padding:0;", e = _doc3.createElementNS ? _doc3.createElementNS(ns.replace(/^https/, "http"), type) : _doc3.createElement(type);
       if (i) {
         if (!svg) {
           if (!_divContainer) {
             _divContainer = _createSibling2(element);
-            _divContainer.style.cssText = css2;
+            _divContainer.style.cssText = css;
           }
-          e.style.cssText = css2 + "width:0.1px;height:0.1px;top:" + y + "px;left:" + x + "px";
+          e.style.cssText = css + "width:0.1px;height:0.1px;top:" + y + "px;left:" + x + "px";
           _divContainer.appendChild(e);
         } else {
           _svgContainer || (_svgContainer = _createSibling2(element));
@@ -4438,16 +4438,16 @@
       var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f, determinant = a * d - b * c || 1e-10;
       return _setMatrix(this, d / determinant, -b / determinant, -c / determinant, a / determinant, (c * f - d * e) / determinant, -(a * f - b * e) / determinant);
     };
-    _proto.multiply = function multiply(matrix2) {
-      var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f, a2 = matrix2.a, b2 = matrix2.c, c2 = matrix2.b, d2 = matrix2.d, e2 = matrix2.e, f2 = matrix2.f;
+    _proto.multiply = function multiply(matrix) {
+      var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f, a2 = matrix.a, b2 = matrix.c, c2 = matrix.b, d2 = matrix.d, e2 = matrix.e, f2 = matrix.f;
       return _setMatrix(this, a2 * a + c2 * c, a2 * b + c2 * d, b2 * a + d2 * c, b2 * b + d2 * d, e + e2 * a + f2 * c, f + e2 * b + f2 * d);
     };
-    _proto.clone = function clone2() {
+    _proto.clone = function clone() {
       return new Matrix2D2(this.a, this.b, this.c, this.d, this.e, this.f);
     };
-    _proto.equals = function equals(matrix2) {
+    _proto.equals = function equals(matrix) {
       var a = this.a, b = this.b, c = this.c, d = this.d, e = this.e, f = this.f;
-      return a === matrix2.a && b === matrix2.b && c === matrix2.c && d === matrix2.d && e === matrix2.e && f === matrix2.f;
+      return a === matrix.a && b === matrix.b && c === matrix.c && d === matrix.d && e === matrix.e && f === matrix.f;
     };
     _proto.apply = function apply(point, decoratee) {
       if (decoratee === void 0) {
@@ -4772,7 +4772,7 @@
   var _point1 = {};
   var _getElementBounds = function _getElementBounds2(element, context3) {
     context3 = _toArray(context3)[0];
-    var isSVG = element.getBBox && element.ownerSVGElement, doc = element.ownerDocument || _doc4, left, right, top, bottom, matrix2, p1, p2, p3, p4, bbox, width, height, cs;
+    var isSVG = element.getBBox && element.ownerSVGElement, doc = element.ownerDocument || _doc4, left, right, top, bottom, matrix, p1, p2, p3, p4, bbox, width, height, cs;
     if (element === _win4) {
       top = _getDocScrollTop3(doc);
       left = _getDocScrollLeft3(doc);
@@ -4811,20 +4811,20 @@
         height: bottom - top
       };
     }
-    matrix2 = getGlobalMatrix(context3, true).multiply(getGlobalMatrix(element));
-    p1 = matrix2.apply({
+    matrix = getGlobalMatrix(context3, true).multiply(getGlobalMatrix(element));
+    p1 = matrix.apply({
       x: left,
       y: top
     });
-    p2 = matrix2.apply({
+    p2 = matrix.apply({
       x: right,
       y: top
     });
-    p3 = matrix2.apply({
+    p3 = matrix.apply({
       x: right,
       y: bottom
     });
-    p4 = matrix2.apply({
+    p4 = matrix.apply({
       x: left,
       y: bottom
     });
@@ -5121,7 +5121,7 @@
         }
         try {
           _docElement3.addEventListener("test", null, Object.defineProperty({}, "passive", {
-            get: function get() {
+            get: function get2() {
               _supportsPassive = 1;
             }
           }));
@@ -5171,7 +5171,7 @@
       var list = this._listeners[type], i = list && list.indexOf(callback);
       i >= 0 && list.splice(i, 1);
     };
-    _proto.dispatchEvent = function dispatchEvent2(type) {
+    _proto.dispatchEvent = function dispatchEvent(type) {
       var _this = this;
       var result;
       (this._listeners[type] || []).forEach(function(callback) {
@@ -5207,7 +5207,7 @@
       gsap2.getProperty(target, "x");
       var type = (vars.type || "x,y").toLowerCase(), xyMode = ~type.indexOf("x") || ~type.indexOf("y"), rotationMode = type.indexOf("rotation") !== -1, xProp = rotationMode ? "rotation" : xyMode ? "x" : "left", yProp = xyMode ? "y" : "top", allowX = !!(~type.indexOf("x") || ~type.indexOf("left") || type === "scroll"), allowY = !!(~type.indexOf("y") || ~type.indexOf("top") || type === "scroll"), minimumMovement = vars.minimumMovement || 2, self = _assertThisInitialized2(_this2), triggers = _toArray(vars.trigger || vars.handle || target), killProps = {}, dragEndTime = 0, checkAutoScrollBounds = false, autoScrollMarginTop = vars.autoScrollMarginTop || 40, autoScrollMarginRight = vars.autoScrollMarginRight || 40, autoScrollMarginBottom = vars.autoScrollMarginBottom || 40, autoScrollMarginLeft = vars.autoScrollMarginLeft || 40, isClickable = vars.clickableTest || _isClickable, clickTime = 0, gsCache = target._gsap || gsap2.core.getCache(target), isFixed = _isFixed3(target), getPropAsNum = function getPropAsNum2(property, unit) {
         return parseFloat(gsCache.get(target, property, unit));
-      }, ownerDoc = target.ownerDocument || _doc4, enabled, scrollProxy, startPointerX, startPointerY, startElementX, startElementY, hasBounds, hasDragCallback, hasMoveCallback, maxX, minX, maxY, minY, touch, touchID, rotationOrigin, dirty, old, snapX, snapY, snapXY, isClicking, touchEventTarget, matrix2, interrupted, allowNativeTouchScrolling, touchDragAxis, isDispatching, clickDispatch, trustedClickDispatch, isPreventingDefault, innerMatrix, dragged, onContextMenu = function onContextMenu2(e) {
+      }, ownerDoc = target.ownerDocument || _doc4, enabled, scrollProxy, startPointerX, startPointerY, startElementX, startElementY, hasBounds, hasDragCallback, hasMoveCallback, maxX, minX, maxY, minY, touch, touchID, rotationOrigin, dirty, old, snapX, snapY, snapXY, isClicking, touchEventTarget, matrix, interrupted, allowNativeTouchScrolling, touchDragAxis, isDispatching, clickDispatch, trustedClickDispatch, isPreventingDefault, innerMatrix, dragged, onContextMenu = function onContextMenu2(e) {
         _preventDefault(e);
         e.stopImmediatePropagation && e.stopImmediatePropagation();
         return false;
@@ -5390,7 +5390,7 @@
         }
         if (_isArray2(snap3)) {
           return function(n) {
-            var i = snap3.length, closest2 = 0, absDif = _bigNum3, val, dif;
+            var i = snap3.length, closest = 0, absDif = _bigNum3, val, dif;
             while (--i > -1) {
               val = snap3[i];
               dif = val - n;
@@ -5398,11 +5398,11 @@
                 dif = -dif;
               }
               if (dif < absDif && val >= min && val <= max) {
-                closest2 = i;
+                closest = i;
                 absDif = dif;
               }
             }
-            return snap3[closest2];
+            return snap3[closest];
           };
         }
         return isNaN(snap3) ? function(n) {
@@ -5439,18 +5439,18 @@
         }
         if (_isArray2(snap3)) {
           return function(p) {
-            var i = snap3.length, closest2 = 0, minDist = _bigNum3, x, y, point, dist;
+            var i = snap3.length, closest = 0, minDist = _bigNum3, x, y, point, dist;
             while (--i > -1) {
               point = snap3[i];
               x = point.x - p.x;
               y = point.y - p.y;
               dist = x * x + y * y;
               if (dist < minDist) {
-                closest2 = i;
+                closest = i;
                 minDist = dist;
               }
             }
-            return minDist <= radius ? snap3[closest2] : p;
+            return minDist <= radius ? snap3[closest] : p;
           };
         }
         return function(n) {
@@ -5586,19 +5586,19 @@
           self.applyBounds();
         }
       }, updateMatrix = function updateMatrix2(shiftStart) {
-        var start = matrix2, p;
-        matrix2 = getGlobalMatrix(target.parentNode, true);
-        if (shiftStart && self.isPressed && !matrix2.equals(start || new Matrix2D())) {
+        var start = matrix, p;
+        matrix = getGlobalMatrix(target.parentNode, true);
+        if (shiftStart && self.isPressed && !matrix.equals(start || new Matrix2D())) {
           p = start.inverse().apply({
             x: startPointerX,
             y: startPointerY
           });
-          matrix2.apply(p, p);
+          matrix.apply(p, p);
           startPointerX = p.x;
           startPointerY = p.y;
         }
-        if (matrix2.equals(_identityMatrix2)) {
-          matrix2 = null;
+        if (matrix.equals(_identityMatrix2)) {
+          matrix = null;
         }
       }, recordStartPositions = function recordStartPositions2() {
         var edgeTolerance = 1 - self.edgeResistance, offsetX = isFixed ? _getDocScrollLeft3(ownerDoc) : 0, offsetY = isFixed ? _getDocScrollTop3(ownerDoc) : 0, parsedOrigin, x, y;
@@ -5610,7 +5610,7 @@
         updateMatrix(false);
         _point1.x = self.pointerX - offsetX;
         _point1.y = self.pointerY - offsetY;
-        matrix2 && matrix2.apply(_point1, _point1);
+        matrix && matrix.apply(_point1, _point1);
         startPointerX = _point1.x;
         startPointerY = _point1.y;
         if (dirty) {
@@ -5773,7 +5773,7 @@
         if (touchEventTarget && allowNativeTouchScrolling && !touchDragAxis) {
           _point1.x = e.pageX - (isFixed ? _getDocScrollLeft3(ownerDoc) : 0);
           _point1.y = e.pageY - (isFixed ? _getDocScrollTop3(ownerDoc) : 0);
-          matrix2 && matrix2.apply(_point1, _point1);
+          matrix && matrix.apply(_point1, _point1);
           pointerX = _point1.x;
           pointerY = _point1.y;
           dx = Math.abs(pointerX - startPointerX);
@@ -5828,9 +5828,9 @@
             x = startElementX;
           }
         } else {
-          if (matrix2) {
-            temp = pointerX * matrix2.a + pointerY * matrix2.c + matrix2.e;
-            pointerY = pointerX * matrix2.b + pointerY * matrix2.d + matrix2.f;
+          if (matrix) {
+            temp = pointerX * matrix.a + pointerY * matrix.c + matrix.e;
+            pointerY = pointerX * matrix.b + pointerY * matrix.d + matrix.f;
             pointerX = temp;
           }
           yChange = pointerY - startPointerY;
@@ -6026,9 +6026,9 @@
         if (e && self.isDragging && !scrollProxy) {
           var parent = e.target || target.parentNode, deltaX = parent.scrollLeft - parent._gsScrollX, deltaY = parent.scrollTop - parent._gsScrollY;
           if (deltaX || deltaY) {
-            if (matrix2) {
-              startPointerX -= deltaX * matrix2.a + deltaY * matrix2.c;
-              startPointerY -= deltaY * matrix2.d + deltaX * matrix2.b;
+            if (matrix) {
+              startPointerX -= deltaX * matrix.a + deltaY * matrix.c;
+              startPointerY -= deltaY * matrix.d + deltaX * matrix.b;
             } else {
               startPointerX -= deltaX;
               startPointerY -= deltaY;
@@ -6060,9 +6060,9 @@
           _dispatchEvent(self, "click", "onClick");
         }
       }, localizePoint = function localizePoint2(p) {
-        return matrix2 ? {
-          x: p.x * matrix2.a + p.y * matrix2.c + matrix2.e,
-          y: p.x * matrix2.b + p.y * matrix2.d + matrix2.f
+        return matrix ? {
+          x: p.x * matrix.a + p.y * matrix.c + matrix.e,
+          y: p.x * matrix.b + p.y * matrix.d + matrix.f
         } : {
           x: p.x,
           y: p.y
@@ -6354,7 +6354,7 @@
         return new Draggable2(target, vars);
       });
     };
-    Draggable2.get = function get(target) {
+    Draggable2.get = function get2(target) {
       return _lookup[(_toArray(target)[0] || {})._gsDragID];
     };
     Draggable2.timeSinceDrag = function timeSinceDrag() {
@@ -6618,7 +6618,7 @@
       type = type || "wheel,touch,pointer";
       debounce = debounce !== false;
       lineHeight || (lineHeight = parseFloat(_win5.getComputedStyle(_body3).lineHeight) || 22);
-      var id, onStopDelayedCall, dragged, moved2, wheeled, locked, axis, self = this, prevDeltaX = 0, prevDeltaY = 0, scrollFuncX = _getScrollFunc(target, _horizontal), scrollFuncY = _getScrollFunc(target, _vertical), scrollX = scrollFuncX(), scrollY = scrollFuncY(), limitToTouch = ~type.indexOf("touch") && !~type.indexOf("pointer") && _eventTypes[0] === "pointerdown", isViewport = _isViewport(target), ownerDoc = target.ownerDocument || _doc5, deltaX = [0, 0, 0], deltaY = [0, 0, 0], onClickTime = 0, clickCapture = function clickCapture2() {
+      var id, onStopDelayedCall, dragged, moved, wheeled, locked, axis, self = this, prevDeltaX = 0, prevDeltaY = 0, scrollFuncX = _getScrollFunc(target, _horizontal), scrollFuncY = _getScrollFunc(target, _vertical), scrollX = scrollFuncX(), scrollY = scrollFuncY(), limitToTouch = ~type.indexOf("touch") && !~type.indexOf("pointer") && _eventTypes[0] === "pointerdown", isViewport = _isViewport(target), ownerDoc = target.ownerDocument || _doc5, deltaX = [0, 0, 0], deltaY = [0, 0, 0], onClickTime = 0, clickCapture = function clickCapture2() {
         return onClickTime = _getTime2();
       }, _ignoreCheck = function _ignoreCheck2(e, isPointerOrTouch) {
         return (self.event = e) && ignore && ~ignore.indexOf(e.target) || isPointerOrTouch && limitToTouch && e.pointerType !== "touch" || ignoreCheck && ignoreCheck(e, isPointerOrTouch);
@@ -6646,13 +6646,13 @@
           prevDeltaY = self.deltaY;
           deltaY[0] = deltaY[1] = deltaY[2] = 0;
         }
-        if (moved2 || dragged) {
+        if (moved || dragged) {
           onMove && onMove(self);
           if (dragged) {
             onDrag(self);
             dragged = false;
           }
-          moved2 = false;
+          moved = false;
         }
         locked && !(locked = false) && onLockAxis && onLockAxis(self);
         if (wheeled) {
@@ -6660,9 +6660,9 @@
           wheeled = false;
         }
         id = 0;
-      }, onDelta = function onDelta2(x, y, index2) {
-        deltaX[index2] += x;
-        deltaY[index2] += y;
+      }, onDelta = function onDelta2(x, y, index) {
+        deltaX[index] += x;
+        deltaY[index] += y;
         self._vx.update(x);
         self._vy.update(y);
         debounce ? id || (id = requestAnimationFrame(update)) : update();
@@ -6759,14 +6759,14 @@
         var multiplier = (e.deltaMode === 1 ? lineHeight : e.deltaMode === 2 ? _win5.innerHeight : 1) * wheelSpeed;
         onDelta(e.deltaX * multiplier, e.deltaY * multiplier, 0);
         onStop && !isNormalizer && onStopDelayedCall.restart(true);
-      }, _onMove2 = function _onMove3(e) {
+      }, _onMove = function _onMove2(e) {
         if (_ignoreCheck(e)) {
           return;
         }
         var x = e.clientX, y = e.clientY, dx = x - self.x, dy = y - self.y;
         self.x = x;
         self.y = y;
-        moved2 = true;
+        moved = true;
         (dx || dy) && onTouchOrPointerDelta(dx, dy);
       }, _onHover = function _onHover2(e) {
         self.event = e;
@@ -6800,7 +6800,7 @@
             onGestureEnd && _addListener3(ownerDoc, "gestureend", _onGestureEnd);
             onHover && _addListener3(target, _pointerType + "enter", _onHover);
             onHoverEnd && _addListener3(target, _pointerType + "leave", _onHoverEnd);
-            onMove && _addListener3(target, _pointerType + "move", _onMove2);
+            onMove && _addListener3(target, _pointerType + "move", _onMove);
           }
           self.isEnabled = true;
           e && e.type && _onPress(e);
@@ -6829,7 +6829,7 @@
           _removeListener3(ownerDoc, "gestureend", _onGestureEnd);
           _removeListener3(target, _pointerType + "enter", _onHover);
           _removeListener3(target, _pointerType + "leave", _onHoverEnd);
-          _removeListener3(target, _pointerType + "move", _onMove2);
+          _removeListener3(target, _pointerType + "move", _onMove);
           self.isEnabled = self.isPressed = self.isDragging = false;
           onDisable && onDisable(self);
         }
@@ -6846,12 +6846,12 @@
     };
     _createClass(Observer2, [{
       key: "velocityX",
-      get: function get() {
+      get: function get2() {
         return this._vx.getVelocity();
       }
     }, {
       key: "velocityY",
-      get: function get() {
+      get: function get2() {
         return this._vy.getVelocity();
       }
     }]);
@@ -6872,2225 +6872,3158 @@
   };
   _getGSAP3() && gsap3.registerPlugin(Observer);
 
-  // node_modules/sortablejs/modular/sortable.esm.js
-  function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-    if (Object.getOwnPropertySymbols) {
-      var symbols = Object.getOwnPropertySymbols(object);
-      if (enumerableOnly) {
-        symbols = symbols.filter(function(sym) {
-          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-        });
-      }
-      keys.push.apply(keys, symbols);
+  // node_modules/gsap/ScrollTrigger.js
+  var gsap4;
+  var _coreInitted4;
+  var _win6;
+  var _doc6;
+  var _docEl2;
+  var _body4;
+  var _root2;
+  var _resizeDelay;
+  var _toArray2;
+  var _clamp4;
+  var _time2;
+  var _syncInterval;
+  var _refreshing;
+  var _pointerIsDown;
+  var _transformProp4;
+  var _i;
+  var _prevWidth;
+  var _prevHeight;
+  var _autoRefresh;
+  var _sort;
+  var _suppressOverwrites2;
+  var _ignoreResize;
+  var _normalizer2;
+  var _ignoreMobileResize;
+  var _baseScreenHeight;
+  var _baseScreenWidth;
+  var _fixIOSBug;
+  var _context4;
+  var _scrollRestoration;
+  var _div100vh;
+  var _100vh;
+  var _limitCallbacks;
+  var _startup2 = 1;
+  var _getTime3 = Date.now;
+  var _time1 = _getTime3();
+  var _lastScrollTime = 0;
+  var _enabled = 0;
+  var _parseClamp = function _parseClamp2(value, type, self) {
+    var clamp3 = _isString3(value) && (value.substr(0, 6) === "clamp(" || value.indexOf("max") > -1);
+    self["_" + type + "Clamp"] = clamp3;
+    return clamp3 ? value.substr(6, value.length - 7) : value;
+  };
+  var _keepClamp = function _keepClamp2(value, clamp3) {
+    return clamp3 && (!_isString3(value) || value.substr(0, 6) !== "clamp(") ? "clamp(" + value + ")" : value;
+  };
+  var _rafBugFix = function _rafBugFix2() {
+    return _enabled && requestAnimationFrame(_rafBugFix2);
+  };
+  var _pointerDownHandler = function _pointerDownHandler2() {
+    return _pointerIsDown = 1;
+  };
+  var _pointerUpHandler = function _pointerUpHandler2() {
+    return _pointerIsDown = 0;
+  };
+  var _passThrough3 = function _passThrough4(v) {
+    return v;
+  };
+  var _round5 = function _round6(value) {
+    return Math.round(value * 1e5) / 1e5 || 0;
+  };
+  var _windowExists7 = function _windowExists8() {
+    return typeof window !== "undefined";
+  };
+  var _getGSAP5 = function _getGSAP6() {
+    return gsap4 || _windowExists7() && (gsap4 = window.gsap) && gsap4.registerPlugin && gsap4;
+  };
+  var _isViewport3 = function _isViewport4(e) {
+    return !!~_root2.indexOf(e);
+  };
+  var _getViewportDimension = function _getViewportDimension2(dimensionProperty) {
+    return (dimensionProperty === "Height" ? _100vh : _win6["inner" + dimensionProperty]) || _docEl2["client" + dimensionProperty] || _body4["client" + dimensionProperty];
+  };
+  var _getBoundsFunc = function _getBoundsFunc2(element) {
+    return _getProxyProp(element, "getBoundingClientRect") || (_isViewport3(element) ? function() {
+      _winOffsets.width = _win6.innerWidth;
+      _winOffsets.height = _100vh;
+      return _winOffsets;
+    } : function() {
+      return _getBounds3(element);
+    });
+  };
+  var _getSizeFunc = function _getSizeFunc2(scroller, isViewport, _ref) {
+    var d = _ref.d, d2 = _ref.d2, a = _ref.a;
+    return (a = _getProxyProp(scroller, "getBoundingClientRect")) ? function() {
+      return a()[d];
+    } : function() {
+      return (isViewport ? _getViewportDimension(d2) : scroller["client" + d2]) || 0;
+    };
+  };
+  var _getOffsetsFunc = function _getOffsetsFunc2(element, isViewport) {
+    return !isViewport || ~_proxies.indexOf(element) ? _getBoundsFunc(element) : function() {
+      return _winOffsets;
+    };
+  };
+  var _maxScroll = function _maxScroll2(element, _ref2) {
+    var s = _ref2.s, d2 = _ref2.d2, d = _ref2.d, a = _ref2.a;
+    return Math.max(0, (s = "scroll" + d2) && (a = _getProxyProp(element, s)) ? a() - _getBoundsFunc(element)()[d] : _isViewport3(element) ? (_docEl2[s] || _body4[s]) - _getViewportDimension(d2) : element[s] - element["offset" + d2]);
+  };
+  var _iterateAutoRefresh = function _iterateAutoRefresh2(func, events) {
+    for (var i = 0; i < _autoRefresh.length; i += 3) {
+      (!events || ~events.indexOf(_autoRefresh[i + 1])) && func(_autoRefresh[i], _autoRefresh[i + 1], _autoRefresh[i + 2]);
     }
-    return keys;
-  }
-  function _objectSpread2(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? arguments[i] : {};
-      if (i % 2) {
-        ownKeys(Object(source), true).forEach(function(key) {
-          _defineProperty(target, key, source[key]);
-        });
-      } else if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-      } else {
-        ownKeys(Object(source)).forEach(function(key) {
-          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-      }
+  };
+  var _isString3 = function _isString4(value) {
+    return typeof value === "string";
+  };
+  var _isFunction5 = function _isFunction6(value) {
+    return typeof value === "function";
+  };
+  var _isNumber3 = function _isNumber4(value) {
+    return typeof value === "number";
+  };
+  var _isObject5 = function _isObject6(value) {
+    return typeof value === "object";
+  };
+  var _endAnimation = function _endAnimation2(animation, reversed, pause) {
+    return animation && animation.progress(reversed ? 0 : 1) && pause && animation.pause();
+  };
+  var _callback3 = function _callback4(self, func) {
+    if (self.enabled) {
+      var result = func(self);
+      result && result.totalTime && (self.callbackAnimation = result);
     }
-    return target;
-  }
-  function _typeof(obj) {
-    "@babel/helpers - typeof";
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function(obj2) {
-        return typeof obj2;
-      };
-    } else {
-      _typeof = function(obj2) {
-        return obj2 && typeof Symbol === "function" && obj2.constructor === Symbol && obj2 !== Symbol.prototype ? "symbol" : typeof obj2;
-      };
-    }
-    return _typeof(obj);
-  }
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
+  };
+  var _abs = Math.abs;
+  var _left = "left";
+  var _top = "top";
+  var _right = "right";
+  var _bottom = "bottom";
+  var _width = "width";
+  var _height = "height";
+  var _Right = "Right";
+  var _Left = "Left";
+  var _Top = "Top";
+  var _Bottom = "Bottom";
+  var _padding = "padding";
+  var _margin = "margin";
+  var _Width = "Width";
+  var _Height = "Height";
+  var _px = "px";
+  var _getComputedStyle3 = function _getComputedStyle4(element) {
+    return _win6.getComputedStyle(element);
+  };
+  var _makePositionable = function _makePositionable2(element) {
+    var position = _getComputedStyle3(element).position;
+    element.style.position = position === "absolute" || position === "fixed" ? position : "relative";
+  };
+  var _setDefaults5 = function _setDefaults6(obj, defaults3) {
+    for (var p in defaults3) {
+      p in obj || (obj[p] = defaults3[p]);
     }
     return obj;
-  }
-  function _extends() {
-    _extends = Object.assign || function(target) {
-      for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-        for (var key in source) {
-          if (Object.prototype.hasOwnProperty.call(source, key)) {
-            target[key] = source[key];
-          }
-        }
-      }
-      return target;
-    };
-    return _extends.apply(this, arguments);
-  }
-  function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null)
-      return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key, i;
-    for (i = 0; i < sourceKeys.length; i++) {
-      key = sourceKeys[i];
-      if (excluded.indexOf(key) >= 0)
-        continue;
-      target[key] = source[key];
-    }
-    return target;
-  }
-  function _objectWithoutProperties(source, excluded) {
-    if (source == null)
-      return {};
-    var target = _objectWithoutPropertiesLoose(source, excluded);
-    var key, i;
-    if (Object.getOwnPropertySymbols) {
-      var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-      for (i = 0; i < sourceSymbolKeys.length; i++) {
-        key = sourceSymbolKeys[i];
-        if (excluded.indexOf(key) >= 0)
-          continue;
-        if (!Object.prototype.propertyIsEnumerable.call(source, key))
-          continue;
-        target[key] = source[key];
-      }
-    }
-    return target;
-  }
-  var version = "1.15.0";
-  function userAgent(pattern) {
-    if (typeof window !== "undefined" && window.navigator) {
-      return !!/* @__PURE__ */ navigator.userAgent.match(pattern);
-    }
-  }
-  var IE11OrLess = userAgent(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i);
-  var Edge = userAgent(/Edge/i);
-  var FireFox = userAgent(/firefox/i);
-  var Safari = userAgent(/safari/i) && !userAgent(/chrome/i) && !userAgent(/android/i);
-  var IOS = userAgent(/iP(ad|od|hone)/i);
-  var ChromeForAndroid = userAgent(/chrome/i) && userAgent(/android/i);
-  var captureMode = {
-    capture: false,
-    passive: false
   };
-  function on(el, event, fn) {
-    el.addEventListener(event, fn, !IE11OrLess && captureMode);
-  }
-  function off(el, event, fn) {
-    el.removeEventListener(event, fn, !IE11OrLess && captureMode);
-  }
-  function matches(el, selector3) {
-    if (!selector3)
-      return;
-    selector3[0] === ">" && (selector3 = selector3.substring(1));
-    if (el) {
-      try {
-        if (el.matches) {
-          return el.matches(selector3);
-        } else if (el.msMatchesSelector) {
-          return el.msMatchesSelector(selector3);
-        } else if (el.webkitMatchesSelector) {
-          return el.webkitMatchesSelector(selector3);
-        }
-      } catch (_) {
-        return false;
-      }
+  var _getBounds3 = function _getBounds4(element, withoutTransforms) {
+    var tween = withoutTransforms && _getComputedStyle3(element)[_transformProp4] !== "matrix(1, 0, 0, 1, 0, 0)" && gsap4.to(element, {
+      x: 0,
+      y: 0,
+      xPercent: 0,
+      yPercent: 0,
+      rotation: 0,
+      rotationX: 0,
+      rotationY: 0,
+      scale: 1,
+      skewX: 0,
+      skewY: 0
+    }).progress(1), bounds = element.getBoundingClientRect();
+    tween && tween.progress(0).kill();
+    return bounds;
+  };
+  var _getSize = function _getSize2(element, _ref3) {
+    var d2 = _ref3.d2;
+    return element["offset" + d2] || element["client" + d2] || 0;
+  };
+  var _getLabelRatioArray = function _getLabelRatioArray2(timeline2) {
+    var a = [], labels = timeline2.labels, duration = timeline2.duration(), p;
+    for (p in labels) {
+      a.push(labels[p] / duration);
     }
-    return false;
-  }
-  function getParentOrHost(el) {
-    return el.host && el !== document && el.host.nodeType ? el.host : el.parentNode;
-  }
-  function closest(el, selector3, ctx, includeCTX) {
-    if (el) {
-      ctx = ctx || document;
-      do {
-        if (selector3 != null && (selector3[0] === ">" ? el.parentNode === ctx && matches(el, selector3) : matches(el, selector3)) || includeCTX && el === ctx) {
-          return el;
-        }
-        if (el === ctx)
-          break;
-      } while (el = getParentOrHost(el));
-    }
-    return null;
-  }
-  var R_SPACE = /\s+/g;
-  function toggleClass(el, name, state) {
-    if (el && name) {
-      if (el.classList) {
-        el.classList[state ? "add" : "remove"](name);
-      } else {
-        var className = (" " + el.className + " ").replace(R_SPACE, " ").replace(" " + name + " ", " ");
-        el.className = (className + (state ? " " + name : "")).replace(R_SPACE, " ");
-      }
-    }
-  }
-  function css(el, prop, val) {
-    var style = el && el.style;
-    if (style) {
-      if (val === void 0) {
-        if (document.defaultView && document.defaultView.getComputedStyle) {
-          val = document.defaultView.getComputedStyle(el, "");
-        } else if (el.currentStyle) {
-          val = el.currentStyle;
-        }
-        return prop === void 0 ? val : val[prop];
-      } else {
-        if (!(prop in style) && prop.indexOf("webkit") === -1) {
-          prop = "-webkit-" + prop;
-        }
-        style[prop] = val + (typeof val === "string" ? "" : "px");
-      }
-    }
-  }
-  function matrix(el, selfOnly) {
-    var appliedTransforms = "";
-    if (typeof el === "string") {
-      appliedTransforms = el;
-    } else {
-      do {
-        var transform = css(el, "transform");
-        if (transform && transform !== "none") {
-          appliedTransforms = transform + " " + appliedTransforms;
-        }
-      } while (!selfOnly && (el = el.parentNode));
-    }
-    var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;
-    return matrixFn && new matrixFn(appliedTransforms);
-  }
-  function find(ctx, tagName, iterator) {
-    if (ctx) {
-      var list = ctx.getElementsByTagName(tagName), i = 0, n = list.length;
-      if (iterator) {
-        for (; i < n; i++) {
-          iterator(list[i], i);
-        }
-      }
-      return list;
-    }
-    return [];
-  }
-  function getWindowScrollingElement() {
-    var scrollingElement = document.scrollingElement;
-    if (scrollingElement) {
-      return scrollingElement;
-    } else {
-      return document.documentElement;
-    }
-  }
-  function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
-    if (!el.getBoundingClientRect && el !== window)
-      return;
-    var elRect, top, left, bottom, right, height, width;
-    if (el !== window && el.parentNode && el !== getWindowScrollingElement()) {
-      elRect = el.getBoundingClientRect();
-      top = elRect.top;
-      left = elRect.left;
-      bottom = elRect.bottom;
-      right = elRect.right;
-      height = elRect.height;
-      width = elRect.width;
-    } else {
-      top = 0;
-      left = 0;
-      bottom = window.innerHeight;
-      right = window.innerWidth;
-      height = window.innerHeight;
-      width = window.innerWidth;
-    }
-    if ((relativeToContainingBlock || relativeToNonStaticParent) && el !== window) {
-      container = container || el.parentNode;
-      if (!IE11OrLess) {
-        do {
-          if (container && container.getBoundingClientRect && (css(container, "transform") !== "none" || relativeToNonStaticParent && css(container, "position") !== "static")) {
-            var containerRect = container.getBoundingClientRect();
-            top -= containerRect.top + parseInt(css(container, "border-top-width"));
-            left -= containerRect.left + parseInt(css(container, "border-left-width"));
-            bottom = top + elRect.height;
-            right = left + elRect.width;
-            break;
-          }
-        } while (container = container.parentNode);
-      }
-    }
-    if (undoScale && el !== window) {
-      var elMatrix = matrix(container || el), scaleX = elMatrix && elMatrix.a, scaleY = elMatrix && elMatrix.d;
-      if (elMatrix) {
-        top /= scaleY;
-        left /= scaleX;
-        width /= scaleX;
-        height /= scaleY;
-        bottom = top + height;
-        right = left + width;
-      }
-    }
-    return {
-      top,
-      left,
-      bottom,
-      right,
-      width,
-      height
+    return a;
+  };
+  var _getClosestLabel = function _getClosestLabel2(animation) {
+    return function(value) {
+      return gsap4.utils.snap(_getLabelRatioArray(animation), value);
     };
-  }
-  function isScrolledPast(el, elSide, parentSide) {
-    var parent = getParentAutoScrollElement(el, true), elSideVal = getRect(el)[elSide];
-    while (parent) {
-      var parentSideVal = getRect(parent)[parentSide], visible = void 0;
-      if (parentSide === "top" || parentSide === "left") {
-        visible = elSideVal >= parentSideVal;
+  };
+  var _snapDirectional = function _snapDirectional2(snapIncrementOrArray) {
+    var snap3 = gsap4.utils.snap(snapIncrementOrArray), a = Array.isArray(snapIncrementOrArray) && snapIncrementOrArray.slice(0).sort(function(a2, b) {
+      return a2 - b;
+    });
+    return a ? function(value, direction, threshold) {
+      if (threshold === void 0) {
+        threshold = 1e-3;
+      }
+      var i;
+      if (!direction) {
+        return snap3(value);
+      }
+      if (direction > 0) {
+        value -= threshold;
+        for (i = 0; i < a.length; i++) {
+          if (a[i] >= value) {
+            return a[i];
+          }
+        }
+        return a[i - 1];
       } else {
-        visible = elSideVal <= parentSideVal;
-      }
-      if (!visible)
-        return parent;
-      if (parent === getWindowScrollingElement())
-        break;
-      parent = getParentAutoScrollElement(parent, false);
-    }
-    return false;
-  }
-  function getChild(el, childNum, options, includeDragEl) {
-    var currentChild = 0, i = 0, children = el.children;
-    while (i < children.length) {
-      if (children[i].style.display !== "none" && children[i] !== Sortable.ghost && (includeDragEl || children[i] !== Sortable.dragged) && closest(children[i], options.draggable, el, false)) {
-        if (currentChild === childNum) {
-          return children[i];
-        }
-        currentChild++;
-      }
-      i++;
-    }
-    return null;
-  }
-  function lastChild(el, selector3) {
-    var last = el.lastElementChild;
-    while (last && (last === Sortable.ghost || css(last, "display") === "none" || selector3 && !matches(last, selector3))) {
-      last = last.previousElementSibling;
-    }
-    return last || null;
-  }
-  function index(el, selector3) {
-    var index2 = 0;
-    if (!el || !el.parentNode) {
-      return -1;
-    }
-    while (el = el.previousElementSibling) {
-      if (el.nodeName.toUpperCase() !== "TEMPLATE" && el !== Sortable.clone && (!selector3 || matches(el, selector3))) {
-        index2++;
-      }
-    }
-    return index2;
-  }
-  function getRelativeScrollOffset(el) {
-    var offsetLeft = 0, offsetTop = 0, winScroller = getWindowScrollingElement();
-    if (el) {
-      do {
-        var elMatrix = matrix(el), scaleX = elMatrix.a, scaleY = elMatrix.d;
-        offsetLeft += el.scrollLeft * scaleX;
-        offsetTop += el.scrollTop * scaleY;
-      } while (el !== winScroller && (el = el.parentNode));
-    }
-    return [offsetLeft, offsetTop];
-  }
-  function indexOfObject(arr, obj) {
-    for (var i in arr) {
-      if (!arr.hasOwnProperty(i))
-        continue;
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key) && obj[key] === arr[i][key])
-          return Number(i);
-      }
-    }
-    return -1;
-  }
-  function getParentAutoScrollElement(el, includeSelf) {
-    if (!el || !el.getBoundingClientRect)
-      return getWindowScrollingElement();
-    var elem = el;
-    var gotSelf = false;
-    do {
-      if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
-        var elemCSS = css(elem);
-        if (elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == "auto" || elemCSS.overflowX == "scroll") || elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == "auto" || elemCSS.overflowY == "scroll")) {
-          if (!elem.getBoundingClientRect || elem === document.body)
-            return getWindowScrollingElement();
-          if (gotSelf || includeSelf)
-            return elem;
-          gotSelf = true;
+        i = a.length;
+        value += threshold;
+        while (i--) {
+          if (a[i] <= value) {
+            return a[i];
+          }
         }
       }
-    } while (elem = elem.parentNode);
-    return getWindowScrollingElement();
-  }
-  function extend(dst, src) {
-    if (dst && src) {
-      for (var key in src) {
-        if (src.hasOwnProperty(key)) {
-          dst[key] = src[key];
-        }
+      return a[0];
+    } : function(value, direction, threshold) {
+      if (threshold === void 0) {
+        threshold = 1e-3;
+      }
+      var snapped = snap3(value);
+      return !direction || Math.abs(snapped - value) < threshold || snapped - value < 0 === direction < 0 ? snapped : snap3(direction < 0 ? value - snapIncrementOrArray : value + snapIncrementOrArray);
+    };
+  };
+  var _getLabelAtDirection = function _getLabelAtDirection2(timeline2) {
+    return function(value, st) {
+      return _snapDirectional(_getLabelRatioArray(timeline2))(value, st.direction);
+    };
+  };
+  var _multiListener = function _multiListener2(func, element, types, callback) {
+    return types.split(",").forEach(function(type) {
+      return func(element, type, callback);
+    });
+  };
+  var _addListener5 = function _addListener6(element, type, func, nonPassive, capture) {
+    return element.addEventListener(type, func, {
+      passive: !nonPassive,
+      capture: !!capture
+    });
+  };
+  var _removeListener5 = function _removeListener6(element, type, func, capture) {
+    return element.removeEventListener(type, func, !!capture);
+  };
+  var _wheelListener = function _wheelListener2(func, el, scrollFunc) {
+    scrollFunc = scrollFunc && scrollFunc.wheelHandler;
+    if (scrollFunc) {
+      func(el, "wheel", scrollFunc);
+      func(el, "touchmove", scrollFunc);
+    }
+  };
+  var _markerDefaults = {
+    startColor: "green",
+    endColor: "red",
+    indent: 0,
+    fontSize: "16px",
+    fontWeight: "normal"
+  };
+  var _defaults2 = {
+    toggleActions: "play",
+    anticipatePin: 0
+  };
+  var _keywords = {
+    top: 0,
+    left: 0,
+    center: 0.5,
+    bottom: 1,
+    right: 1
+  };
+  var _offsetToPx = function _offsetToPx2(value, size) {
+    if (_isString3(value)) {
+      var eqIndex = value.indexOf("="), relative = ~eqIndex ? +(value.charAt(eqIndex - 1) + 1) * parseFloat(value.substr(eqIndex + 1)) : 0;
+      if (~eqIndex) {
+        value.indexOf("%") > eqIndex && (relative *= size / 100);
+        value = value.substr(0, eqIndex - 1);
+      }
+      value = relative + (value in _keywords ? _keywords[value] * size : ~value.indexOf("%") ? parseFloat(value) * size / 100 : parseFloat(value) || 0);
+    }
+    return value;
+  };
+  var _createMarker = function _createMarker2(type, name, container, direction, _ref4, offset, matchWidthEl, containerAnimation) {
+    var startColor = _ref4.startColor, endColor = _ref4.endColor, fontSize = _ref4.fontSize, indent = _ref4.indent, fontWeight = _ref4.fontWeight;
+    var e = _doc6.createElement("div"), useFixedPosition = _isViewport3(container) || _getProxyProp(container, "pinType") === "fixed", isScroller = type.indexOf("scroller") !== -1, parent = useFixedPosition ? _body4 : container, isStart = type.indexOf("start") !== -1, color = isStart ? startColor : endColor, css = "border-color:" + color + ";font-size:" + fontSize + ";color:" + color + ";font-weight:" + fontWeight + ";pointer-events:none;white-space:nowrap;font-family:sans-serif,Arial;z-index:1000;padding:4px 8px;border-width:0;border-style:solid;";
+    css += "position:" + ((isScroller || containerAnimation) && useFixedPosition ? "fixed;" : "absolute;");
+    (isScroller || containerAnimation || !useFixedPosition) && (css += (direction === _vertical ? _right : _bottom) + ":" + (offset + parseFloat(indent)) + "px;");
+    matchWidthEl && (css += "box-sizing:border-box;text-align:left;width:" + matchWidthEl.offsetWidth + "px;");
+    e._isStart = isStart;
+    e.setAttribute("class", "gsap-marker-" + type + (name ? " marker-" + name : ""));
+    e.style.cssText = css;
+    e.innerText = name || name === 0 ? type + "-" + name : type;
+    parent.children[0] ? parent.insertBefore(e, parent.children[0]) : parent.appendChild(e);
+    e._offset = e["offset" + direction.op.d2];
+    _positionMarker(e, 0, direction, isStart);
+    return e;
+  };
+  var _positionMarker = function _positionMarker2(marker, start, direction, flipped) {
+    var vars = {
+      display: "block"
+    }, side = direction[flipped ? "os2" : "p2"], oppositeSide = direction[flipped ? "p2" : "os2"];
+    marker._isFlipped = flipped;
+    vars[direction.a + "Percent"] = flipped ? -100 : 0;
+    vars[direction.a] = flipped ? "1px" : 0;
+    vars["border" + side + _Width] = 1;
+    vars["border" + oppositeSide + _Width] = 0;
+    vars[direction.p] = start + "px";
+    gsap4.set(marker, vars);
+  };
+  var _triggers = [];
+  var _ids = {};
+  var _rafID;
+  var _sync = function _sync2() {
+    return _getTime3() - _lastScrollTime > 34 && (_rafID || (_rafID = requestAnimationFrame(_updateAll)));
+  };
+  var _onScroll3 = function _onScroll4() {
+    if (!_normalizer2 || !_normalizer2.isPressed || _normalizer2.startX > _body4.clientWidth) {
+      _scrollers.cache++;
+      if (_normalizer2) {
+        _rafID || (_rafID = requestAnimationFrame(_updateAll));
+      } else {
+        _updateAll();
+      }
+      _lastScrollTime || _dispatch3("scrollStart");
+      _lastScrollTime = _getTime3();
+    }
+  };
+  var _setBaseDimensions = function _setBaseDimensions2() {
+    _baseScreenWidth = _win6.innerWidth;
+    _baseScreenHeight = _win6.innerHeight;
+  };
+  var _onResize = function _onResize2() {
+    _scrollers.cache++;
+    !_refreshing && !_ignoreResize && !_doc6.fullscreenElement && !_doc6.webkitFullscreenElement && (!_ignoreMobileResize || _baseScreenWidth !== _win6.innerWidth || Math.abs(_win6.innerHeight - _baseScreenHeight) > _win6.innerHeight * 0.25) && _resizeDelay.restart(true);
+  };
+  var _listeners2 = {};
+  var _emptyArray2 = [];
+  var _softRefresh = function _softRefresh2() {
+    return _removeListener5(ScrollTrigger2, "scrollEnd", _softRefresh2) || _refreshAll(true);
+  };
+  var _dispatch3 = function _dispatch4(type) {
+    return _listeners2[type] && _listeners2[type].map(function(f) {
+      return f();
+    }) || _emptyArray2;
+  };
+  var _savedStyles = [];
+  var _revertRecorded = function _revertRecorded2(media) {
+    for (var i = 0; i < _savedStyles.length; i += 5) {
+      if (!media || _savedStyles[i + 4] && _savedStyles[i + 4].query === media) {
+        _savedStyles[i].style.cssText = _savedStyles[i + 1];
+        _savedStyles[i].getBBox && _savedStyles[i].setAttribute("transform", _savedStyles[i + 2] || "");
+        _savedStyles[i + 3].uncache = 1;
       }
     }
-    return dst;
-  }
-  function isRectEqual(rect1, rect2) {
-    return Math.round(rect1.top) === Math.round(rect2.top) && Math.round(rect1.left) === Math.round(rect2.left) && Math.round(rect1.height) === Math.round(rect2.height) && Math.round(rect1.width) === Math.round(rect2.width);
-  }
-  var _throttleTimeout;
-  function throttle(callback, ms) {
-    return function() {
-      if (!_throttleTimeout) {
-        var args = arguments, _this = this;
-        if (args.length === 1) {
-          callback.call(_this, args[0]);
+  };
+  var _revertAll = function _revertAll2(kill, media) {
+    var trigger;
+    for (_i = 0; _i < _triggers.length; _i++) {
+      trigger = _triggers[_i];
+      if (trigger && (!media || trigger._ctx === media)) {
+        if (kill) {
+          trigger.kill(1);
         } else {
-          callback.apply(_this, args);
+          trigger.revert(true, true);
         }
-        _throttleTimeout = setTimeout(function() {
-          _throttleTimeout = void 0;
-        }, ms);
       }
-    };
-  }
-  function cancelThrottle() {
-    clearTimeout(_throttleTimeout);
-    _throttleTimeout = void 0;
-  }
-  function scrollBy(el, x, y) {
-    el.scrollLeft += x;
-    el.scrollTop += y;
-  }
-  function clone(el) {
-    var Polymer = window.Polymer;
-    var $ = window.jQuery || window.Zepto;
-    if (Polymer && Polymer.dom) {
-      return Polymer.dom(el).cloneNode(true);
-    } else if ($) {
-      return $(el).clone(true)[0];
-    } else {
-      return el.cloneNode(true);
     }
-  }
-  var expando = "Sortable" + (/* @__PURE__ */ new Date()).getTime();
-  function AnimationStateManager() {
-    var animationStates = [], animationCallbackId;
-    return {
-      captureAnimationState: function captureAnimationState() {
-        animationStates = [];
-        if (!this.options.animation)
-          return;
-        var children = [].slice.call(this.el.children);
-        children.forEach(function(child) {
-          if (css(child, "display") === "none" || child === Sortable.ghost)
-            return;
-          animationStates.push({
-            target: child,
-            rect: getRect(child)
-          });
-          var fromRect = _objectSpread2({}, animationStates[animationStates.length - 1].rect);
-          if (child.thisAnimationDuration) {
-            var childMatrix = matrix(child, true);
-            if (childMatrix) {
-              fromRect.top -= childMatrix.f;
-              fromRect.left -= childMatrix.e;
-            }
-          }
-          child.fromRect = fromRect;
-        });
-      },
-      addAnimationState: function addAnimationState(state) {
-        animationStates.push(state);
-      },
-      removeAnimationState: function removeAnimationState(target) {
-        animationStates.splice(indexOfObject(animationStates, {
-          target
-        }), 1);
-      },
-      animateAll: function animateAll(callback) {
-        var _this = this;
-        if (!this.options.animation) {
-          clearTimeout(animationCallbackId);
-          if (typeof callback === "function")
-            callback();
-          return;
-        }
-        var animating = false, animationTime = 0;
-        animationStates.forEach(function(state) {
-          var time = 0, target = state.target, fromRect = target.fromRect, toRect = getRect(target), prevFromRect = target.prevFromRect, prevToRect = target.prevToRect, animatingRect = state.rect, targetMatrix = matrix(target, true);
-          if (targetMatrix) {
-            toRect.top -= targetMatrix.f;
-            toRect.left -= targetMatrix.e;
-          }
-          target.toRect = toRect;
-          if (target.thisAnimationDuration) {
-            if (isRectEqual(prevFromRect, toRect) && !isRectEqual(fromRect, toRect) && // Make sure animatingRect is on line between toRect & fromRect
-            (animatingRect.top - toRect.top) / (animatingRect.left - toRect.left) === (fromRect.top - toRect.top) / (fromRect.left - toRect.left)) {
-              time = calculateRealTime(animatingRect, prevFromRect, prevToRect, _this.options);
-            }
-          }
-          if (!isRectEqual(toRect, fromRect)) {
-            target.prevFromRect = fromRect;
-            target.prevToRect = toRect;
-            if (!time) {
-              time = _this.options.animation;
-            }
-            _this.animate(target, animatingRect, toRect, time);
-          }
-          if (time) {
-            animating = true;
-            animationTime = Math.max(animationTime, time);
-            clearTimeout(target.animationResetTimer);
-            target.animationResetTimer = setTimeout(function() {
-              target.animationTime = 0;
-              target.prevFromRect = null;
-              target.fromRect = null;
-              target.prevToRect = null;
-              target.thisAnimationDuration = null;
-            }, time);
-            target.thisAnimationDuration = time;
-          }
-        });
-        clearTimeout(animationCallbackId);
-        if (!animating) {
-          if (typeof callback === "function")
-            callback();
-        } else {
-          animationCallbackId = setTimeout(function() {
-            if (typeof callback === "function")
-              callback();
-          }, animationTime);
-        }
-        animationStates = [];
-      },
-      animate: function animate(target, currentRect, toRect, duration) {
-        if (duration) {
-          css(target, "transition", "");
-          css(target, "transform", "");
-          var elMatrix = matrix(this.el), scaleX = elMatrix && elMatrix.a, scaleY = elMatrix && elMatrix.d, translateX = (currentRect.left - toRect.left) / (scaleX || 1), translateY = (currentRect.top - toRect.top) / (scaleY || 1);
-          target.animatingX = !!translateX;
-          target.animatingY = !!translateY;
-          css(target, "transform", "translate3d(" + translateX + "px," + translateY + "px,0)");
-          this.forRepaintDummy = repaint(target);
-          css(target, "transition", "transform " + duration + "ms" + (this.options.easing ? " " + this.options.easing : ""));
-          css(target, "transform", "translate3d(0,0,0)");
-          typeof target.animated === "number" && clearTimeout(target.animated);
-          target.animated = setTimeout(function() {
-            css(target, "transition", "");
-            css(target, "transform", "");
-            target.animated = false;
-            target.animatingX = false;
-            target.animatingY = false;
-          }, duration);
-        }
-      }
-    };
-  }
-  function repaint(target) {
-    return target.offsetWidth;
-  }
-  function calculateRealTime(animatingRect, fromRect, toRect, options) {
-    return Math.sqrt(Math.pow(fromRect.top - animatingRect.top, 2) + Math.pow(fromRect.left - animatingRect.left, 2)) / Math.sqrt(Math.pow(fromRect.top - toRect.top, 2) + Math.pow(fromRect.left - toRect.left, 2)) * options.animation;
-  }
-  var plugins = [];
-  var defaults2 = {
-    initializeByDefault: true
+    media && _revertRecorded(media);
+    media || _dispatch3("revert");
   };
-  var PluginManager = {
-    mount: function mount(plugin) {
-      for (var option2 in defaults2) {
-        if (defaults2.hasOwnProperty(option2) && !(option2 in plugin)) {
-          plugin[option2] = defaults2[option2];
-        }
-      }
-      plugins.forEach(function(p) {
-        if (p.pluginName === plugin.pluginName) {
-          throw "Sortable: Cannot mount plugin ".concat(plugin.pluginName, " more than once");
-        }
+  var _clearScrollMemory = function _clearScrollMemory2(scrollRestoration, force) {
+    _scrollers.cache++;
+    (force || !_refreshingAll) && _scrollers.forEach(function(obj) {
+      return _isFunction5(obj) && obj.cacheID++ && (obj.rec = 0);
+    });
+    _isString3(scrollRestoration) && (_win6.history.scrollRestoration = _scrollRestoration = scrollRestoration);
+  };
+  var _refreshingAll;
+  var _refreshID = 0;
+  var _queueRefreshID;
+  var _queueRefreshAll = function _queueRefreshAll2() {
+    if (_queueRefreshID !== _refreshID) {
+      var id = _queueRefreshID = _refreshID;
+      requestAnimationFrame(function() {
+        return id === _refreshID && _refreshAll(true);
       });
-      plugins.push(plugin);
-    },
-    pluginEvent: function pluginEvent(eventName, sortable, evt) {
-      var _this = this;
-      this.eventCanceled = false;
-      evt.cancel = function() {
-        _this.eventCanceled = true;
-      };
-      var eventNameGlobal = eventName + "Global";
-      plugins.forEach(function(plugin) {
-        if (!sortable[plugin.pluginName])
-          return;
-        if (sortable[plugin.pluginName][eventNameGlobal]) {
-          sortable[plugin.pluginName][eventNameGlobal](_objectSpread2({
-            sortable
-          }, evt));
-        }
-        if (sortable.options[plugin.pluginName] && sortable[plugin.pluginName][eventName]) {
-          sortable[plugin.pluginName][eventName](_objectSpread2({
-            sortable
-          }, evt));
-        }
-      });
-    },
-    initializePlugins: function initializePlugins(sortable, el, defaults3, options) {
-      plugins.forEach(function(plugin) {
-        var pluginName = plugin.pluginName;
-        if (!sortable.options[pluginName] && !plugin.initializeByDefault)
-          return;
-        var initialized = new plugin(sortable, el, sortable.options);
-        initialized.sortable = sortable;
-        initialized.options = sortable.options;
-        sortable[pluginName] = initialized;
-        _extends(defaults3, initialized.defaults);
-      });
-      for (var option2 in sortable.options) {
-        if (!sortable.options.hasOwnProperty(option2))
-          continue;
-        var modified = this.modifyOption(sortable, option2, sortable.options[option2]);
-        if (typeof modified !== "undefined") {
-          sortable.options[option2] = modified;
-        }
-      }
-    },
-    getEventProperties: function getEventProperties(name, sortable) {
-      var eventProperties = {};
-      plugins.forEach(function(plugin) {
-        if (typeof plugin.eventProperties !== "function")
-          return;
-        _extends(eventProperties, plugin.eventProperties.call(sortable[plugin.pluginName], name));
-      });
-      return eventProperties;
-    },
-    modifyOption: function modifyOption(sortable, name, value) {
-      var modifiedValue;
-      plugins.forEach(function(plugin) {
-        if (!sortable[plugin.pluginName])
-          return;
-        if (plugin.optionListeners && typeof plugin.optionListeners[name] === "function") {
-          modifiedValue = plugin.optionListeners[name].call(sortable[plugin.pluginName], value);
-        }
-      });
-      return modifiedValue;
     }
   };
-  function dispatchEvent(_ref) {
-    var sortable = _ref.sortable, rootEl2 = _ref.rootEl, name = _ref.name, targetEl = _ref.targetEl, cloneEl2 = _ref.cloneEl, toEl = _ref.toEl, fromEl = _ref.fromEl, oldIndex2 = _ref.oldIndex, newIndex2 = _ref.newIndex, oldDraggableIndex2 = _ref.oldDraggableIndex, newDraggableIndex2 = _ref.newDraggableIndex, originalEvent = _ref.originalEvent, putSortable2 = _ref.putSortable, extraEventProperties = _ref.extraEventProperties;
-    sortable = sortable || rootEl2 && rootEl2[expando];
-    if (!sortable)
+  var _refresh100vh = function _refresh100vh2() {
+    _body4.appendChild(_div100vh);
+    _100vh = _div100vh.offsetHeight || _win6.innerHeight;
+    _body4.removeChild(_div100vh);
+  };
+  var _refreshAll = function _refreshAll2(force, skipRevert) {
+    if (_lastScrollTime && !force) {
+      _addListener5(ScrollTrigger2, "scrollEnd", _softRefresh);
       return;
-    var evt, options = sortable.options, onName = "on" + name.charAt(0).toUpperCase() + name.substr(1);
-    if (window.CustomEvent && !IE11OrLess && !Edge) {
-      evt = new CustomEvent(name, {
-        bubbles: true,
-        cancelable: true
-      });
-    } else {
-      evt = document.createEvent("Event");
-      evt.initEvent(name, true, true);
     }
-    evt.to = toEl || rootEl2;
-    evt.from = fromEl || rootEl2;
-    evt.item = targetEl || rootEl2;
-    evt.clone = cloneEl2;
-    evt.oldIndex = oldIndex2;
-    evt.newIndex = newIndex2;
-    evt.oldDraggableIndex = oldDraggableIndex2;
-    evt.newDraggableIndex = newDraggableIndex2;
-    evt.originalEvent = originalEvent;
-    evt.pullMode = putSortable2 ? putSortable2.lastPutMode : void 0;
-    var allEventProperties = _objectSpread2(_objectSpread2({}, extraEventProperties), PluginManager.getEventProperties(name, sortable));
-    for (var option2 in allEventProperties) {
-      evt[option2] = allEventProperties[option2];
-    }
-    if (rootEl2) {
-      rootEl2.dispatchEvent(evt);
-    }
-    if (options[onName]) {
-      options[onName].call(sortable, evt);
-    }
-  }
-  var _excluded = ["evt"];
-  var pluginEvent2 = function pluginEvent3(eventName, sortable) {
-    var _ref = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {}, originalEvent = _ref.evt, data = _objectWithoutProperties(_ref, _excluded);
-    PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, _objectSpread2({
-      dragEl,
-      parentEl,
-      ghostEl,
-      rootEl,
-      nextEl,
-      lastDownEl,
-      cloneEl,
-      cloneHidden,
-      dragStarted: moved,
-      putSortable,
-      activeSortable: Sortable.active,
-      originalEvent,
-      oldIndex,
-      oldDraggableIndex,
-      newIndex,
-      newDraggableIndex,
-      hideGhostForTarget: _hideGhostForTarget,
-      unhideGhostForTarget: _unhideGhostForTarget,
-      cloneNowHidden: function cloneNowHidden() {
-        cloneHidden = true;
-      },
-      cloneNowShown: function cloneNowShown() {
-        cloneHidden = false;
-      },
-      dispatchSortableEvent: function dispatchSortableEvent(name) {
-        _dispatchEvent3({
-          sortable,
-          name,
-          originalEvent
-        });
-      }
-    }, data));
-  };
-  function _dispatchEvent3(info) {
-    dispatchEvent(_objectSpread2({
-      putSortable,
-      cloneEl,
-      targetEl: dragEl,
-      rootEl,
-      oldIndex,
-      oldDraggableIndex,
-      newIndex,
-      newDraggableIndex
-    }, info));
-  }
-  var dragEl;
-  var parentEl;
-  var ghostEl;
-  var rootEl;
-  var nextEl;
-  var lastDownEl;
-  var cloneEl;
-  var cloneHidden;
-  var oldIndex;
-  var newIndex;
-  var oldDraggableIndex;
-  var newDraggableIndex;
-  var activeGroup;
-  var putSortable;
-  var awaitingDragStarted = false;
-  var ignoreNextClick = false;
-  var sortables = [];
-  var tapEvt;
-  var touchEvt;
-  var lastDx;
-  var lastDy;
-  var tapDistanceLeft;
-  var tapDistanceTop;
-  var moved;
-  var lastTarget;
-  var lastDirection;
-  var pastFirstInvertThresh = false;
-  var isCircumstantialInvert = false;
-  var targetMoveDistance;
-  var ghostRelativeParent;
-  var ghostRelativeParentInitialScroll = [];
-  var _silent = false;
-  var savedInputChecked = [];
-  var documentExists = typeof document !== "undefined";
-  var PositionGhostAbsolutely = IOS;
-  var CSSFloatProperty = Edge || IE11OrLess ? "cssFloat" : "float";
-  var supportDraggable = documentExists && !ChromeForAndroid && !IOS && "draggable" in document.createElement("div");
-  var supportCssPointerEvents = function() {
-    if (!documentExists)
-      return;
-    if (IE11OrLess) {
-      return false;
-    }
-    var el = document.createElement("x");
-    el.style.cssText = "pointer-events:auto";
-    return el.style.pointerEvents === "auto";
-  }();
-  var _detectDirection = function _detectDirection2(el, options) {
-    var elCSS = css(el), elWidth = parseInt(elCSS.width) - parseInt(elCSS.paddingLeft) - parseInt(elCSS.paddingRight) - parseInt(elCSS.borderLeftWidth) - parseInt(elCSS.borderRightWidth), child1 = getChild(el, 0, options), child2 = getChild(el, 1, options), firstChildCSS = child1 && css(child1), secondChildCSS = child2 && css(child2), firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + getRect(child1).width, secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + getRect(child2).width;
-    if (elCSS.display === "flex") {
-      return elCSS.flexDirection === "column" || elCSS.flexDirection === "column-reverse" ? "vertical" : "horizontal";
-    }
-    if (elCSS.display === "grid") {
-      return elCSS.gridTemplateColumns.split(" ").length <= 1 ? "vertical" : "horizontal";
-    }
-    if (child1 && firstChildCSS["float"] && firstChildCSS["float"] !== "none") {
-      var touchingSideChild2 = firstChildCSS["float"] === "left" ? "left" : "right";
-      return child2 && (secondChildCSS.clear === "both" || secondChildCSS.clear === touchingSideChild2) ? "vertical" : "horizontal";
-    }
-    return child1 && (firstChildCSS.display === "block" || firstChildCSS.display === "flex" || firstChildCSS.display === "table" || firstChildCSS.display === "grid" || firstChildWidth >= elWidth && elCSS[CSSFloatProperty] === "none" || child2 && elCSS[CSSFloatProperty] === "none" && firstChildWidth + secondChildWidth > elWidth) ? "vertical" : "horizontal";
-  };
-  var _dragElInRowColumn = function _dragElInRowColumn2(dragRect, targetRect, vertical) {
-    var dragElS1Opp = vertical ? dragRect.left : dragRect.top, dragElS2Opp = vertical ? dragRect.right : dragRect.bottom, dragElOppLength = vertical ? dragRect.width : dragRect.height, targetS1Opp = vertical ? targetRect.left : targetRect.top, targetS2Opp = vertical ? targetRect.right : targetRect.bottom, targetOppLength = vertical ? targetRect.width : targetRect.height;
-    return dragElS1Opp === targetS1Opp || dragElS2Opp === targetS2Opp || dragElS1Opp + dragElOppLength / 2 === targetS1Opp + targetOppLength / 2;
-  };
-  var _detectNearestEmptySortable = function _detectNearestEmptySortable2(x, y) {
-    var ret;
-    sortables.some(function(sortable) {
-      var threshold = sortable[expando].options.emptyInsertThreshold;
-      if (!threshold || lastChild(sortable))
-        return;
-      var rect = getRect(sortable), insideHorizontally = x >= rect.left - threshold && x <= rect.right + threshold, insideVertically = y >= rect.top - threshold && y <= rect.bottom + threshold;
-      if (insideHorizontally && insideVertically) {
-        return ret = sortable;
+    _refresh100vh();
+    _refreshingAll = ScrollTrigger2.isRefreshing = true;
+    _scrollers.forEach(function(obj) {
+      return _isFunction5(obj) && ++obj.cacheID && (obj.rec = obj());
+    });
+    var refreshInits = _dispatch3("refreshInit");
+    _sort && ScrollTrigger2.sort();
+    skipRevert || _revertAll();
+    _scrollers.forEach(function(obj) {
+      if (_isFunction5(obj)) {
+        obj.smooth && (obj.target.style.scrollBehavior = "auto");
+        obj(0);
       }
     });
-    return ret;
+    _triggers.slice(0).forEach(function(t) {
+      return t.refresh();
+    });
+    _triggers.forEach(function(t, i) {
+      if (t._subPinOffset && t.pin) {
+        var prop = t.vars.horizontal ? "offsetWidth" : "offsetHeight", original = t.pin[prop];
+        t.revert(true, 1);
+        t.adjustPinSpacing(t.pin[prop] - original);
+        t.refresh();
+      }
+    });
+    _triggers.forEach(function(t) {
+      var max = _maxScroll(t.scroller, t._dir);
+      (t.vars.end === "max" || t._endClamp && t.end > max) && t.setPositions(t.start, Math.max(t.start + 1, max), true);
+    });
+    refreshInits.forEach(function(result) {
+      return result && result.render && result.render(-1);
+    });
+    _scrollers.forEach(function(obj) {
+      if (_isFunction5(obj)) {
+        obj.smooth && requestAnimationFrame(function() {
+          return obj.target.style.scrollBehavior = "smooth";
+        });
+        obj.rec && obj(obj.rec);
+      }
+    });
+    _clearScrollMemory(_scrollRestoration, 1);
+    _resizeDelay.pause();
+    _refreshID++;
+    _refreshingAll = 2;
+    _updateAll(2);
+    _triggers.forEach(function(t) {
+      return _isFunction5(t.vars.onRefresh) && t.vars.onRefresh(t);
+    });
+    _refreshingAll = ScrollTrigger2.isRefreshing = false;
+    _dispatch3("refresh");
   };
-  var _prepareGroup = function _prepareGroup2(options) {
-    function toFn(value, pull) {
-      return function(to, from, dragEl2, evt) {
-        var sameGroup = to.options.group.name && from.options.group.name && to.options.group.name === from.options.group.name;
-        if (value == null && (pull || sameGroup)) {
-          return true;
-        } else if (value == null || value === false) {
-          return false;
-        } else if (pull && value === "clone") {
-          return value;
-        } else if (typeof value === "function") {
-          return toFn(value(to, from, dragEl2, evt), pull)(to, from, dragEl2, evt);
-        } else {
-          var otherGroup = (pull ? to : from).options.group.name;
-          return value === true || typeof value === "string" && value === otherGroup || value.join && value.indexOf(otherGroup) > -1;
+  var _lastScroll = 0;
+  var _direction = 1;
+  var _primary;
+  var _updateAll = function _updateAll2(force) {
+    if (!_refreshingAll || force === 2) {
+      ScrollTrigger2.isUpdating = true;
+      _primary && _primary.update(0);
+      var l = _triggers.length, time = _getTime3(), recordVelocity = time - _time1 >= 50, scroll = l && _triggers[0].scroll();
+      _direction = _lastScroll > scroll ? -1 : 1;
+      _refreshingAll || (_lastScroll = scroll);
+      if (recordVelocity) {
+        if (_lastScrollTime && !_pointerIsDown && time - _lastScrollTime > 200) {
+          _lastScrollTime = 0;
+          _dispatch3("scrollEnd");
         }
-      };
-    }
-    var group = {};
-    var originalGroup = options.group;
-    if (!originalGroup || _typeof(originalGroup) != "object") {
-      originalGroup = {
-        name: originalGroup
-      };
-    }
-    group.name = originalGroup.name;
-    group.checkPull = toFn(originalGroup.pull, true);
-    group.checkPut = toFn(originalGroup.put);
-    group.revertClone = originalGroup.revertClone;
-    options.group = group;
-  };
-  var _hideGhostForTarget = function _hideGhostForTarget2() {
-    if (!supportCssPointerEvents && ghostEl) {
-      css(ghostEl, "display", "none");
-    }
-  };
-  var _unhideGhostForTarget = function _unhideGhostForTarget2() {
-    if (!supportCssPointerEvents && ghostEl) {
-      css(ghostEl, "display", "");
-    }
-  };
-  if (documentExists && !ChromeForAndroid) {
-    document.addEventListener("click", function(evt) {
-      if (ignoreNextClick) {
-        evt.preventDefault();
-        evt.stopPropagation && evt.stopPropagation();
-        evt.stopImmediatePropagation && evt.stopImmediatePropagation();
-        ignoreNextClick = false;
-        return false;
+        _time2 = _time1;
+        _time1 = time;
       }
-    }, true);
-  }
-  var nearestEmptyInsertDetectEvent = function nearestEmptyInsertDetectEvent2(evt) {
-    if (dragEl) {
-      evt = evt.touches ? evt.touches[0] : evt;
-      var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
-      if (nearest) {
-        var event = {};
-        for (var i in evt) {
-          if (evt.hasOwnProperty(i)) {
-            event[i] = evt[i];
-          }
+      if (_direction < 0) {
+        _i = l;
+        while (_i-- > 0) {
+          _triggers[_i] && _triggers[_i].update(0, recordVelocity);
         }
-        event.target = event.rootEl = nearest;
-        event.preventDefault = void 0;
-        event.stopPropagation = void 0;
-        nearest[expando]._onDragOver(event);
+        _direction = 1;
+      } else {
+        for (_i = 0; _i < l; _i++) {
+          _triggers[_i] && _triggers[_i].update(0, recordVelocity);
+        }
+      }
+      ScrollTrigger2.isUpdating = false;
+    }
+    _rafID = 0;
+  };
+  var _propNamesToCopy = [_left, _top, _bottom, _right, _margin + _Bottom, _margin + _Right, _margin + _Top, _margin + _Left, "display", "flexShrink", "float", "zIndex", "gridColumnStart", "gridColumnEnd", "gridRowStart", "gridRowEnd", "gridArea", "justifySelf", "alignSelf", "placeSelf", "order"];
+  var _stateProps = _propNamesToCopy.concat([_width, _height, "boxSizing", "max" + _Width, "max" + _Height, "position", _margin, _padding, _padding + _Top, _padding + _Right, _padding + _Bottom, _padding + _Left]);
+  var _swapPinOut = function _swapPinOut2(pin, spacer, state) {
+    _setState(state);
+    var cache2 = pin._gsap;
+    if (cache2.spacerIsNative) {
+      _setState(cache2.spacerState);
+    } else if (pin._gsap.swappedIn) {
+      var parent = spacer.parentNode;
+      if (parent) {
+        parent.insertBefore(pin, spacer);
+        parent.removeChild(spacer);
+      }
+    }
+    pin._gsap.swappedIn = false;
+  };
+  var _swapPinIn = function _swapPinIn2(pin, spacer, cs, spacerState) {
+    if (!pin._gsap.swappedIn) {
+      var i = _propNamesToCopy.length, spacerStyle = spacer.style, pinStyle = pin.style, p;
+      while (i--) {
+        p = _propNamesToCopy[i];
+        spacerStyle[p] = cs[p];
+      }
+      spacerStyle.position = cs.position === "absolute" ? "absolute" : "relative";
+      cs.display === "inline" && (spacerStyle.display = "inline-block");
+      pinStyle[_bottom] = pinStyle[_right] = "auto";
+      spacerStyle.flexBasis = cs.flexBasis || "auto";
+      spacerStyle.overflow = "visible";
+      spacerStyle.boxSizing = "border-box";
+      spacerStyle[_width] = _getSize(pin, _horizontal) + _px;
+      spacerStyle[_height] = _getSize(pin, _vertical) + _px;
+      spacerStyle[_padding] = pinStyle[_margin] = pinStyle[_top] = pinStyle[_left] = "0";
+      _setState(spacerState);
+      pinStyle[_width] = pinStyle["max" + _Width] = cs[_width];
+      pinStyle[_height] = pinStyle["max" + _Height] = cs[_height];
+      pinStyle[_padding] = cs[_padding];
+      if (pin.parentNode !== spacer) {
+        pin.parentNode.insertBefore(spacer, pin);
+        spacer.appendChild(pin);
+      }
+      pin._gsap.swappedIn = true;
+    }
+  };
+  var _capsExp2 = /([A-Z])/g;
+  var _setState = function _setState2(state) {
+    if (state) {
+      var style = state.t.style, l = state.length, i = 0, p, value;
+      (state.t._gsap || gsap4.core.getCache(state.t)).uncache = 1;
+      for (; i < l; i += 2) {
+        value = state[i + 1];
+        p = state[i];
+        if (value) {
+          style[p] = value;
+        } else if (style[p]) {
+          style.removeProperty(p.replace(_capsExp2, "-$1").toLowerCase());
+        }
       }
     }
   };
-  var _checkOutsideTargetEl = function _checkOutsideTargetEl2(evt) {
-    if (dragEl) {
-      dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+  var _getState = function _getState2(element) {
+    var l = _stateProps.length, style = element.style, state = [], i = 0;
+    for (; i < l; i++) {
+      state.push(_stateProps[i], style[_stateProps[i]]);
     }
+    state.t = element;
+    return state;
   };
-  function Sortable(el, options) {
-    if (!(el && el.nodeType && el.nodeType === 1)) {
-      throw "Sortable: `el` must be an HTMLElement, not ".concat({}.toString.call(el));
+  var _copyState = function _copyState2(state, override, omitOffsets) {
+    var result = [], l = state.length, i = omitOffsets ? 8 : 0, p;
+    for (; i < l; i += 2) {
+      p = state[i];
+      result.push(p, p in override ? override[p] : state[i + 1]);
     }
-    this.el = el;
-    this.options = options = _extends({}, options);
-    el[expando] = this;
-    var defaults3 = {
-      group: null,
-      sort: true,
-      disabled: false,
-      store: null,
-      handle: null,
-      draggable: /^[uo]l$/i.test(el.nodeName) ? ">li" : ">*",
-      swapThreshold: 1,
-      // percentage; 0 <= x <= 1
-      invertSwap: false,
-      // invert always
-      invertedSwapThreshold: null,
-      // will be set to same as swapThreshold if default
-      removeCloneOnHide: true,
-      direction: function direction() {
-        return _detectDirection(el, this.options);
-      },
-      ghostClass: "sortable-ghost",
-      chosenClass: "sortable-chosen",
-      dragClass: "sortable-drag",
-      ignore: "a, img",
-      filter: null,
-      preventOnFilter: true,
-      animation: 0,
-      easing: null,
-      setData: function setData(dataTransfer, dragEl2) {
-        dataTransfer.setData("Text", dragEl2.textContent);
-      },
-      dropBubble: false,
-      dragoverBubble: false,
-      dataIdAttr: "data-id",
-      delay: 0,
-      delayOnTouchOnly: false,
-      touchStartThreshold: (Number.parseInt ? Number : window).parseInt(window.devicePixelRatio, 10) || 1,
-      forceFallback: false,
-      fallbackClass: "sortable-fallback",
-      fallbackOnBody: false,
-      fallbackTolerance: 0,
-      fallbackOffset: {
-        x: 0,
-        y: 0
-      },
-      supportPointer: Sortable.supportPointer !== false && "PointerEvent" in window && !Safari,
-      emptyInsertThreshold: 5
-    };
-    PluginManager.initializePlugins(this, el, defaults3);
-    for (var name in defaults3) {
-      !(name in options) && (options[name] = defaults3[name]);
+    result.t = state.t;
+    return result;
+  };
+  var _winOffsets = {
+    left: 0,
+    top: 0
+  };
+  var _parsePosition3 = function _parsePosition4(value, trigger, scrollerSize, direction, scroll, marker, markerScroller, self, scrollerBounds, borderWidth, useFixedPosition, scrollerMax, containerAnimation, clampZeroProp) {
+    _isFunction5(value) && (value = value(self));
+    if (_isString3(value) && value.substr(0, 3) === "max") {
+      value = scrollerMax + (value.charAt(4) === "=" ? _offsetToPx("0" + value.substr(3), scrollerSize) : 0);
     }
-    _prepareGroup(options);
-    for (var fn in this) {
-      if (fn.charAt(0) === "_" && typeof this[fn] === "function") {
-        this[fn] = this[fn].bind(this);
+    var time = containerAnimation ? containerAnimation.time() : 0, p1, p2, element;
+    containerAnimation && containerAnimation.seek(0);
+    isNaN(value) || (value = +value);
+    if (!_isNumber3(value)) {
+      _isFunction5(trigger) && (trigger = trigger(self));
+      var offsets = (value || "0").split(" "), bounds, localOffset, globalOffset, display;
+      element = _getTarget(trigger, self) || _body4;
+      bounds = _getBounds3(element) || {};
+      if ((!bounds || !bounds.left && !bounds.top) && _getComputedStyle3(element).display === "none") {
+        display = element.style.display;
+        element.style.display = "block";
+        bounds = _getBounds3(element);
+        display ? element.style.display = display : element.style.removeProperty("display");
       }
-    }
-    this.nativeDraggable = options.forceFallback ? false : supportDraggable;
-    if (this.nativeDraggable) {
-      this.options.touchStartThreshold = 1;
-    }
-    if (options.supportPointer) {
-      on(el, "pointerdown", this._onTapStart);
+      localOffset = _offsetToPx(offsets[0], bounds[direction.d]);
+      globalOffset = _offsetToPx(offsets[1] || "0", scrollerSize);
+      value = bounds[direction.p] - scrollerBounds[direction.p] - borderWidth + localOffset + scroll - globalOffset;
+      markerScroller && _positionMarker(markerScroller, globalOffset, direction, scrollerSize - globalOffset < 20 || markerScroller._isStart && globalOffset > 20);
+      scrollerSize -= scrollerSize - globalOffset;
     } else {
-      on(el, "mousedown", this._onTapStart);
-      on(el, "touchstart", this._onTapStart);
+      containerAnimation && (value = gsap4.utils.mapRange(containerAnimation.scrollTrigger.start, containerAnimation.scrollTrigger.end, 0, scrollerMax, value));
+      markerScroller && _positionMarker(markerScroller, scrollerSize, direction, true);
     }
-    if (this.nativeDraggable) {
-      on(el, "dragover", this);
-      on(el, "dragenter", this);
+    if (clampZeroProp) {
+      self[clampZeroProp] = value || -1e-3;
+      value < 0 && (value = 0);
     }
-    sortables.push(this.el);
-    options.store && options.store.get && this.sort(options.store.get(this) || []);
-    _extends(this, AnimationStateManager());
-  }
-  Sortable.prototype = /** @lends Sortable.prototype */
-  {
-    constructor: Sortable,
-    _isOutsideThisEl: function _isOutsideThisEl(target) {
-      if (!this.el.contains(target) && target !== this.el) {
-        lastTarget = null;
+    if (marker) {
+      var position = value + scrollerSize, isStart = marker._isStart;
+      p1 = "scroll" + direction.d2;
+      _positionMarker(marker, position, direction, isStart && position > 20 || !isStart && (useFixedPosition ? Math.max(_body4[p1], _docEl2[p1]) : marker.parentNode[p1]) <= position + 1);
+      if (useFixedPosition) {
+        scrollerBounds = _getBounds3(markerScroller);
+        useFixedPosition && (marker.style[direction.op.p] = scrollerBounds[direction.op.p] - direction.op.m - marker._offset + _px);
       }
-    },
-    _getDirection: function _getDirection(evt, target) {
-      return typeof this.options.direction === "function" ? this.options.direction.call(this, evt, target, dragEl) : this.options.direction;
-    },
-    _onTapStart: function _onTapStart(evt) {
-      if (!evt.cancelable)
-        return;
-      var _this = this, el = this.el, options = this.options, preventOnFilter = options.preventOnFilter, type = evt.type, touch = evt.touches && evt.touches[0] || evt.pointerType && evt.pointerType === "touch" && evt, target = (touch || evt).target, originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0] || evt.composedPath && evt.composedPath()[0]) || target, filter = options.filter;
-      _saveInputCheckedState(el);
-      if (dragEl) {
-        return;
-      }
-      if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
-        return;
-      }
-      if (originalTarget.isContentEditable) {
-        return;
-      }
-      if (!this.nativeDraggable && Safari && target && target.tagName.toUpperCase() === "SELECT") {
-        return;
-      }
-      target = closest(target, options.draggable, el, false);
-      if (target && target.animated) {
-        return;
-      }
-      if (lastDownEl === target) {
-        return;
-      }
-      oldIndex = index(target);
-      oldDraggableIndex = index(target, options.draggable);
-      if (typeof filter === "function") {
-        if (filter.call(this, evt, target, this)) {
-          _dispatchEvent3({
-            sortable: _this,
-            rootEl: originalTarget,
-            name: "filter",
-            targetEl: target,
-            toEl: el,
-            fromEl: el
-          });
-          pluginEvent2("filter", _this, {
-            evt
-          });
-          preventOnFilter && evt.cancelable && evt.preventDefault();
-          return;
-        }
-      } else if (filter) {
-        filter = filter.split(",").some(function(criteria) {
-          criteria = closest(originalTarget, criteria.trim(), el, false);
-          if (criteria) {
-            _dispatchEvent3({
-              sortable: _this,
-              rootEl: criteria,
-              name: "filter",
-              targetEl: target,
-              fromEl: el,
-              toEl: el
-            });
-            pluginEvent2("filter", _this, {
-              evt
-            });
-            return true;
+    }
+    if (containerAnimation && element) {
+      p1 = _getBounds3(element);
+      containerAnimation.seek(scrollerMax);
+      p2 = _getBounds3(element);
+      containerAnimation._caScrollDist = p1[direction.p] - p2[direction.p];
+      value = value / containerAnimation._caScrollDist * scrollerMax;
+    }
+    containerAnimation && containerAnimation.seek(time);
+    return containerAnimation ? value : Math.round(value);
+  };
+  var _prefixExp = /(webkit|moz|length|cssText|inset)/i;
+  var _reparent = function _reparent2(element, parent, top, left) {
+    if (element.parentNode !== parent) {
+      var style = element.style, p, cs;
+      if (parent === _body4) {
+        element._stOrig = style.cssText;
+        cs = _getComputedStyle3(element);
+        for (p in cs) {
+          if (!+p && !_prefixExp.test(p) && cs[p] && typeof style[p] === "string" && p !== "0") {
+            style[p] = cs[p];
           }
-        });
-        if (filter) {
-          preventOnFilter && evt.cancelable && evt.preventDefault();
-          return;
         }
-      }
-      if (options.handle && !closest(originalTarget, options.handle, el, false)) {
-        return;
-      }
-      this._prepareDragStart(evt, touch, target);
-    },
-    _prepareDragStart: function _prepareDragStart(evt, touch, target) {
-      var _this = this, el = _this.el, options = _this.options, ownerDocument = el.ownerDocument, dragStartFn;
-      if (target && !dragEl && target.parentNode === el) {
-        var dragRect = getRect(target);
-        rootEl = el;
-        dragEl = target;
-        parentEl = dragEl.parentNode;
-        nextEl = dragEl.nextSibling;
-        lastDownEl = target;
-        activeGroup = options.group;
-        Sortable.dragged = dragEl;
-        tapEvt = {
-          target: dragEl,
-          clientX: (touch || evt).clientX,
-          clientY: (touch || evt).clientY
-        };
-        tapDistanceLeft = tapEvt.clientX - dragRect.left;
-        tapDistanceTop = tapEvt.clientY - dragRect.top;
-        this._lastX = (touch || evt).clientX;
-        this._lastY = (touch || evt).clientY;
-        dragEl.style["will-change"] = "all";
-        dragStartFn = function dragStartFn2() {
-          pluginEvent2("delayEnded", _this, {
-            evt
-          });
-          if (Sortable.eventCanceled) {
-            _this._onDrop();
-            return;
-          }
-          _this._disableDelayedDragEvents();
-          if (!FireFox && _this.nativeDraggable) {
-            dragEl.draggable = true;
-          }
-          _this._triggerDragStart(evt, touch);
-          _dispatchEvent3({
-            sortable: _this,
-            name: "choose",
-            originalEvent: evt
-          });
-          toggleClass(dragEl, options.chosenClass, true);
-        };
-        options.ignore.split(",").forEach(function(criteria) {
-          find(dragEl, criteria.trim(), _disableDraggable);
-        });
-        on(ownerDocument, "dragover", nearestEmptyInsertDetectEvent);
-        on(ownerDocument, "mousemove", nearestEmptyInsertDetectEvent);
-        on(ownerDocument, "touchmove", nearestEmptyInsertDetectEvent);
-        on(ownerDocument, "mouseup", _this._onDrop);
-        on(ownerDocument, "touchend", _this._onDrop);
-        on(ownerDocument, "touchcancel", _this._onDrop);
-        if (FireFox && this.nativeDraggable) {
-          this.options.touchStartThreshold = 4;
-          dragEl.draggable = true;
-        }
-        pluginEvent2("delayStart", this, {
-          evt
-        });
-        if (options.delay && (!options.delayOnTouchOnly || touch) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
-          if (Sortable.eventCanceled) {
-            this._onDrop();
-            return;
-          }
-          on(ownerDocument, "mouseup", _this._disableDelayedDrag);
-          on(ownerDocument, "touchend", _this._disableDelayedDrag);
-          on(ownerDocument, "touchcancel", _this._disableDelayedDrag);
-          on(ownerDocument, "mousemove", _this._delayedDragTouchMoveHandler);
-          on(ownerDocument, "touchmove", _this._delayedDragTouchMoveHandler);
-          options.supportPointer && on(ownerDocument, "pointermove", _this._delayedDragTouchMoveHandler);
-          _this._dragStartTimer = setTimeout(dragStartFn, options.delay);
-        } else {
-          dragStartFn();
-        }
-      }
-    },
-    _delayedDragTouchMoveHandler: function _delayedDragTouchMoveHandler(e) {
-      var touch = e.touches ? e.touches[0] : e;
-      if (Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) >= Math.floor(this.options.touchStartThreshold / (this.nativeDraggable && window.devicePixelRatio || 1))) {
-        this._disableDelayedDrag();
-      }
-    },
-    _disableDelayedDrag: function _disableDelayedDrag() {
-      dragEl && _disableDraggable(dragEl);
-      clearTimeout(this._dragStartTimer);
-      this._disableDelayedDragEvents();
-    },
-    _disableDelayedDragEvents: function _disableDelayedDragEvents() {
-      var ownerDocument = this.el.ownerDocument;
-      off(ownerDocument, "mouseup", this._disableDelayedDrag);
-      off(ownerDocument, "touchend", this._disableDelayedDrag);
-      off(ownerDocument, "touchcancel", this._disableDelayedDrag);
-      off(ownerDocument, "mousemove", this._delayedDragTouchMoveHandler);
-      off(ownerDocument, "touchmove", this._delayedDragTouchMoveHandler);
-      off(ownerDocument, "pointermove", this._delayedDragTouchMoveHandler);
-    },
-    _triggerDragStart: function _triggerDragStart(evt, touch) {
-      touch = touch || evt.pointerType == "touch" && evt;
-      if (!this.nativeDraggable || touch) {
-        if (this.options.supportPointer) {
-          on(document, "pointermove", this._onTouchMove);
-        } else if (touch) {
-          on(document, "touchmove", this._onTouchMove);
-        } else {
-          on(document, "mousemove", this._onTouchMove);
-        }
+        style.top = top;
+        style.left = left;
       } else {
-        on(dragEl, "dragend", this);
-        on(rootEl, "dragstart", this._onDragStart);
+        style.cssText = element._stOrig;
       }
-      try {
-        if (document.selection) {
-          _nextTick(function() {
-            document.selection.empty();
-          });
+      gsap4.core.getCache(element).uncache = 1;
+      parent.appendChild(element);
+    }
+  };
+  var _interruptionTracker = function _interruptionTracker2(getValueFunc, initialValue, onInterrupt) {
+    var last1 = initialValue, last2 = last1;
+    return function(value) {
+      var current = Math.round(getValueFunc());
+      if (current !== last1 && current !== last2 && Math.abs(current - last1) > 3 && Math.abs(current - last2) > 3) {
+        value = current;
+        onInterrupt && onInterrupt();
+      }
+      last2 = last1;
+      last1 = value;
+      return value;
+    };
+  };
+  var _shiftMarker = function _shiftMarker2(marker, direction, value) {
+    var vars = {};
+    vars[direction.p] = "+=" + value;
+    gsap4.set(marker, vars);
+  };
+  var _getTweenCreator = function _getTweenCreator2(scroller, direction) {
+    var getScroll = _getScrollFunc(scroller, direction), prop = "_scroll" + direction.p2, getTween = function getTween2(scrollTo, vars, initialValue, change1, change2) {
+      var tween = getTween2.tween, onComplete = vars.onComplete, modifiers = {};
+      initialValue = initialValue || getScroll();
+      var checkForInterruption = _interruptionTracker(getScroll, initialValue, function() {
+        tween.kill();
+        getTween2.tween = 0;
+      });
+      change2 = change1 && change2 || 0;
+      change1 = change1 || scrollTo - initialValue;
+      tween && tween.kill();
+      vars[prop] = scrollTo;
+      vars.modifiers = modifiers;
+      modifiers[prop] = function() {
+        return checkForInterruption(initialValue + change1 * tween.ratio + change2 * tween.ratio * tween.ratio);
+      };
+      vars.onUpdate = function() {
+        _scrollers.cache++;
+        _updateAll();
+      };
+      vars.onComplete = function() {
+        getTween2.tween = 0;
+        onComplete && onComplete.call(tween);
+      };
+      tween = getTween2.tween = gsap4.to(scroller, vars);
+      return tween;
+    };
+    scroller[prop] = getScroll;
+    getScroll.wheelHandler = function() {
+      return getTween.tween && getTween.tween.kill() && (getTween.tween = 0);
+    };
+    _addListener5(scroller, "wheel", getScroll.wheelHandler);
+    ScrollTrigger2.isTouch && _addListener5(scroller, "touchmove", getScroll.wheelHandler);
+    return getTween;
+  };
+  var ScrollTrigger2 = /* @__PURE__ */ function() {
+    function ScrollTrigger3(vars, animation) {
+      _coreInitted4 || ScrollTrigger3.register(gsap4) || console.warn("Please gsap.registerPlugin(ScrollTrigger)");
+      _context4(this);
+      this.init(vars, animation);
+    }
+    var _proto = ScrollTrigger3.prototype;
+    _proto.init = function init4(vars, animation) {
+      this.progress = this.start = 0;
+      this.vars && this.kill(true, true);
+      if (!_enabled) {
+        this.update = this.refresh = this.kill = _passThrough3;
+        return;
+      }
+      vars = _setDefaults5(_isString3(vars) || _isNumber3(vars) || vars.nodeType ? {
+        trigger: vars
+      } : vars, _defaults2);
+      var _vars = vars, onUpdate = _vars.onUpdate, toggleClass = _vars.toggleClass, id = _vars.id, onToggle = _vars.onToggle, onRefresh = _vars.onRefresh, scrub = _vars.scrub, trigger = _vars.trigger, pin = _vars.pin, pinSpacing = _vars.pinSpacing, invalidateOnRefresh = _vars.invalidateOnRefresh, anticipatePin = _vars.anticipatePin, onScrubComplete = _vars.onScrubComplete, onSnapComplete = _vars.onSnapComplete, once = _vars.once, snap3 = _vars.snap, pinReparent = _vars.pinReparent, pinSpacer = _vars.pinSpacer, containerAnimation = _vars.containerAnimation, fastScrollEnd = _vars.fastScrollEnd, preventOverlaps = _vars.preventOverlaps, direction = vars.horizontal || vars.containerAnimation && vars.horizontal !== false ? _horizontal : _vertical, isToggle = !scrub && scrub !== 0, scroller = _getTarget(vars.scroller || _win6), scrollerCache = gsap4.core.getCache(scroller), isViewport = _isViewport3(scroller), useFixedPosition = ("pinType" in vars ? vars.pinType : _getProxyProp(scroller, "pinType") || isViewport && "fixed") === "fixed", callbacks = [vars.onEnter, vars.onLeave, vars.onEnterBack, vars.onLeaveBack], toggleActions = isToggle && vars.toggleActions.split(" "), markers = "markers" in vars ? vars.markers : _defaults2.markers, borderWidth = isViewport ? 0 : parseFloat(_getComputedStyle3(scroller)["border" + direction.p2 + _Width]) || 0, self = this, onRefreshInit = vars.onRefreshInit && function() {
+        return vars.onRefreshInit(self);
+      }, getScrollerSize = _getSizeFunc(scroller, isViewport, direction), getScrollerOffsets = _getOffsetsFunc(scroller, isViewport), lastSnap = 0, lastRefresh = 0, prevProgress = 0, scrollFunc = _getScrollFunc(scroller, direction), tweenTo, pinCache, snapFunc, scroll1, scroll2, start, end, markerStart, markerEnd, markerStartTrigger, markerEndTrigger, markerVars, executingOnRefresh, change, pinOriginalState, pinActiveState, pinState, spacer, offset, pinGetter, pinSetter, pinStart, pinChange, spacingStart, spacerState, markerStartSetter, pinMoves, markerEndSetter, cs, snap1, snap22, scrubTween, scrubSmooth, snapDurClamp, snapDelayedCall, prevScroll, prevAnimProgress, caMarkerSetter, customRevertReturn;
+      self._startClamp = self._endClamp = false;
+      self._dir = direction;
+      anticipatePin *= 45;
+      self.scroller = scroller;
+      self.scroll = containerAnimation ? containerAnimation.time.bind(containerAnimation) : scrollFunc;
+      scroll1 = scrollFunc();
+      self.vars = vars;
+      animation = animation || vars.animation;
+      if ("refreshPriority" in vars) {
+        _sort = 1;
+        vars.refreshPriority === -9999 && (_primary = self);
+      }
+      scrollerCache.tweenScroll = scrollerCache.tweenScroll || {
+        top: _getTweenCreator(scroller, _vertical),
+        left: _getTweenCreator(scroller, _horizontal)
+      };
+      self.tweenTo = tweenTo = scrollerCache.tweenScroll[direction.p];
+      self.scrubDuration = function(value) {
+        scrubSmooth = _isNumber3(value) && value;
+        if (!scrubSmooth) {
+          scrubTween && scrubTween.progress(1).kill();
+          scrubTween = 0;
         } else {
-          window.getSelection().removeAllRanges();
-        }
-      } catch (err) {
-      }
-    },
-    _dragStarted: function _dragStarted(fallback, evt) {
-      awaitingDragStarted = false;
-      if (rootEl && dragEl) {
-        pluginEvent2("dragStarted", this, {
-          evt
-        });
-        if (this.nativeDraggable) {
-          on(document, "dragover", _checkOutsideTargetEl);
-        }
-        var options = this.options;
-        !fallback && toggleClass(dragEl, options.dragClass, false);
-        toggleClass(dragEl, options.ghostClass, true);
-        Sortable.active = this;
-        fallback && this._appendGhost();
-        _dispatchEvent3({
-          sortable: this,
-          name: "start",
-          originalEvent: evt
-        });
-      } else {
-        this._nulling();
-      }
-    },
-    _emulateDragOver: function _emulateDragOver() {
-      if (touchEvt) {
-        this._lastX = touchEvt.clientX;
-        this._lastY = touchEvt.clientY;
-        _hideGhostForTarget();
-        var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-        var parent = target;
-        while (target && target.shadowRoot) {
-          target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-          if (target === parent)
-            break;
-          parent = target;
-        }
-        dragEl.parentNode[expando]._isOutsideThisEl(target);
-        if (parent) {
-          do {
-            if (parent[expando]) {
-              var inserted = void 0;
-              inserted = parent[expando]._onDragOver({
-                clientX: touchEvt.clientX,
-                clientY: touchEvt.clientY,
-                target,
-                rootEl: parent
-              });
-              if (inserted && !this.options.dragoverBubble) {
-                break;
-              }
+          scrubTween ? scrubTween.duration(value) : scrubTween = gsap4.to(animation, {
+            ease: "expo",
+            totalProgress: "+=0",
+            duration: scrubSmooth,
+            paused: true,
+            onComplete: function onComplete() {
+              return onScrubComplete && onScrubComplete(self);
             }
-            target = parent;
-          } while (parent = parent.parentNode);
+          });
         }
-        _unhideGhostForTarget();
+      };
+      if (animation) {
+        animation.vars.lazy = false;
+        animation._initted && !self.isReverted || animation.vars.immediateRender !== false && vars.immediateRender !== false && animation.duration() && animation.render(0, true, true);
+        self.animation = animation.pause();
+        animation.scrollTrigger = self;
+        self.scrubDuration(scrub);
+        snap1 = 0;
+        id || (id = animation.vars.id);
       }
-    },
-    _onTouchMove: function _onTouchMove(evt) {
-      if (tapEvt) {
-        var options = this.options, fallbackTolerance = options.fallbackTolerance, fallbackOffset = options.fallbackOffset, touch = evt.touches ? evt.touches[0] : evt, ghostMatrix = ghostEl && matrix(ghostEl, true), scaleX = ghostEl && ghostMatrix && ghostMatrix.a, scaleY = ghostEl && ghostMatrix && ghostMatrix.d, relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent), dx = (touch.clientX - tapEvt.clientX + fallbackOffset.x) / (scaleX || 1) + (relativeScrollOffset ? relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0] : 0) / (scaleX || 1), dy = (touch.clientY - tapEvt.clientY + fallbackOffset.y) / (scaleY || 1) + (relativeScrollOffset ? relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1] : 0) / (scaleY || 1);
-        if (!Sortable.active && !awaitingDragStarted) {
-          if (fallbackTolerance && Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) < fallbackTolerance) {
-            return;
-          }
-          this._onDragStart(evt, true);
+      if (snap3) {
+        if (!_isObject5(snap3) || snap3.push) {
+          snap3 = {
+            snapTo: snap3
+          };
         }
-        if (ghostEl) {
-          if (ghostMatrix) {
-            ghostMatrix.e += dx - (lastDx || 0);
-            ghostMatrix.f += dy - (lastDy || 0);
+        "scrollBehavior" in _body4.style && gsap4.set(isViewport ? [_body4, _docEl2] : scroller, {
+          scrollBehavior: "auto"
+        });
+        _scrollers.forEach(function(o) {
+          return _isFunction5(o) && o.target === (isViewport ? _doc6.scrollingElement || _docEl2 : scroller) && (o.smooth = false);
+        });
+        snapFunc = _isFunction5(snap3.snapTo) ? snap3.snapTo : snap3.snapTo === "labels" ? _getClosestLabel(animation) : snap3.snapTo === "labelsDirectional" ? _getLabelAtDirection(animation) : snap3.directional !== false ? function(value, st) {
+          return _snapDirectional(snap3.snapTo)(value, _getTime3() - lastRefresh < 500 ? 0 : st.direction);
+        } : gsap4.utils.snap(snap3.snapTo);
+        snapDurClamp = snap3.duration || {
+          min: 0.1,
+          max: 2
+        };
+        snapDurClamp = _isObject5(snapDurClamp) ? _clamp4(snapDurClamp.min, snapDurClamp.max) : _clamp4(snapDurClamp, snapDurClamp);
+        snapDelayedCall = gsap4.delayedCall(snap3.delay || scrubSmooth / 2 || 0.1, function() {
+          var scroll = scrollFunc(), refreshedRecently = _getTime3() - lastRefresh < 500, tween = tweenTo.tween;
+          if ((refreshedRecently || Math.abs(self.getVelocity()) < 10) && !tween && !_pointerIsDown && lastSnap !== scroll) {
+            var progress = (scroll - start) / change, totalProgress = animation && !isToggle ? animation.totalProgress() : progress, velocity = refreshedRecently ? 0 : (totalProgress - snap22) / (_getTime3() - _time2) * 1e3 || 0, change1 = gsap4.utils.clamp(-progress, 1 - progress, _abs(velocity / 2) * velocity / 0.185), naturalEnd = progress + (snap3.inertia === false ? 0 : change1), endValue = _clamp4(0, 1, snapFunc(naturalEnd, self)), endScroll = Math.round(start + endValue * change), _snap = snap3, onStart = _snap.onStart, _onInterrupt = _snap.onInterrupt, _onComplete = _snap.onComplete;
+            if (scroll <= end && scroll >= start && endScroll !== scroll) {
+              if (tween && !tween._initted && tween.data <= _abs(endScroll - scroll)) {
+                return;
+              }
+              if (snap3.inertia === false) {
+                change1 = endValue - progress;
+              }
+              tweenTo(endScroll, {
+                duration: snapDurClamp(_abs(Math.max(_abs(naturalEnd - totalProgress), _abs(endValue - totalProgress)) * 0.185 / velocity / 0.05 || 0)),
+                ease: snap3.ease || "power3",
+                data: _abs(endScroll - scroll),
+                // record the distance so that if another snap tween occurs (conflict) we can prioritize the closest snap.
+                onInterrupt: function onInterrupt() {
+                  return snapDelayedCall.restart(true) && _onInterrupt && _onInterrupt(self);
+                },
+                onComplete: function onComplete() {
+                  self.update();
+                  lastSnap = scrollFunc();
+                  snap1 = snap22 = animation && !isToggle ? animation.totalProgress() : self.progress;
+                  onSnapComplete && onSnapComplete(self);
+                  _onComplete && _onComplete(self);
+                }
+              }, scroll, change1 * change, endScroll - scroll - change1 * change);
+              onStart && onStart(self, tweenTo.tween);
+            }
+          } else if (self.isActive && lastSnap !== scroll) {
+            snapDelayedCall.restart(true);
+          }
+        }).pause();
+      }
+      id && (_ids[id] = self);
+      trigger = self.trigger = _getTarget(trigger || pin !== true && pin);
+      customRevertReturn = trigger && trigger._gsap && trigger._gsap.stRevert;
+      customRevertReturn && (customRevertReturn = customRevertReturn(self));
+      pin = pin === true ? trigger : _getTarget(pin);
+      _isString3(toggleClass) && (toggleClass = {
+        targets: trigger,
+        className: toggleClass
+      });
+      if (pin) {
+        pinSpacing === false || pinSpacing === _margin || (pinSpacing = !pinSpacing && pin.parentNode && pin.parentNode.style && _getComputedStyle3(pin.parentNode).display === "flex" ? false : _padding);
+        self.pin = pin;
+        pinCache = gsap4.core.getCache(pin);
+        if (!pinCache.spacer) {
+          if (pinSpacer) {
+            pinSpacer = _getTarget(pinSpacer);
+            pinSpacer && !pinSpacer.nodeType && (pinSpacer = pinSpacer.current || pinSpacer.nativeElement);
+            pinCache.spacerIsNative = !!pinSpacer;
+            pinSpacer && (pinCache.spacerState = _getState(pinSpacer));
+          }
+          pinCache.spacer = spacer = pinSpacer || _doc6.createElement("div");
+          spacer.classList.add("pin-spacer");
+          id && spacer.classList.add("pin-spacer-" + id);
+          pinCache.pinState = pinOriginalState = _getState(pin);
+        } else {
+          pinOriginalState = pinCache.pinState;
+        }
+        vars.force3D !== false && gsap4.set(pin, {
+          force3D: true
+        });
+        self.spacer = spacer = pinCache.spacer;
+        cs = _getComputedStyle3(pin);
+        spacingStart = cs[pinSpacing + direction.os2];
+        pinGetter = gsap4.getProperty(pin);
+        pinSetter = gsap4.quickSetter(pin, direction.a, _px);
+        _swapPinIn(pin, spacer, cs);
+        pinState = _getState(pin);
+      }
+      if (markers) {
+        markerVars = _isObject5(markers) ? _setDefaults5(markers, _markerDefaults) : _markerDefaults;
+        markerStartTrigger = _createMarker("scroller-start", id, scroller, direction, markerVars, 0);
+        markerEndTrigger = _createMarker("scroller-end", id, scroller, direction, markerVars, 0, markerStartTrigger);
+        offset = markerStartTrigger["offset" + direction.op.d2];
+        var content = _getTarget(_getProxyProp(scroller, "content") || scroller);
+        markerStart = this.markerStart = _createMarker("start", id, content, direction, markerVars, offset, 0, containerAnimation);
+        markerEnd = this.markerEnd = _createMarker("end", id, content, direction, markerVars, offset, 0, containerAnimation);
+        containerAnimation && (caMarkerSetter = gsap4.quickSetter([markerStart, markerEnd], direction.a, _px));
+        if (!useFixedPosition && !(_proxies.length && _getProxyProp(scroller, "fixedMarkers") === true)) {
+          _makePositionable(isViewport ? _body4 : scroller);
+          gsap4.set([markerStartTrigger, markerEndTrigger], {
+            force3D: true
+          });
+          markerStartSetter = gsap4.quickSetter(markerStartTrigger, direction.a, _px);
+          markerEndSetter = gsap4.quickSetter(markerEndTrigger, direction.a, _px);
+        }
+      }
+      if (containerAnimation) {
+        var oldOnUpdate = containerAnimation.vars.onUpdate, oldParams = containerAnimation.vars.onUpdateParams;
+        containerAnimation.eventCallback("onUpdate", function() {
+          self.update(0, 0, 1);
+          oldOnUpdate && oldOnUpdate.apply(containerAnimation, oldParams || []);
+        });
+      }
+      self.previous = function() {
+        return _triggers[_triggers.indexOf(self) - 1];
+      };
+      self.next = function() {
+        return _triggers[_triggers.indexOf(self) + 1];
+      };
+      self.revert = function(revert, temp) {
+        if (!temp) {
+          return self.kill(true);
+        }
+        var r = revert !== false || !self.enabled, prevRefreshing = _refreshing;
+        if (r !== self.isReverted) {
+          if (r) {
+            prevScroll = Math.max(scrollFunc(), self.scroll.rec || 0);
+            prevProgress = self.progress;
+            prevAnimProgress = animation && animation.progress();
+          }
+          markerStart && [markerStart, markerEnd, markerStartTrigger, markerEndTrigger].forEach(function(m) {
+            return m.style.display = r ? "none" : "block";
+          });
+          if (r) {
+            _refreshing = self;
+            self.update(r);
+          }
+          if (pin && (!pinReparent || !self.isActive)) {
+            if (r) {
+              _swapPinOut(pin, spacer, pinOriginalState);
+            } else {
+              _swapPinIn(pin, spacer, _getComputedStyle3(pin), spacerState);
+            }
+          }
+          r || self.update(r);
+          _refreshing = prevRefreshing;
+          self.isReverted = r;
+        }
+      };
+      self.refresh = function(soft, force, position, pinOffset) {
+        if ((_refreshing || !self.enabled) && !force) {
+          return;
+        }
+        if (pin && soft && _lastScrollTime) {
+          _addListener5(ScrollTrigger3, "scrollEnd", _softRefresh);
+          return;
+        }
+        !_refreshingAll && onRefreshInit && onRefreshInit(self);
+        _refreshing = self;
+        if (tweenTo.tween && !position) {
+          tweenTo.tween.kill();
+          tweenTo.tween = 0;
+        }
+        scrubTween && scrubTween.pause();
+        invalidateOnRefresh && animation && animation.revert({
+          kill: false
+        }).invalidate();
+        self.isReverted || self.revert(true, true);
+        self._subPinOffset = false;
+        var size = getScrollerSize(), scrollerBounds = getScrollerOffsets(), max = containerAnimation ? containerAnimation.duration() : _maxScroll(scroller, direction), isFirstRefresh = change <= 0.01, offset2 = 0, otherPinOffset = pinOffset || 0, parsedEnd = _isObject5(position) ? position.end : vars.end, parsedEndTrigger = vars.endTrigger || trigger, parsedStart = _isObject5(position) ? position.start : vars.start || (vars.start === 0 || !trigger ? 0 : pin ? "0 0" : "0 100%"), pinnedContainer = self.pinnedContainer = vars.pinnedContainer && _getTarget(vars.pinnedContainer, self), triggerIndex = trigger && Math.max(0, _triggers.indexOf(self)) || 0, i = triggerIndex, cs2, bounds, scroll, isVertical, override, curTrigger, curPin, oppositeScroll, initted, revertedPins, forcedOverflow, markerStartOffset, markerEndOffset;
+        if (markers && _isObject5(position)) {
+          markerStartOffset = gsap4.getProperty(markerStartTrigger, direction.p);
+          markerEndOffset = gsap4.getProperty(markerEndTrigger, direction.p);
+        }
+        while (i--) {
+          curTrigger = _triggers[i];
+          curTrigger.end || curTrigger.refresh(0, 1) || (_refreshing = self);
+          curPin = curTrigger.pin;
+          if (curPin && (curPin === trigger || curPin === pin || curPin === pinnedContainer) && !curTrigger.isReverted) {
+            revertedPins || (revertedPins = []);
+            revertedPins.unshift(curTrigger);
+            curTrigger.revert(true, true);
+          }
+          if (curTrigger !== _triggers[i]) {
+            triggerIndex--;
+            i--;
+          }
+        }
+        _isFunction5(parsedStart) && (parsedStart = parsedStart(self));
+        parsedStart = _parseClamp(parsedStart, "start", self);
+        start = _parsePosition3(parsedStart, trigger, size, direction, scrollFunc(), markerStart, markerStartTrigger, self, scrollerBounds, borderWidth, useFixedPosition, max, containerAnimation, self._startClamp && "_startClamp") || (pin ? -1e-3 : 0);
+        _isFunction5(parsedEnd) && (parsedEnd = parsedEnd(self));
+        if (_isString3(parsedEnd) && !parsedEnd.indexOf("+=")) {
+          if (~parsedEnd.indexOf(" ")) {
+            parsedEnd = (_isString3(parsedStart) ? parsedStart.split(" ")[0] : "") + parsedEnd;
           } else {
-            ghostMatrix = {
-              a: 1,
-              b: 0,
-              c: 0,
-              d: 1,
-              e: dx,
-              f: dy
+            offset2 = _offsetToPx(parsedEnd.substr(2), size);
+            parsedEnd = _isString3(parsedStart) ? parsedStart : (containerAnimation ? gsap4.utils.mapRange(0, containerAnimation.duration(), containerAnimation.scrollTrigger.start, containerAnimation.scrollTrigger.end, start) : start) + offset2;
+            parsedEndTrigger = trigger;
+          }
+        }
+        parsedEnd = _parseClamp(parsedEnd, "end", self);
+        end = Math.max(start, _parsePosition3(parsedEnd || (parsedEndTrigger ? "100% 0" : max), parsedEndTrigger, size, direction, scrollFunc() + offset2, markerEnd, markerEndTrigger, self, scrollerBounds, borderWidth, useFixedPosition, max, containerAnimation, self._endClamp && "_endClamp")) || -1e-3;
+        offset2 = 0;
+        i = triggerIndex;
+        while (i--) {
+          curTrigger = _triggers[i];
+          curPin = curTrigger.pin;
+          if (curPin && curTrigger.start - curTrigger._pinPush <= start && !containerAnimation && curTrigger.end > 0) {
+            cs2 = curTrigger.end - (self._startClamp ? Math.max(0, curTrigger.start) : curTrigger.start);
+            if ((curPin === trigger && curTrigger.start - curTrigger._pinPush < start || curPin === pinnedContainer) && isNaN(parsedStart)) {
+              offset2 += cs2 * (1 - curTrigger.progress);
+            }
+            curPin === pin && (otherPinOffset += cs2);
+          }
+        }
+        start += offset2;
+        end += offset2;
+        self._startClamp && (self._startClamp += offset2);
+        if (self._endClamp && !_refreshingAll) {
+          self._endClamp = end || -1e-3;
+          end = Math.min(end, _maxScroll(scroller, direction));
+        }
+        change = end - start || (start -= 0.01) && 1e-3;
+        if (isFirstRefresh) {
+          prevProgress = gsap4.utils.clamp(0, 1, gsap4.utils.normalize(start, end, prevScroll));
+        }
+        self._pinPush = otherPinOffset;
+        if (markerStart && offset2) {
+          cs2 = {};
+          cs2[direction.a] = "+=" + offset2;
+          pinnedContainer && (cs2[direction.p] = "-=" + scrollFunc());
+          gsap4.set([markerStart, markerEnd], cs2);
+        }
+        if (pin) {
+          cs2 = _getComputedStyle3(pin);
+          isVertical = direction === _vertical;
+          scroll = scrollFunc();
+          pinStart = parseFloat(pinGetter(direction.a)) + otherPinOffset;
+          if (!max && end > 1) {
+            forcedOverflow = (isViewport ? _doc6.scrollingElement || _docEl2 : scroller).style;
+            forcedOverflow = {
+              style: forcedOverflow,
+              value: forcedOverflow["overflow" + direction.a.toUpperCase()]
             };
+            if (isViewport && _getComputedStyle3(_body4)["overflow" + direction.a.toUpperCase()] !== "scroll") {
+              forcedOverflow.style["overflow" + direction.a.toUpperCase()] = "scroll";
+            }
           }
-          var cssMatrix = "matrix(".concat(ghostMatrix.a, ",").concat(ghostMatrix.b, ",").concat(ghostMatrix.c, ",").concat(ghostMatrix.d, ",").concat(ghostMatrix.e, ",").concat(ghostMatrix.f, ")");
-          css(ghostEl, "webkitTransform", cssMatrix);
-          css(ghostEl, "mozTransform", cssMatrix);
-          css(ghostEl, "msTransform", cssMatrix);
-          css(ghostEl, "transform", cssMatrix);
-          lastDx = dx;
-          lastDy = dy;
-          touchEvt = touch;
-        }
-        evt.cancelable && evt.preventDefault();
-      }
-    },
-    _appendGhost: function _appendGhost() {
-      if (!ghostEl) {
-        var container = this.options.fallbackOnBody ? document.body : rootEl, rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container), options = this.options;
-        if (PositionGhostAbsolutely) {
-          ghostRelativeParent = container;
-          while (css(ghostRelativeParent, "position") === "static" && css(ghostRelativeParent, "transform") === "none" && ghostRelativeParent !== document) {
-            ghostRelativeParent = ghostRelativeParent.parentNode;
+          _swapPinIn(pin, spacer, cs2);
+          pinState = _getState(pin);
+          bounds = _getBounds3(pin, true);
+          oppositeScroll = useFixedPosition && _getScrollFunc(scroller, isVertical ? _horizontal : _vertical)();
+          if (pinSpacing) {
+            spacerState = [pinSpacing + direction.os2, change + otherPinOffset + _px];
+            spacerState.t = spacer;
+            i = pinSpacing === _padding ? _getSize(pin, direction) + change + otherPinOffset : 0;
+            i && spacerState.push(direction.d, i + _px);
+            _setState(spacerState);
+            if (pinnedContainer) {
+              _triggers.forEach(function(t) {
+                if (t.pin === pinnedContainer && t.vars.pinSpacing !== false) {
+                  t._subPinOffset = true;
+                }
+              });
+            }
+            useFixedPosition && scrollFunc(prevScroll);
           }
-          if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
-            if (ghostRelativeParent === document)
-              ghostRelativeParent = getWindowScrollingElement();
-            rect.top += ghostRelativeParent.scrollTop;
-            rect.left += ghostRelativeParent.scrollLeft;
+          if (useFixedPosition) {
+            override = {
+              top: bounds.top + (isVertical ? scroll - start : oppositeScroll) + _px,
+              left: bounds.left + (isVertical ? oppositeScroll : scroll - start) + _px,
+              boxSizing: "border-box",
+              position: "fixed"
+            };
+            override[_width] = override["max" + _Width] = Math.ceil(bounds.width) + _px;
+            override[_height] = override["max" + _Height] = Math.ceil(bounds.height) + _px;
+            override[_margin] = override[_margin + _Top] = override[_margin + _Right] = override[_margin + _Bottom] = override[_margin + _Left] = "0";
+            override[_padding] = cs2[_padding];
+            override[_padding + _Top] = cs2[_padding + _Top];
+            override[_padding + _Right] = cs2[_padding + _Right];
+            override[_padding + _Bottom] = cs2[_padding + _Bottom];
+            override[_padding + _Left] = cs2[_padding + _Left];
+            pinActiveState = _copyState(pinOriginalState, override, pinReparent);
+            _refreshingAll && scrollFunc(0);
+          }
+          if (animation) {
+            initted = animation._initted;
+            _suppressOverwrites2(1);
+            animation.render(animation.duration(), true, true);
+            pinChange = pinGetter(direction.a) - pinStart + change + otherPinOffset;
+            pinMoves = Math.abs(change - pinChange) > 1;
+            useFixedPosition && pinMoves && pinActiveState.splice(pinActiveState.length - 2, 2);
+            animation.render(0, true, true);
+            initted || animation.invalidate(true);
+            animation.parent || animation.totalTime(animation.totalTime());
+            _suppressOverwrites2(0);
           } else {
-            ghostRelativeParent = getWindowScrollingElement();
+            pinChange = change;
           }
-          ghostRelativeParentInitialScroll = getRelativeScrollOffset(ghostRelativeParent);
+          forcedOverflow && (forcedOverflow.value ? forcedOverflow.style["overflow" + direction.a.toUpperCase()] = forcedOverflow.value : forcedOverflow.style.removeProperty("overflow-" + direction.a));
+        } else if (trigger && scrollFunc() && !containerAnimation) {
+          bounds = trigger.parentNode;
+          while (bounds && bounds !== _body4) {
+            if (bounds._pinOffset) {
+              start -= bounds._pinOffset;
+              end -= bounds._pinOffset;
+            }
+            bounds = bounds.parentNode;
+          }
         }
-        ghostEl = dragEl.cloneNode(true);
-        toggleClass(ghostEl, options.ghostClass, false);
-        toggleClass(ghostEl, options.fallbackClass, true);
-        toggleClass(ghostEl, options.dragClass, true);
-        css(ghostEl, "transition", "");
-        css(ghostEl, "transform", "");
-        css(ghostEl, "box-sizing", "border-box");
-        css(ghostEl, "margin", 0);
-        css(ghostEl, "top", rect.top);
-        css(ghostEl, "left", rect.left);
-        css(ghostEl, "width", rect.width);
-        css(ghostEl, "height", rect.height);
-        css(ghostEl, "opacity", "0.8");
-        css(ghostEl, "position", PositionGhostAbsolutely ? "absolute" : "fixed");
-        css(ghostEl, "zIndex", "100000");
-        css(ghostEl, "pointerEvents", "none");
-        Sortable.ghost = ghostEl;
-        container.appendChild(ghostEl);
-        css(ghostEl, "transform-origin", tapDistanceLeft / parseInt(ghostEl.style.width) * 100 + "% " + tapDistanceTop / parseInt(ghostEl.style.height) * 100 + "%");
-      }
-    },
-    _onDragStart: function _onDragStart(evt, fallback) {
-      var _this = this;
-      var dataTransfer = evt.dataTransfer;
-      var options = _this.options;
-      pluginEvent2("dragStart", this, {
-        evt
-      });
-      if (Sortable.eventCanceled) {
-        this._onDrop();
-        return;
-      }
-      pluginEvent2("setupClone", this);
-      if (!Sortable.eventCanceled) {
-        cloneEl = clone(dragEl);
-        cloneEl.removeAttribute("id");
-        cloneEl.draggable = false;
-        cloneEl.style["will-change"] = "";
-        this._hideClone();
-        toggleClass(cloneEl, this.options.chosenClass, false);
-        Sortable.clone = cloneEl;
-      }
-      _this.cloneId = _nextTick(function() {
-        pluginEvent2("clone", _this);
-        if (Sortable.eventCanceled)
-          return;
-        if (!_this.options.removeCloneOnHide) {
-          rootEl.insertBefore(cloneEl, dragEl);
-        }
-        _this._hideClone();
-        _dispatchEvent3({
-          sortable: _this,
-          name: "clone"
+        revertedPins && revertedPins.forEach(function(t) {
+          return t.revert(false, true);
         });
-      });
-      !fallback && toggleClass(dragEl, options.dragClass, true);
-      if (fallback) {
-        ignoreNextClick = true;
-        _this._loopId = setInterval(_this._emulateDragOver, 50);
-      } else {
-        off(document, "mouseup", _this._onDrop);
-        off(document, "touchend", _this._onDrop);
-        off(document, "touchcancel", _this._onDrop);
-        if (dataTransfer) {
-          dataTransfer.effectAllowed = "move";
-          options.setData && options.setData.call(_this, dataTransfer, dragEl);
+        self.start = start;
+        self.end = end;
+        scroll1 = scroll2 = _refreshingAll ? prevScroll : scrollFunc();
+        if (!containerAnimation && !_refreshingAll) {
+          scroll1 < prevScroll && scrollFunc(prevScroll);
+          self.scroll.rec = 0;
         }
-        on(document, "drop", _this);
-        css(dragEl, "transform", "translateZ(0)");
-      }
-      awaitingDragStarted = true;
-      _this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));
-      on(document, "selectstart", _this);
-      moved = true;
-      if (Safari) {
-        css(document.body, "user-select", "none");
-      }
-    },
-    // Returns true - if no further action is needed (either inserted or another condition)
-    _onDragOver: function _onDragOver(evt) {
-      var el = this.el, target = evt.target, dragRect, targetRect, revert, options = this.options, group = options.group, activeSortable = Sortable.active, isOwner = activeGroup === group, canSort = options.sort, fromSortable = putSortable || activeSortable, vertical, _this = this, completedFired = false;
-      if (_silent)
-        return;
-      function dragOverEvent(name, extra) {
-        pluginEvent2(name, _this, _objectSpread2({
-          evt,
-          isOwner,
-          axis: vertical ? "vertical" : "horizontal",
-          revert,
-          dragRect,
-          targetRect,
-          canSort,
-          fromSortable,
-          target,
-          completed,
-          onMove: function onMove(target2, after2) {
-            return _onMove(rootEl, el, dragEl, dragRect, target2, getRect(target2), evt, after2);
-          },
-          changed
-        }, extra));
-      }
-      function capture() {
-        dragOverEvent("dragOverAnimationCapture");
-        _this.captureAnimationState();
-        if (_this !== fromSortable) {
-          fromSortable.captureAnimationState();
+        self.revert(false, true);
+        lastRefresh = _getTime3();
+        if (snapDelayedCall) {
+          lastSnap = -1;
+          snapDelayedCall.restart(true);
         }
-      }
-      function completed(insertion) {
-        dragOverEvent("dragOverCompleted", {
-          insertion
-        });
-        if (insertion) {
-          if (isOwner) {
-            activeSortable._hideClone();
-          } else {
-            activeSortable._showClone(_this);
-          }
-          if (_this !== fromSortable) {
-            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-            toggleClass(dragEl, options.ghostClass, true);
-          }
-          if (putSortable !== _this && _this !== Sortable.active) {
-            putSortable = _this;
-          } else if (_this === Sortable.active && putSortable) {
-            putSortable = null;
-          }
-          if (fromSortable === _this) {
-            _this._ignoreWhileAnimating = target;
-          }
-          _this.animateAll(function() {
-            dragOverEvent("dragOverAnimationComplete");
-            _this._ignoreWhileAnimating = null;
-          });
-          if (_this !== fromSortable) {
-            fromSortable.animateAll();
-            fromSortable._ignoreWhileAnimating = null;
-          }
+        _refreshing = 0;
+        animation && isToggle && (animation._initted || prevAnimProgress) && animation.progress() !== prevAnimProgress && animation.progress(prevAnimProgress || 0, true).render(animation.time(), true, true);
+        if (isFirstRefresh || prevProgress !== self.progress || containerAnimation) {
+          animation && !isToggle && animation.totalProgress(containerAnimation && start < -1e-3 && !prevProgress ? gsap4.utils.normalize(start, end, 0) : prevProgress, true);
+          self.progress = isFirstRefresh || (scroll1 - start) / change === prevProgress ? 0 : prevProgress;
         }
-        if (target === dragEl && !dragEl.animated || target === el && !target.animated) {
-          lastTarget = null;
+        pin && pinSpacing && (spacer._pinOffset = Math.round(self.progress * pinChange));
+        scrubTween && scrubTween.invalidate();
+        if (!isNaN(markerStartOffset)) {
+          markerStartOffset -= gsap4.getProperty(markerStartTrigger, direction.p);
+          markerEndOffset -= gsap4.getProperty(markerEndTrigger, direction.p);
+          _shiftMarker(markerStartTrigger, direction, markerStartOffset);
+          _shiftMarker(markerStart, direction, markerStartOffset - (pinOffset || 0));
+          _shiftMarker(markerEndTrigger, direction, markerEndOffset);
+          _shiftMarker(markerEnd, direction, markerEndOffset - (pinOffset || 0));
         }
-        if (!options.dragoverBubble && !evt.rootEl && target !== document) {
-          dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
-          !insertion && nearestEmptyInsertDetectEvent(evt);
+        isFirstRefresh && !_refreshingAll && self.update();
+        if (onRefresh && !_refreshingAll && !executingOnRefresh) {
+          executingOnRefresh = true;
+          onRefresh(self);
+          executingOnRefresh = false;
         }
-        !options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
-        return completedFired = true;
-      }
-      function changed() {
-        newIndex = index(dragEl);
-        newDraggableIndex = index(dragEl, options.draggable);
-        _dispatchEvent3({
-          sortable: _this,
-          name: "change",
-          toEl: el,
-          newIndex,
-          newDraggableIndex,
-          originalEvent: evt
-        });
-      }
-      if (evt.preventDefault !== void 0) {
-        evt.cancelable && evt.preventDefault();
-      }
-      target = closest(target, options.draggable, el, true);
-      dragOverEvent("dragOver");
-      if (Sortable.eventCanceled)
-        return completedFired;
-      if (dragEl.contains(evt.target) || target.animated && target.animatingX && target.animatingY || _this._ignoreWhileAnimating === target) {
-        return completed(false);
-      }
-      ignoreNextClick = false;
-      if (activeSortable && !options.disabled && (isOwner ? canSort || (revert = parentEl !== rootEl) : putSortable === this || (this.lastPutMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) && group.checkPut(this, activeSortable, dragEl, evt))) {
-        vertical = this._getDirection(evt, target) === "vertical";
-        dragRect = getRect(dragEl);
-        dragOverEvent("dragOverValid");
-        if (Sortable.eventCanceled)
-          return completedFired;
-        if (revert) {
-          parentEl = rootEl;
-          capture();
-          this._hideClone();
-          dragOverEvent("revert");
-          if (!Sortable.eventCanceled) {
-            if (nextEl) {
-              rootEl.insertBefore(dragEl, nextEl);
-            } else {
-              rootEl.appendChild(dragEl);
-            }
-          }
-          return completed(true);
-        }
-        var elLastChild = lastChild(el, options.draggable);
-        if (!elLastChild || _ghostIsLast(evt, vertical, this) && !elLastChild.animated) {
-          if (elLastChild === dragEl) {
-            return completed(false);
-          }
-          if (elLastChild && el === evt.target) {
-            target = elLastChild;
-          }
-          if (target) {
-            targetRect = getRect(target);
-          }
-          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
-            capture();
-            if (elLastChild && elLastChild.nextSibling) {
-              el.insertBefore(dragEl, elLastChild.nextSibling);
-            } else {
-              el.appendChild(dragEl);
-            }
-            parentEl = el;
-            changed();
-            return completed(true);
-          }
-        } else if (elLastChild && _ghostIsFirst(evt, vertical, this)) {
-          var firstChild = getChild(el, 0, options, true);
-          if (firstChild === dragEl) {
-            return completed(false);
-          }
-          target = firstChild;
-          targetRect = getRect(target);
-          if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, false) !== false) {
-            capture();
-            el.insertBefore(dragEl, firstChild);
-            parentEl = el;
-            changed();
-            return completed(true);
-          }
-        } else if (target.parentNode === el) {
-          targetRect = getRect(target);
-          var direction = 0, targetBeforeFirstSwap, differentLevel = dragEl.parentNode !== el, differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical), side1 = vertical ? "top" : "left", scrolledPastTop = isScrolledPast(target, "top", "top") || isScrolledPast(dragEl, "top", "top"), scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
-          if (lastTarget !== target) {
-            targetBeforeFirstSwap = targetRect[side1];
-            pastFirstInvertThresh = false;
-            isCircumstantialInvert = !differentRowCol && options.invertSwap || differentLevel;
-          }
-          direction = _getSwapDirection(evt, target, targetRect, vertical, differentRowCol ? 1 : options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold, isCircumstantialInvert, lastTarget === target);
-          var sibling;
-          if (direction !== 0) {
-            var dragIndex = index(dragEl);
-            do {
-              dragIndex -= direction;
-              sibling = parentEl.children[dragIndex];
-            } while (sibling && (css(sibling, "display") === "none" || sibling === ghostEl));
-          }
-          if (direction === 0 || sibling === target) {
-            return completed(false);
-          }
-          lastTarget = target;
-          lastDirection = direction;
-          var nextSibling = target.nextElementSibling, after = false;
-          after = direction === 1;
-          var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
-          if (moveVector !== false) {
-            if (moveVector === 1 || moveVector === -1) {
-              after = moveVector === 1;
-            }
-            _silent = true;
-            setTimeout(_unsilent, 30);
-            capture();
-            if (after && !nextSibling) {
-              el.appendChild(dragEl);
-            } else {
-              target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-            }
-            if (scrolledPastTop) {
-              scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);
-            }
-            parentEl = dragEl.parentNode;
-            if (targetBeforeFirstSwap !== void 0 && !isCircumstantialInvert) {
-              targetMoveDistance = Math.abs(targetBeforeFirstSwap - getRect(target)[side1]);
-            }
-            changed();
-            return completed(true);
-          }
-        }
-        if (el.contains(dragEl)) {
-          return completed(false);
-        }
-      }
-      return false;
-    },
-    _ignoreWhileAnimating: null,
-    _offMoveEvents: function _offMoveEvents() {
-      off(document, "mousemove", this._onTouchMove);
-      off(document, "touchmove", this._onTouchMove);
-      off(document, "pointermove", this._onTouchMove);
-      off(document, "dragover", nearestEmptyInsertDetectEvent);
-      off(document, "mousemove", nearestEmptyInsertDetectEvent);
-      off(document, "touchmove", nearestEmptyInsertDetectEvent);
-    },
-    _offUpEvents: function _offUpEvents() {
-      var ownerDocument = this.el.ownerDocument;
-      off(ownerDocument, "mouseup", this._onDrop);
-      off(ownerDocument, "touchend", this._onDrop);
-      off(ownerDocument, "pointerup", this._onDrop);
-      off(ownerDocument, "touchcancel", this._onDrop);
-      off(document, "selectstart", this);
-    },
-    _onDrop: function _onDrop(evt) {
-      var el = this.el, options = this.options;
-      newIndex = index(dragEl);
-      newDraggableIndex = index(dragEl, options.draggable);
-      pluginEvent2("drop", this, {
-        evt
-      });
-      parentEl = dragEl && dragEl.parentNode;
-      newIndex = index(dragEl);
-      newDraggableIndex = index(dragEl, options.draggable);
-      if (Sortable.eventCanceled) {
-        this._nulling();
-        return;
-      }
-      awaitingDragStarted = false;
-      isCircumstantialInvert = false;
-      pastFirstInvertThresh = false;
-      clearInterval(this._loopId);
-      clearTimeout(this._dragStartTimer);
-      _cancelNextTick(this.cloneId);
-      _cancelNextTick(this._dragStartId);
-      if (this.nativeDraggable) {
-        off(document, "drop", this);
-        off(el, "dragstart", this._onDragStart);
-      }
-      this._offMoveEvents();
-      this._offUpEvents();
-      if (Safari) {
-        css(document.body, "user-select", "");
-      }
-      css(dragEl, "transform", "");
-      if (evt) {
-        if (moved) {
-          evt.cancelable && evt.preventDefault();
-          !options.dropBubble && evt.stopPropagation();
-        }
-        ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
-        if (rootEl === parentEl || putSortable && putSortable.lastPutMode !== "clone") {
-          cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
-        }
-        if (dragEl) {
-          if (this.nativeDraggable) {
-            off(dragEl, "dragend", this);
-          }
-          _disableDraggable(dragEl);
-          dragEl.style["will-change"] = "";
-          if (moved && !awaitingDragStarted) {
-            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
-          }
-          toggleClass(dragEl, this.options.chosenClass, false);
-          _dispatchEvent3({
-            sortable: this,
-            name: "unchoose",
-            toEl: parentEl,
-            newIndex: null,
-            newDraggableIndex: null,
-            originalEvent: evt
-          });
-          if (rootEl !== parentEl) {
-            if (newIndex >= 0) {
-              _dispatchEvent3({
-                rootEl: parentEl,
-                name: "add",
-                toEl: parentEl,
-                fromEl: rootEl,
-                originalEvent: evt
-              });
-              _dispatchEvent3({
-                sortable: this,
-                name: "remove",
-                toEl: parentEl,
-                originalEvent: evt
-              });
-              _dispatchEvent3({
-                rootEl: parentEl,
-                name: "sort",
-                toEl: parentEl,
-                fromEl: rootEl,
-                originalEvent: evt
-              });
-              _dispatchEvent3({
-                sortable: this,
-                name: "sort",
-                toEl: parentEl,
-                originalEvent: evt
-              });
-            }
-            putSortable && putSortable.save();
-          } else {
-            if (newIndex !== oldIndex) {
-              if (newIndex >= 0) {
-                _dispatchEvent3({
-                  sortable: this,
-                  name: "update",
-                  toEl: parentEl,
-                  originalEvent: evt
-                });
-                _dispatchEvent3({
-                  sortable: this,
-                  name: "sort",
-                  toEl: parentEl,
-                  originalEvent: evt
-                });
-              }
-            }
-          }
-          if (Sortable.active) {
-            if (newIndex == null || newIndex === -1) {
-              newIndex = oldIndex;
-              newDraggableIndex = oldDraggableIndex;
-            }
-            _dispatchEvent3({
-              sortable: this,
-              name: "end",
-              toEl: parentEl,
-              originalEvent: evt
-            });
-            this.save();
-          }
-        }
-      }
-      this._nulling();
-    },
-    _nulling: function _nulling() {
-      pluginEvent2("nulling", this);
-      rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = newDraggableIndex = oldIndex = oldDraggableIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable.dragged = Sortable.ghost = Sortable.clone = Sortable.active = null;
-      savedInputChecked.forEach(function(el) {
-        el.checked = true;
-      });
-      savedInputChecked.length = lastDx = lastDy = 0;
-    },
-    handleEvent: function handleEvent(evt) {
-      switch (evt.type) {
-        case "drop":
-        case "dragend":
-          this._onDrop(evt);
-          break;
-        case "dragenter":
-        case "dragover":
-          if (dragEl) {
-            this._onDragOver(evt);
-            _globalDragOver(evt);
-          }
-          break;
-        case "selectstart":
-          evt.preventDefault();
-          break;
-      }
-    },
-    /**
-     * Serializes the item into an array of string.
-     * @returns {String[]}
-     */
-    toArray: function toArray3() {
-      var order = [], el, children = this.el.children, i = 0, n = children.length, options = this.options;
-      for (; i < n; i++) {
-        el = children[i];
-        if (closest(el, options.draggable, this.el, false)) {
-          order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));
-        }
-      }
-      return order;
-    },
-    /**
-     * Sorts the elements according to the array.
-     * @param  {String[]}  order  order of the items
-     */
-    sort: function sort(order, useAnimation) {
-      var items = {}, rootEl2 = this.el;
-      this.toArray().forEach(function(id, i) {
-        var el = rootEl2.children[i];
-        if (closest(el, this.options.draggable, rootEl2, false)) {
-          items[id] = el;
-        }
-      }, this);
-      useAnimation && this.captureAnimationState();
-      order.forEach(function(id) {
-        if (items[id]) {
-          rootEl2.removeChild(items[id]);
-          rootEl2.appendChild(items[id]);
-        }
-      });
-      useAnimation && this.animateAll();
-    },
-    /**
-     * Save the current sorting
-     */
-    save: function save() {
-      var store = this.options.store;
-      store && store.set && store.set(this);
-    },
-    /**
-     * For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
-     * @param   {HTMLElement}  el
-     * @param   {String}       [selector]  default: `options.draggable`
-     * @returns {HTMLElement|null}
-     */
-    closest: function closest$1(el, selector3) {
-      return closest(el, selector3 || this.options.draggable, this.el, false);
-    },
-    /**
-     * Set/get option
-     * @param   {string} name
-     * @param   {*}      [value]
-     * @returns {*}
-     */
-    option: function option(name, value) {
-      var options = this.options;
-      if (value === void 0) {
-        return options[name];
-      } else {
-        var modifiedValue = PluginManager.modifyOption(this, name, value);
-        if (typeof modifiedValue !== "undefined") {
-          options[name] = modifiedValue;
-        } else {
-          options[name] = value;
-        }
-        if (name === "group") {
-          _prepareGroup(options);
-        }
-      }
-    },
-    /**
-     * Destroy
-     */
-    destroy: function destroy() {
-      pluginEvent2("destroy", this);
-      var el = this.el;
-      el[expando] = null;
-      off(el, "mousedown", this._onTapStart);
-      off(el, "touchstart", this._onTapStart);
-      off(el, "pointerdown", this._onTapStart);
-      if (this.nativeDraggable) {
-        off(el, "dragover", this);
-        off(el, "dragenter", this);
-      }
-      Array.prototype.forEach.call(el.querySelectorAll("[draggable]"), function(el2) {
-        el2.removeAttribute("draggable");
-      });
-      this._onDrop();
-      this._disableDelayedDragEvents();
-      sortables.splice(sortables.indexOf(this.el), 1);
-      this.el = el = null;
-    },
-    _hideClone: function _hideClone() {
-      if (!cloneHidden) {
-        pluginEvent2("hideClone", this);
-        if (Sortable.eventCanceled)
-          return;
-        css(cloneEl, "display", "none");
-        if (this.options.removeCloneOnHide && cloneEl.parentNode) {
-          cloneEl.parentNode.removeChild(cloneEl);
-        }
-        cloneHidden = true;
-      }
-    },
-    _showClone: function _showClone(putSortable2) {
-      if (putSortable2.lastPutMode !== "clone") {
-        this._hideClone();
-        return;
-      }
-      if (cloneHidden) {
-        pluginEvent2("showClone", this);
-        if (Sortable.eventCanceled)
-          return;
-        if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {
-          rootEl.insertBefore(cloneEl, dragEl);
-        } else if (nextEl) {
-          rootEl.insertBefore(cloneEl, nextEl);
-        } else {
-          rootEl.appendChild(cloneEl);
-        }
-        if (this.options.group.revertClone) {
-          this.animate(dragEl, cloneEl);
-        }
-        css(cloneEl, "display", "");
-        cloneHidden = false;
-      }
-    }
-  };
-  function _globalDragOver(evt) {
-    if (evt.dataTransfer) {
-      evt.dataTransfer.dropEffect = "move";
-    }
-    evt.cancelable && evt.preventDefault();
-  }
-  function _onMove(fromEl, toEl, dragEl2, dragRect, targetEl, targetRect, originalEvent, willInsertAfter) {
-    var evt, sortable = fromEl[expando], onMoveFn = sortable.options.onMove, retVal;
-    if (window.CustomEvent && !IE11OrLess && !Edge) {
-      evt = new CustomEvent("move", {
-        bubbles: true,
-        cancelable: true
-      });
-    } else {
-      evt = document.createEvent("Event");
-      evt.initEvent("move", true, true);
-    }
-    evt.to = toEl;
-    evt.from = fromEl;
-    evt.dragged = dragEl2;
-    evt.draggedRect = dragRect;
-    evt.related = targetEl || toEl;
-    evt.relatedRect = targetRect || getRect(toEl);
-    evt.willInsertAfter = willInsertAfter;
-    evt.originalEvent = originalEvent;
-    fromEl.dispatchEvent(evt);
-    if (onMoveFn) {
-      retVal = onMoveFn.call(sortable, evt, originalEvent);
-    }
-    return retVal;
-  }
-  function _disableDraggable(el) {
-    el.draggable = false;
-  }
-  function _unsilent() {
-    _silent = false;
-  }
-  function _ghostIsFirst(evt, vertical, sortable) {
-    var rect = getRect(getChild(sortable.el, 0, sortable.options, true));
-    var spacer = 10;
-    return vertical ? evt.clientX < rect.left - spacer || evt.clientY < rect.top && evt.clientX < rect.right : evt.clientY < rect.top - spacer || evt.clientY < rect.bottom && evt.clientX < rect.left;
-  }
-  function _ghostIsLast(evt, vertical, sortable) {
-    var rect = getRect(lastChild(sortable.el, sortable.options.draggable));
-    var spacer = 10;
-    return vertical ? evt.clientX > rect.right + spacer || evt.clientX <= rect.right && evt.clientY > rect.bottom && evt.clientX >= rect.left : evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer;
-  }
-  function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
-    var mouseOnAxis = vertical ? evt.clientY : evt.clientX, targetLength = vertical ? targetRect.height : targetRect.width, targetS1 = vertical ? targetRect.top : targetRect.left, targetS2 = vertical ? targetRect.bottom : targetRect.right, invert = false;
-    if (!invertSwap) {
-      if (isLastTarget && targetMoveDistance < targetLength * swapThreshold) {
-        if (!pastFirstInvertThresh && (lastDirection === 1 ? mouseOnAxis > targetS1 + targetLength * invertedSwapThreshold / 2 : mouseOnAxis < targetS2 - targetLength * invertedSwapThreshold / 2)) {
-          pastFirstInvertThresh = true;
-        }
-        if (!pastFirstInvertThresh) {
-          if (lastDirection === 1 ? mouseOnAxis < targetS1 + targetMoveDistance : mouseOnAxis > targetS2 - targetMoveDistance) {
-            return -lastDirection;
-          }
-        } else {
-          invert = true;
-        }
-      } else {
-        if (mouseOnAxis > targetS1 + targetLength * (1 - swapThreshold) / 2 && mouseOnAxis < targetS2 - targetLength * (1 - swapThreshold) / 2) {
-          return _getInsertDirection(target);
-        }
-      }
-    }
-    invert = invert || invertSwap;
-    if (invert) {
-      if (mouseOnAxis < targetS1 + targetLength * invertedSwapThreshold / 2 || mouseOnAxis > targetS2 - targetLength * invertedSwapThreshold / 2) {
-        return mouseOnAxis > targetS1 + targetLength / 2 ? 1 : -1;
-      }
-    }
-    return 0;
-  }
-  function _getInsertDirection(target) {
-    if (index(dragEl) < index(target)) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-  function _generateId(el) {
-    var str = el.tagName + el.className + el.src + el.href + el.textContent, i = str.length, sum = 0;
-    while (i--) {
-      sum += str.charCodeAt(i);
-    }
-    return sum.toString(36);
-  }
-  function _saveInputCheckedState(root) {
-    savedInputChecked.length = 0;
-    var inputs = root.getElementsByTagName("input");
-    var idx = inputs.length;
-    while (idx--) {
-      var el = inputs[idx];
-      el.checked && savedInputChecked.push(el);
-    }
-  }
-  function _nextTick(fn) {
-    return setTimeout(fn, 0);
-  }
-  function _cancelNextTick(id) {
-    return clearTimeout(id);
-  }
-  if (documentExists) {
-    on(document, "touchmove", function(evt) {
-      if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
-        evt.preventDefault();
-      }
-    });
-  }
-  Sortable.utils = {
-    on,
-    off,
-    css,
-    find,
-    is: function is(el, selector3) {
-      return !!closest(el, selector3, el, false);
-    },
-    extend,
-    throttle,
-    closest,
-    toggleClass,
-    clone,
-    index,
-    nextTick: _nextTick,
-    cancelNextTick: _cancelNextTick,
-    detectDirection: _detectDirection,
-    getChild
-  };
-  Sortable.get = function(element) {
-    return element[expando];
-  };
-  Sortable.mount = function() {
-    for (var _len = arguments.length, plugins2 = new Array(_len), _key = 0; _key < _len; _key++) {
-      plugins2[_key] = arguments[_key];
-    }
-    if (plugins2[0].constructor === Array)
-      plugins2 = plugins2[0];
-    plugins2.forEach(function(plugin) {
-      if (!plugin.prototype || !plugin.prototype.constructor) {
-        throw "Sortable: Mounted plugin must be a constructor function, not ".concat({}.toString.call(plugin));
-      }
-      if (plugin.utils)
-        Sortable.utils = _objectSpread2(_objectSpread2({}, Sortable.utils), plugin.utils);
-      PluginManager.mount(plugin);
-    });
-  };
-  Sortable.create = function(el, options) {
-    return new Sortable(el, options);
-  };
-  Sortable.version = version;
-  var autoScrolls = [];
-  var scrollEl;
-  var scrollRootEl;
-  var scrolling = false;
-  var lastAutoScrollX;
-  var lastAutoScrollY;
-  var touchEvt$1;
-  var pointerElemChangedInterval;
-  function AutoScrollPlugin() {
-    function AutoScroll() {
-      this.defaults = {
-        scroll: true,
-        forceAutoScrollFallback: false,
-        scrollSensitivity: 30,
-        scrollSpeed: 10,
-        bubbleScroll: true
       };
-      for (var fn in this) {
-        if (fn.charAt(0) === "_" && typeof this[fn] === "function") {
-          this[fn] = this[fn].bind(this);
+      self.getVelocity = function() {
+        return (scrollFunc() - scroll2) / (_getTime3() - _time2) * 1e3 || 0;
+      };
+      self.endAnimation = function() {
+        _endAnimation(self.callbackAnimation);
+        if (animation) {
+          scrubTween ? scrubTween.progress(1) : !animation.paused() ? _endAnimation(animation, animation.reversed()) : isToggle || _endAnimation(animation, self.direction < 0, 1);
         }
-      }
-    }
-    AutoScroll.prototype = {
-      dragStarted: function dragStarted(_ref) {
-        var originalEvent = _ref.originalEvent;
-        if (this.sortable.nativeDraggable) {
-          on(document, "dragover", this._handleAutoScroll);
-        } else {
-          if (this.options.supportPointer) {
-            on(document, "pointermove", this._handleFallbackAutoScroll);
-          } else if (originalEvent.touches) {
-            on(document, "touchmove", this._handleFallbackAutoScroll);
-          } else {
-            on(document, "mousemove", this._handleFallbackAutoScroll);
+      };
+      self.labelToScroll = function(label) {
+        return animation && animation.labels && (start || self.refresh() || start) + animation.labels[label] / animation.duration() * change || 0;
+      };
+      self.getTrailing = function(name) {
+        var i = _triggers.indexOf(self), a = self.direction > 0 ? _triggers.slice(0, i).reverse() : _triggers.slice(i + 1);
+        return (_isString3(name) ? a.filter(function(t) {
+          return t.vars.preventOverlaps === name;
+        }) : a).filter(function(t) {
+          return self.direction > 0 ? t.end <= start : t.start >= end;
+        });
+      };
+      self.update = function(reset, recordVelocity, forceFake) {
+        if (containerAnimation && !forceFake && !reset) {
+          return;
+        }
+        var scroll = _refreshingAll === true ? prevScroll : self.scroll(), p = reset ? 0 : (scroll - start) / change, clipped = p < 0 ? 0 : p > 1 ? 1 : p || 0, prevProgress2 = self.progress, isActive, wasActive, toggleState, action, stateChanged, toggled, isAtMax, isTakingAction;
+        if (recordVelocity) {
+          scroll2 = scroll1;
+          scroll1 = containerAnimation ? scrollFunc() : scroll;
+          if (snap3) {
+            snap22 = snap1;
+            snap1 = animation && !isToggle ? animation.totalProgress() : clipped;
           }
         }
-      },
-      dragOverCompleted: function dragOverCompleted(_ref2) {
-        var originalEvent = _ref2.originalEvent;
-        if (!this.options.dragOverBubble && !originalEvent.rootEl) {
-          this._handleAutoScroll(originalEvent);
-        }
-      },
-      drop: function drop3() {
-        if (this.sortable.nativeDraggable) {
-          off(document, "dragover", this._handleAutoScroll);
-        } else {
-          off(document, "pointermove", this._handleFallbackAutoScroll);
-          off(document, "touchmove", this._handleFallbackAutoScroll);
-          off(document, "mousemove", this._handleFallbackAutoScroll);
-        }
-        clearPointerElemChangedInterval();
-        clearAutoScrolls();
-        cancelThrottle();
-      },
-      nulling: function nulling() {
-        touchEvt$1 = scrollRootEl = scrollEl = scrolling = pointerElemChangedInterval = lastAutoScrollX = lastAutoScrollY = null;
-        autoScrolls.length = 0;
-      },
-      _handleFallbackAutoScroll: function _handleFallbackAutoScroll(evt) {
-        this._handleAutoScroll(evt, true);
-      },
-      _handleAutoScroll: function _handleAutoScroll(evt, fallback) {
-        var _this = this;
-        var x = (evt.touches ? evt.touches[0] : evt).clientX, y = (evt.touches ? evt.touches[0] : evt).clientY, elem = document.elementFromPoint(x, y);
-        touchEvt$1 = evt;
-        if (fallback || this.options.forceAutoScrollFallback || Edge || IE11OrLess || Safari) {
-          autoScroll(evt, this.options, elem, fallback);
-          var ogElemScroller = getParentAutoScrollElement(elem, true);
-          if (scrolling && (!pointerElemChangedInterval || x !== lastAutoScrollX || y !== lastAutoScrollY)) {
-            pointerElemChangedInterval && clearPointerElemChangedInterval();
-            pointerElemChangedInterval = setInterval(function() {
-              var newElem = getParentAutoScrollElement(document.elementFromPoint(x, y), true);
-              if (newElem !== ogElemScroller) {
-                ogElemScroller = newElem;
-                clearAutoScrolls();
-              }
-              autoScroll(evt, _this.options, newElem, fallback);
-            }, 10);
-            lastAutoScrollX = x;
-            lastAutoScrollY = y;
-          }
-        } else {
-          if (!this.options.bubbleScroll || getParentAutoScrollElement(elem, true) === getWindowScrollingElement()) {
-            clearAutoScrolls();
-            return;
-          }
-          autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);
-        }
-      }
-    };
-    return _extends(AutoScroll, {
-      pluginName: "scroll",
-      initializeByDefault: true
-    });
-  }
-  function clearAutoScrolls() {
-    autoScrolls.forEach(function(autoScroll2) {
-      clearInterval(autoScroll2.pid);
-    });
-    autoScrolls = [];
-  }
-  function clearPointerElemChangedInterval() {
-    clearInterval(pointerElemChangedInterval);
-  }
-  var autoScroll = throttle(function(evt, options, rootEl2, isFallback) {
-    if (!options.scroll)
-      return;
-    var x = (evt.touches ? evt.touches[0] : evt).clientX, y = (evt.touches ? evt.touches[0] : evt).clientY, sens = options.scrollSensitivity, speed = options.scrollSpeed, winScroller = getWindowScrollingElement();
-    var scrollThisInstance = false, scrollCustomFn;
-    if (scrollRootEl !== rootEl2) {
-      scrollRootEl = rootEl2;
-      clearAutoScrolls();
-      scrollEl = options.scroll;
-      scrollCustomFn = options.scrollFn;
-      if (scrollEl === true) {
-        scrollEl = getParentAutoScrollElement(rootEl2, true);
-      }
-    }
-    var layersOut = 0;
-    var currentParent = scrollEl;
-    do {
-      var el = currentParent, rect = getRect(el), top = rect.top, bottom = rect.bottom, left = rect.left, right = rect.right, width = rect.width, height = rect.height, canScrollX = void 0, canScrollY = void 0, scrollWidth = el.scrollWidth, scrollHeight = el.scrollHeight, elCSS = css(el), scrollPosX = el.scrollLeft, scrollPosY = el.scrollTop;
-      if (el === winScroller) {
-        canScrollX = width < scrollWidth && (elCSS.overflowX === "auto" || elCSS.overflowX === "scroll" || elCSS.overflowX === "visible");
-        canScrollY = height < scrollHeight && (elCSS.overflowY === "auto" || elCSS.overflowY === "scroll" || elCSS.overflowY === "visible");
-      } else {
-        canScrollX = width < scrollWidth && (elCSS.overflowX === "auto" || elCSS.overflowX === "scroll");
-        canScrollY = height < scrollHeight && (elCSS.overflowY === "auto" || elCSS.overflowY === "scroll");
-      }
-      var vx = canScrollX && (Math.abs(right - x) <= sens && scrollPosX + width < scrollWidth) - (Math.abs(left - x) <= sens && !!scrollPosX);
-      var vy = canScrollY && (Math.abs(bottom - y) <= sens && scrollPosY + height < scrollHeight) - (Math.abs(top - y) <= sens && !!scrollPosY);
-      if (!autoScrolls[layersOut]) {
-        for (var i = 0; i <= layersOut; i++) {
-          if (!autoScrolls[i]) {
-            autoScrolls[i] = {};
-          }
-        }
-      }
-      if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el) {
-        autoScrolls[layersOut].el = el;
-        autoScrolls[layersOut].vx = vx;
-        autoScrolls[layersOut].vy = vy;
-        clearInterval(autoScrolls[layersOut].pid);
-        if (vx != 0 || vy != 0) {
-          scrollThisInstance = true;
-          autoScrolls[layersOut].pid = setInterval(function() {
-            if (isFallback && this.layer === 0) {
-              Sortable.active._onTouchMove(touchEvt$1);
+        anticipatePin && !clipped && pin && !_refreshing && !_startup2 && _lastScrollTime && start < scroll + (scroll - scroll2) / (_getTime3() - _time2) * anticipatePin && (clipped = 1e-4);
+        if (clipped !== prevProgress2 && self.enabled) {
+          isActive = self.isActive = !!clipped && clipped < 1;
+          wasActive = !!prevProgress2 && prevProgress2 < 1;
+          toggled = isActive !== wasActive;
+          stateChanged = toggled || !!clipped !== !!prevProgress2;
+          self.direction = clipped > prevProgress2 ? 1 : -1;
+          self.progress = clipped;
+          if (stateChanged && !_refreshing) {
+            toggleState = clipped && !prevProgress2 ? 0 : clipped === 1 ? 1 : prevProgress2 === 1 ? 2 : 3;
+            if (isToggle) {
+              action = !toggled && toggleActions[toggleState + 1] !== "none" && toggleActions[toggleState + 1] || toggleActions[toggleState];
+              isTakingAction = animation && (action === "complete" || action === "reset" || action in animation);
             }
-            var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;
-            var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;
-            if (typeof scrollCustomFn === "function") {
-              if (scrollCustomFn.call(Sortable.dragged.parentNode[expando], scrollOffsetX, scrollOffsetY, evt, touchEvt$1, autoScrolls[this.layer].el) !== "continue") {
+          }
+          preventOverlaps && (toggled || isTakingAction) && (isTakingAction || scrub || !animation) && (_isFunction5(preventOverlaps) ? preventOverlaps(self) : self.getTrailing(preventOverlaps).forEach(function(t) {
+            return t.endAnimation();
+          }));
+          if (!isToggle) {
+            if (scrubTween && !_refreshing && !_startup2) {
+              scrubTween._dp._time - scrubTween._start !== scrubTween._time && scrubTween.render(scrubTween._dp._time - scrubTween._start);
+              if (scrubTween.resetTo) {
+                scrubTween.resetTo("totalProgress", clipped, animation._tTime / animation._tDur);
+              } else {
+                scrubTween.vars.totalProgress = clipped;
+                scrubTween.invalidate().restart();
+              }
+            } else if (animation) {
+              animation.totalProgress(clipped, !!(_refreshing && (lastRefresh || reset)));
+            }
+          }
+          if (pin) {
+            reset && pinSpacing && (spacer.style[pinSpacing + direction.os2] = spacingStart);
+            if (!useFixedPosition) {
+              pinSetter(_round5(pinStart + pinChange * clipped));
+            } else if (stateChanged) {
+              isAtMax = !reset && clipped > prevProgress2 && end + 1 > scroll && scroll + 1 >= _maxScroll(scroller, direction);
+              if (pinReparent) {
+                if (!reset && (isActive || isAtMax)) {
+                  var bounds = _getBounds3(pin, true), _offset = scroll - start;
+                  _reparent(pin, _body4, bounds.top + (direction === _vertical ? _offset : 0) + _px, bounds.left + (direction === _vertical ? 0 : _offset) + _px);
+                } else {
+                  _reparent(pin, spacer);
+                }
+              }
+              _setState(isActive || isAtMax ? pinActiveState : pinState);
+              pinMoves && clipped < 1 && isActive || pinSetter(pinStart + (clipped === 1 && !isAtMax ? pinChange : 0));
+            }
+          }
+          snap3 && !tweenTo.tween && !_refreshing && !_startup2 && snapDelayedCall.restart(true);
+          toggleClass && (toggled || once && clipped && (clipped < 1 || !_limitCallbacks)) && _toArray2(toggleClass.targets).forEach(function(el) {
+            return el.classList[isActive || once ? "add" : "remove"](toggleClass.className);
+          });
+          onUpdate && !isToggle && !reset && onUpdate(self);
+          if (stateChanged && !_refreshing) {
+            if (isToggle) {
+              if (isTakingAction) {
+                if (action === "complete") {
+                  animation.pause().totalProgress(1);
+                } else if (action === "reset") {
+                  animation.restart(true).pause();
+                } else if (action === "restart") {
+                  animation.restart(true);
+                } else {
+                  animation[action]();
+                }
+              }
+              onUpdate && onUpdate(self);
+            }
+            if (toggled || !_limitCallbacks) {
+              onToggle && toggled && _callback3(self, onToggle);
+              callbacks[toggleState] && _callback3(self, callbacks[toggleState]);
+              once && (clipped === 1 ? self.kill(false, 1) : callbacks[toggleState] = 0);
+              if (!toggled) {
+                toggleState = clipped === 1 ? 1 : 3;
+                callbacks[toggleState] && _callback3(self, callbacks[toggleState]);
+              }
+            }
+            if (fastScrollEnd && !isActive && Math.abs(self.getVelocity()) > (_isNumber3(fastScrollEnd) ? fastScrollEnd : 2500)) {
+              _endAnimation(self.callbackAnimation);
+              scrubTween ? scrubTween.progress(1) : _endAnimation(animation, action === "reverse" ? 1 : !clipped, 1);
+            }
+          } else if (isToggle && onUpdate && !_refreshing) {
+            onUpdate(self);
+          }
+        }
+        if (markerEndSetter) {
+          var n = containerAnimation ? scroll / containerAnimation.duration() * (containerAnimation._caScrollDist || 0) : scroll;
+          markerStartSetter(n + (markerStartTrigger._isFlipped ? 1 : 0));
+          markerEndSetter(n);
+        }
+        caMarkerSetter && caMarkerSetter(-scroll / containerAnimation.duration() * (containerAnimation._caScrollDist || 0));
+      };
+      self.enable = function(reset, refresh) {
+        if (!self.enabled) {
+          self.enabled = true;
+          _addListener5(scroller, "resize", _onResize);
+          isViewport || _addListener5(scroller, "scroll", _onScroll3);
+          onRefreshInit && _addListener5(ScrollTrigger3, "refreshInit", onRefreshInit);
+          if (reset !== false) {
+            self.progress = prevProgress = 0;
+            scroll1 = scroll2 = lastSnap = scrollFunc();
+          }
+          refresh !== false && self.refresh();
+        }
+      };
+      self.getTween = function(snap4) {
+        return snap4 && tweenTo ? tweenTo.tween : scrubTween;
+      };
+      self.setPositions = function(newStart, newEnd, keepClamp, pinOffset) {
+        if (containerAnimation) {
+          var st = containerAnimation.scrollTrigger, duration = containerAnimation.duration(), _change = st.end - st.start;
+          newStart = st.start + _change * newStart / duration;
+          newEnd = st.start + _change * newEnd / duration;
+        }
+        self.refresh(false, false, {
+          start: _keepClamp(newStart, keepClamp && !!self._startClamp),
+          end: _keepClamp(newEnd, keepClamp && !!self._endClamp)
+        }, pinOffset);
+        self.update();
+      };
+      self.adjustPinSpacing = function(amount) {
+        if (spacerState && amount) {
+          var i = spacerState.indexOf(direction.d) + 1;
+          spacerState[i] = parseFloat(spacerState[i]) + amount + _px;
+          spacerState[1] = parseFloat(spacerState[1]) + amount + _px;
+          _setState(spacerState);
+        }
+      };
+      self.disable = function(reset, allowAnimation) {
+        if (self.enabled) {
+          reset !== false && self.revert(true, true);
+          self.enabled = self.isActive = false;
+          allowAnimation || scrubTween && scrubTween.pause();
+          prevScroll = 0;
+          pinCache && (pinCache.uncache = 1);
+          onRefreshInit && _removeListener5(ScrollTrigger3, "refreshInit", onRefreshInit);
+          if (snapDelayedCall) {
+            snapDelayedCall.pause();
+            tweenTo.tween && tweenTo.tween.kill() && (tweenTo.tween = 0);
+          }
+          if (!isViewport) {
+            var i = _triggers.length;
+            while (i--) {
+              if (_triggers[i].scroller === scroller && _triggers[i] !== self) {
                 return;
               }
             }
-            scrollBy(autoScrolls[this.layer].el, scrollOffsetX, scrollOffsetY);
-          }.bind({
-            layer: layersOut
-          }), 24);
+            _removeListener5(scroller, "resize", _onResize);
+            isViewport || _removeListener5(scroller, "scroll", _onScroll3);
+          }
+        }
+      };
+      self.kill = function(revert, allowAnimation) {
+        self.disable(revert, allowAnimation);
+        scrubTween && !allowAnimation && scrubTween.kill();
+        id && delete _ids[id];
+        var i = _triggers.indexOf(self);
+        i >= 0 && _triggers.splice(i, 1);
+        i === _i && _direction > 0 && _i--;
+        i = 0;
+        _triggers.forEach(function(t) {
+          return t.scroller === self.scroller && (i = 1);
+        });
+        i || _refreshingAll || (self.scroll.rec = 0);
+        if (animation) {
+          animation.scrollTrigger = null;
+          revert && animation.revert({
+            kill: false
+          });
+          allowAnimation || animation.kill();
+        }
+        markerStart && [markerStart, markerEnd, markerStartTrigger, markerEndTrigger].forEach(function(m) {
+          return m.parentNode && m.parentNode.removeChild(m);
+        });
+        _primary === self && (_primary = 0);
+        if (pin) {
+          pinCache && (pinCache.uncache = 1);
+          i = 0;
+          _triggers.forEach(function(t) {
+            return t.pin === pin && i++;
+          });
+          i || (pinCache.spacer = 0);
+        }
+        vars.onKill && vars.onKill(self);
+      };
+      _triggers.push(self);
+      self.enable(false, false);
+      customRevertReturn && customRevertReturn(self);
+      if (animation && animation.add && !change) {
+        var updateFunc = self.update;
+        self.update = function() {
+          self.update = updateFunc;
+          start || end || self.refresh();
+        };
+        gsap4.delayedCall(0.01, self.update);
+        change = 0.01;
+        start = end = 0;
+      } else {
+        self.refresh();
+      }
+      pin && _queueRefreshAll();
+    };
+    ScrollTrigger3.register = function register(core) {
+      if (!_coreInitted4) {
+        gsap4 = core || _getGSAP5();
+        _windowExists7() && window.document && ScrollTrigger3.enable();
+        _coreInitted4 = _enabled;
+      }
+      return _coreInitted4;
+    };
+    ScrollTrigger3.defaults = function defaults3(config3) {
+      if (config3) {
+        for (var p in config3) {
+          _defaults2[p] = config3[p];
         }
       }
-      layersOut++;
-    } while (options.bubbleScroll && currentParent !== winScroller && (currentParent = getParentAutoScrollElement(currentParent, false)));
-    scrolling = scrollThisInstance;
-  }, 30);
-  var drop = function drop2(_ref) {
-    var originalEvent = _ref.originalEvent, putSortable2 = _ref.putSortable, dragEl2 = _ref.dragEl, activeSortable = _ref.activeSortable, dispatchSortableEvent = _ref.dispatchSortableEvent, hideGhostForTarget = _ref.hideGhostForTarget, unhideGhostForTarget = _ref.unhideGhostForTarget;
-    if (!originalEvent)
-      return;
-    var toSortable = putSortable2 || activeSortable;
-    hideGhostForTarget();
-    var touch = originalEvent.changedTouches && originalEvent.changedTouches.length ? originalEvent.changedTouches[0] : originalEvent;
-    var target = document.elementFromPoint(touch.clientX, touch.clientY);
-    unhideGhostForTarget();
-    if (toSortable && !toSortable.el.contains(target)) {
-      dispatchSortableEvent("spill");
-      this.onSpill({
-        dragEl: dragEl2,
-        putSortable: putSortable2
+      return _defaults2;
+    };
+    ScrollTrigger3.disable = function disable(reset, kill) {
+      _enabled = 0;
+      _triggers.forEach(function(trigger) {
+        return trigger[kill ? "kill" : "disable"](reset);
+      });
+      _removeListener5(_win6, "wheel", _onScroll3);
+      _removeListener5(_doc6, "scroll", _onScroll3);
+      clearInterval(_syncInterval);
+      _removeListener5(_doc6, "touchcancel", _passThrough3);
+      _removeListener5(_body4, "touchstart", _passThrough3);
+      _multiListener(_removeListener5, _doc6, "pointerdown,touchstart,mousedown", _pointerDownHandler);
+      _multiListener(_removeListener5, _doc6, "pointerup,touchend,mouseup", _pointerUpHandler);
+      _resizeDelay.kill();
+      _iterateAutoRefresh(_removeListener5);
+      for (var i = 0; i < _scrollers.length; i += 3) {
+        _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 1]);
+        _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 2]);
+      }
+    };
+    ScrollTrigger3.enable = function enable() {
+      _win6 = window;
+      _doc6 = document;
+      _docEl2 = _doc6.documentElement;
+      _body4 = _doc6.body;
+      if (gsap4) {
+        _toArray2 = gsap4.utils.toArray;
+        _clamp4 = gsap4.utils.clamp;
+        _context4 = gsap4.core.context || _passThrough3;
+        _suppressOverwrites2 = gsap4.core.suppressOverwrites || _passThrough3;
+        _scrollRestoration = _win6.history.scrollRestoration || "auto";
+        _lastScroll = _win6.pageYOffset;
+        gsap4.core.globals("ScrollTrigger", ScrollTrigger3);
+        if (_body4) {
+          _enabled = 1;
+          _div100vh = document.createElement("div");
+          _div100vh.style.height = "100vh";
+          _div100vh.style.position = "absolute";
+          _refresh100vh();
+          _rafBugFix();
+          Observer.register(gsap4);
+          ScrollTrigger3.isTouch = Observer.isTouch;
+          _fixIOSBug = Observer.isTouch && /(iPad|iPhone|iPod|Mac)/g.test(navigator.userAgent);
+          _addListener5(_win6, "wheel", _onScroll3);
+          _root2 = [_win6, _doc6, _docEl2, _body4];
+          if (gsap4.matchMedia) {
+            ScrollTrigger3.matchMedia = function(vars) {
+              var mm = gsap4.matchMedia(), p;
+              for (p in vars) {
+                mm.add(p, vars[p]);
+              }
+              return mm;
+            };
+            gsap4.addEventListener("matchMediaInit", function() {
+              return _revertAll();
+            });
+            gsap4.addEventListener("matchMediaRevert", function() {
+              return _revertRecorded();
+            });
+            gsap4.addEventListener("matchMedia", function() {
+              _refreshAll(0, 1);
+              _dispatch3("matchMedia");
+            });
+            gsap4.matchMedia("(orientation: portrait)", function() {
+              _setBaseDimensions();
+              return _setBaseDimensions;
+            });
+          } else {
+            console.warn("Requires GSAP 3.11.0 or later");
+          }
+          _setBaseDimensions();
+          _addListener5(_doc6, "scroll", _onScroll3);
+          var bodyStyle = _body4.style, border = bodyStyle.borderTopStyle, AnimationProto = gsap4.core.Animation.prototype, bounds, i;
+          AnimationProto.revert || Object.defineProperty(AnimationProto, "revert", {
+            value: function value() {
+              return this.time(-0.01, true);
+            }
+          });
+          bodyStyle.borderTopStyle = "solid";
+          bounds = _getBounds3(_body4);
+          _vertical.m = Math.round(bounds.top + _vertical.sc()) || 0;
+          _horizontal.m = Math.round(bounds.left + _horizontal.sc()) || 0;
+          border ? bodyStyle.borderTopStyle = border : bodyStyle.removeProperty("border-top-style");
+          _syncInterval = setInterval(_sync, 250);
+          gsap4.delayedCall(0.5, function() {
+            return _startup2 = 0;
+          });
+          _addListener5(_doc6, "touchcancel", _passThrough3);
+          _addListener5(_body4, "touchstart", _passThrough3);
+          _multiListener(_addListener5, _doc6, "pointerdown,touchstart,mousedown", _pointerDownHandler);
+          _multiListener(_addListener5, _doc6, "pointerup,touchend,mouseup", _pointerUpHandler);
+          _transformProp4 = gsap4.utils.checkPrefix("transform");
+          _stateProps.push(_transformProp4);
+          _coreInitted4 = _getTime3();
+          _resizeDelay = gsap4.delayedCall(0.2, _refreshAll).pause();
+          _autoRefresh = [_doc6, "visibilitychange", function() {
+            var w = _win6.innerWidth, h = _win6.innerHeight;
+            if (_doc6.hidden) {
+              _prevWidth = w;
+              _prevHeight = h;
+            } else if (_prevWidth !== w || _prevHeight !== h) {
+              _onResize();
+            }
+          }, _doc6, "DOMContentLoaded", _refreshAll, _win6, "load", _refreshAll, _win6, "resize", _onResize];
+          _iterateAutoRefresh(_addListener5);
+          _triggers.forEach(function(trigger) {
+            return trigger.enable(0, 1);
+          });
+          for (i = 0; i < _scrollers.length; i += 3) {
+            _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 1]);
+            _wheelListener(_removeListener5, _scrollers[i], _scrollers[i + 2]);
+          }
+        }
+      }
+    };
+    ScrollTrigger3.config = function config3(vars) {
+      "limitCallbacks" in vars && (_limitCallbacks = !!vars.limitCallbacks);
+      var ms = vars.syncInterval;
+      ms && clearInterval(_syncInterval) || (_syncInterval = ms) && setInterval(_sync, ms);
+      "ignoreMobileResize" in vars && (_ignoreMobileResize = ScrollTrigger3.isTouch === 1 && vars.ignoreMobileResize);
+      if ("autoRefreshEvents" in vars) {
+        _iterateAutoRefresh(_removeListener5) || _iterateAutoRefresh(_addListener5, vars.autoRefreshEvents || "none");
+        _ignoreResize = (vars.autoRefreshEvents + "").indexOf("resize") === -1;
+      }
+    };
+    ScrollTrigger3.scrollerProxy = function scrollerProxy(target, vars) {
+      var t = _getTarget(target), i = _scrollers.indexOf(t), isViewport = _isViewport3(t);
+      if (~i) {
+        _scrollers.splice(i, isViewport ? 6 : 2);
+      }
+      if (vars) {
+        isViewport ? _proxies.unshift(_win6, vars, _body4, vars, _docEl2, vars) : _proxies.unshift(t, vars);
+      }
+    };
+    ScrollTrigger3.clearMatchMedia = function clearMatchMedia(query) {
+      _triggers.forEach(function(t) {
+        return t._ctx && t._ctx.query === query && t._ctx.kill(true, true);
+      });
+    };
+    ScrollTrigger3.isInViewport = function isInViewport(element, ratio, horizontal) {
+      var bounds = (_isString3(element) ? _getTarget(element) : element).getBoundingClientRect(), offset = bounds[horizontal ? _width : _height] * ratio || 0;
+      return horizontal ? bounds.right - offset > 0 && bounds.left + offset < _win6.innerWidth : bounds.bottom - offset > 0 && bounds.top + offset < _win6.innerHeight;
+    };
+    ScrollTrigger3.positionInViewport = function positionInViewport(element, referencePoint, horizontal) {
+      _isString3(element) && (element = _getTarget(element));
+      var bounds = element.getBoundingClientRect(), size = bounds[horizontal ? _width : _height], offset = referencePoint == null ? size / 2 : referencePoint in _keywords ? _keywords[referencePoint] * size : ~referencePoint.indexOf("%") ? parseFloat(referencePoint) * size / 100 : parseFloat(referencePoint) || 0;
+      return horizontal ? (bounds.left + offset) / _win6.innerWidth : (bounds.top + offset) / _win6.innerHeight;
+    };
+    ScrollTrigger3.killAll = function killAll(allowListeners) {
+      _triggers.slice(0).forEach(function(t) {
+        return t.vars.id !== "ScrollSmoother" && t.kill();
+      });
+      if (allowListeners !== true) {
+        var listeners = _listeners2.killAll || [];
+        _listeners2 = {};
+        listeners.forEach(function(f) {
+          return f();
+        });
+      }
+    };
+    return ScrollTrigger3;
+  }();
+  ScrollTrigger2.version = "3.12.2";
+  ScrollTrigger2.saveStyles = function(targets) {
+    return targets ? _toArray2(targets).forEach(function(target) {
+      if (target && target.style) {
+        var i = _savedStyles.indexOf(target);
+        i >= 0 && _savedStyles.splice(i, 5);
+        _savedStyles.push(target, target.style.cssText, target.getBBox && target.getAttribute("transform"), gsap4.core.getCache(target), _context4());
+      }
+    }) : _savedStyles;
+  };
+  ScrollTrigger2.revert = function(soft, media) {
+    return _revertAll(!soft, media);
+  };
+  ScrollTrigger2.create = function(vars, animation) {
+    return new ScrollTrigger2(vars, animation);
+  };
+  ScrollTrigger2.refresh = function(safe) {
+    return safe ? _onResize() : (_coreInitted4 || ScrollTrigger2.register()) && _refreshAll(true);
+  };
+  ScrollTrigger2.update = function(force) {
+    return ++_scrollers.cache && _updateAll(force === true ? 2 : 0);
+  };
+  ScrollTrigger2.clearScrollMemory = _clearScrollMemory;
+  ScrollTrigger2.maxScroll = function(element, horizontal) {
+    return _maxScroll(element, horizontal ? _horizontal : _vertical);
+  };
+  ScrollTrigger2.getScrollFunc = function(element, horizontal) {
+    return _getScrollFunc(_getTarget(element), horizontal ? _horizontal : _vertical);
+  };
+  ScrollTrigger2.getById = function(id) {
+    return _ids[id];
+  };
+  ScrollTrigger2.getAll = function() {
+    return _triggers.filter(function(t) {
+      return t.vars.id !== "ScrollSmoother";
+    });
+  };
+  ScrollTrigger2.isScrolling = function() {
+    return !!_lastScrollTime;
+  };
+  ScrollTrigger2.snapDirectional = _snapDirectional;
+  ScrollTrigger2.addEventListener = function(type, callback) {
+    var a = _listeners2[type] || (_listeners2[type] = []);
+    ~a.indexOf(callback) || a.push(callback);
+  };
+  ScrollTrigger2.removeEventListener = function(type, callback) {
+    var a = _listeners2[type], i = a && a.indexOf(callback);
+    i >= 0 && a.splice(i, 1);
+  };
+  ScrollTrigger2.batch = function(targets, vars) {
+    var result = [], varsCopy = {}, interval = vars.interval || 0.016, batchMax = vars.batchMax || 1e9, proxyCallback = function proxyCallback2(type, callback) {
+      var elements = [], triggers = [], delay = gsap4.delayedCall(interval, function() {
+        callback(elements, triggers);
+        elements = [];
+        triggers = [];
+      }).pause();
+      return function(self) {
+        elements.length || delay.restart(true);
+        elements.push(self.trigger);
+        triggers.push(self);
+        batchMax <= elements.length && delay.progress(1);
+      };
+    }, p;
+    for (p in vars) {
+      varsCopy[p] = p.substr(0, 2) === "on" && _isFunction5(vars[p]) && p !== "onRefreshInit" ? proxyCallback(p, vars[p]) : vars[p];
+    }
+    if (_isFunction5(batchMax)) {
+      batchMax = batchMax();
+      _addListener5(ScrollTrigger2, "refresh", function() {
+        return batchMax = vars.batchMax();
       });
     }
-  };
-  function Revert() {
-  }
-  Revert.prototype = {
-    startIndex: null,
-    dragStart: function dragStart(_ref2) {
-      var oldDraggableIndex2 = _ref2.oldDraggableIndex;
-      this.startIndex = oldDraggableIndex2;
-    },
-    onSpill: function onSpill(_ref3) {
-      var dragEl2 = _ref3.dragEl, putSortable2 = _ref3.putSortable;
-      this.sortable.captureAnimationState();
-      if (putSortable2) {
-        putSortable2.captureAnimationState();
+    _toArray2(targets).forEach(function(target) {
+      var config3 = {};
+      for (p in varsCopy) {
+        config3[p] = varsCopy[p];
       }
-      var nextSibling = getChild(this.sortable.el, this.startIndex, this.options);
-      if (nextSibling) {
-        this.sortable.el.insertBefore(dragEl2, nextSibling);
+      config3.trigger = target;
+      result.push(ScrollTrigger2.create(config3));
+    });
+    return result;
+  };
+  var _clampScrollAndGetDurationMultiplier = function _clampScrollAndGetDurationMultiplier2(scrollFunc, current, end, max) {
+    current > max ? scrollFunc(max) : current < 0 && scrollFunc(0);
+    return end > max ? (max - current) / (end - current) : end < 0 ? current / (current - end) : 1;
+  };
+  var _allowNativePanning = function _allowNativePanning2(target, direction) {
+    if (direction === true) {
+      target.style.removeProperty("touch-action");
+    } else {
+      target.style.touchAction = direction === true ? "auto" : direction ? "pan-" + direction + (Observer.isTouch ? " pinch-zoom" : "") : "none";
+    }
+    target === _docEl2 && _allowNativePanning2(_body4, direction);
+  };
+  var _overflow = {
+    auto: 1,
+    scroll: 1
+  };
+  var _nestedScroll = function _nestedScroll2(_ref5) {
+    var event = _ref5.event, target = _ref5.target, axis = _ref5.axis;
+    var node = (event.changedTouches ? event.changedTouches[0] : event).target, cache2 = node._gsap || gsap4.core.getCache(node), time = _getTime3(), cs;
+    if (!cache2._isScrollT || time - cache2._isScrollT > 2e3) {
+      while (node && node !== _body4 && (node.scrollHeight <= node.clientHeight && node.scrollWidth <= node.clientWidth || !(_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]))) {
+        node = node.parentNode;
+      }
+      cache2._isScroll = node && node !== target && !_isViewport3(node) && (_overflow[(cs = _getComputedStyle3(node)).overflowY] || _overflow[cs.overflowX]);
+      cache2._isScrollT = time;
+    }
+    if (cache2._isScroll || axis === "x") {
+      event.stopPropagation();
+      event._gsapAllow = true;
+    }
+  };
+  var _inputObserver = function _inputObserver2(target, type, inputs, nested) {
+    return Observer.create({
+      target,
+      capture: true,
+      debounce: false,
+      lockAxis: true,
+      type,
+      onWheel: nested = nested && _nestedScroll,
+      onPress: nested,
+      onDrag: nested,
+      onScroll: nested,
+      onEnable: function onEnable() {
+        return inputs && _addListener5(_doc6, Observer.eventTypes[0], _captureInputs, false, true);
+      },
+      onDisable: function onDisable() {
+        return _removeListener5(_doc6, Observer.eventTypes[0], _captureInputs, true);
+      }
+    });
+  };
+  var _inputExp = /(input|label|select|textarea)/i;
+  var _inputIsFocused;
+  var _captureInputs = function _captureInputs2(e) {
+    var isInput = _inputExp.test(e.target.tagName);
+    if (isInput || _inputIsFocused) {
+      e._gsapAllow = true;
+      _inputIsFocused = isInput;
+    }
+  };
+  var _getScrollNormalizer = function _getScrollNormalizer2(vars) {
+    _isObject5(vars) || (vars = {});
+    vars.preventDefault = vars.isNormalizer = vars.allowClicks = true;
+    vars.type || (vars.type = "wheel,touch");
+    vars.debounce = !!vars.debounce;
+    vars.id = vars.id || "normalizer";
+    var _vars2 = vars, normalizeScrollX = _vars2.normalizeScrollX, momentum = _vars2.momentum, allowNestedScroll = _vars2.allowNestedScroll, onRelease = _vars2.onRelease, self, maxY, target = _getTarget(vars.target) || _docEl2, smoother = gsap4.core.globals().ScrollSmoother, smootherInstance = smoother && smoother.get(), content = _fixIOSBug && (vars.content && _getTarget(vars.content) || smootherInstance && vars.content !== false && !smootherInstance.smooth() && smootherInstance.content()), scrollFuncY = _getScrollFunc(target, _vertical), scrollFuncX = _getScrollFunc(target, _horizontal), scale = 1, initialScale = (Observer.isTouch && _win6.visualViewport ? _win6.visualViewport.scale * _win6.visualViewport.width : _win6.outerWidth) / _win6.innerWidth, wheelRefresh = 0, resolveMomentumDuration = _isFunction5(momentum) ? function() {
+      return momentum(self);
+    } : function() {
+      return momentum || 2.8;
+    }, lastRefreshID, skipTouchMove, inputObserver = _inputObserver(target, vars.type, true, allowNestedScroll), resumeTouchMove = function resumeTouchMove2() {
+      return skipTouchMove = false;
+    }, scrollClampX = _passThrough3, scrollClampY = _passThrough3, updateClamps = function updateClamps2() {
+      maxY = _maxScroll(target, _vertical);
+      scrollClampY = _clamp4(_fixIOSBug ? 1 : 0, maxY);
+      normalizeScrollX && (scrollClampX = _clamp4(0, _maxScroll(target, _horizontal)));
+      lastRefreshID = _refreshID;
+    }, removeContentOffset = function removeContentOffset2() {
+      content._gsap.y = _round5(parseFloat(content._gsap.y) + scrollFuncY.offset) + "px";
+      content.style.transform = "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, " + parseFloat(content._gsap.y) + ", 0, 1)";
+      scrollFuncY.offset = scrollFuncY.cacheID = 0;
+    }, ignoreDrag = function ignoreDrag2() {
+      if (skipTouchMove) {
+        requestAnimationFrame(resumeTouchMove);
+        var offset = _round5(self.deltaY / 2), scroll = scrollClampY(scrollFuncY.v - offset);
+        if (content && scroll !== scrollFuncY.v + scrollFuncY.offset) {
+          scrollFuncY.offset = scroll - scrollFuncY.v;
+          var y = _round5((parseFloat(content && content._gsap.y) || 0) - scrollFuncY.offset);
+          content.style.transform = "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, " + y + ", 0, 1)";
+          content._gsap.y = y + "px";
+          scrollFuncY.cacheID = _scrollers.cache;
+          _updateAll();
+        }
+        return true;
+      }
+      scrollFuncY.offset && removeContentOffset();
+      skipTouchMove = true;
+    }, tween, startScrollX, startScrollY, onStopDelayedCall, onResize = function onResize2() {
+      updateClamps();
+      if (tween.isActive() && tween.vars.scrollY > maxY) {
+        scrollFuncY() > maxY ? tween.progress(1) && scrollFuncY(maxY) : tween.resetTo("scrollY", maxY);
+      }
+    };
+    content && gsap4.set(content, {
+      y: "+=0"
+    });
+    vars.ignoreCheck = function(e) {
+      return _fixIOSBug && e.type === "touchmove" && ignoreDrag(e) || scale > 1.05 && e.type !== "touchstart" || self.isGesturing || e.touches && e.touches.length > 1;
+    };
+    vars.onPress = function() {
+      skipTouchMove = false;
+      var prevScale = scale;
+      scale = _round5((_win6.visualViewport && _win6.visualViewport.scale || 1) / initialScale);
+      tween.pause();
+      prevScale !== scale && _allowNativePanning(target, scale > 1.01 ? true : normalizeScrollX ? false : "x");
+      startScrollX = scrollFuncX();
+      startScrollY = scrollFuncY();
+      updateClamps();
+      lastRefreshID = _refreshID;
+    };
+    vars.onRelease = vars.onGestureStart = function(self2, wasDragging) {
+      scrollFuncY.offset && removeContentOffset();
+      if (!wasDragging) {
+        onStopDelayedCall.restart(true);
       } else {
-        this.sortable.el.appendChild(dragEl2);
+        _scrollers.cache++;
+        var dur = resolveMomentumDuration(), currentScroll, endScroll;
+        if (normalizeScrollX) {
+          currentScroll = scrollFuncX();
+          endScroll = currentScroll + dur * 0.05 * -self2.velocityX / 0.227;
+          dur *= _clampScrollAndGetDurationMultiplier(scrollFuncX, currentScroll, endScroll, _maxScroll(target, _horizontal));
+          tween.vars.scrollX = scrollClampX(endScroll);
+        }
+        currentScroll = scrollFuncY();
+        endScroll = currentScroll + dur * 0.05 * -self2.velocityY / 0.227;
+        dur *= _clampScrollAndGetDurationMultiplier(scrollFuncY, currentScroll, endScroll, _maxScroll(target, _vertical));
+        tween.vars.scrollY = scrollClampY(endScroll);
+        tween.invalidate().duration(dur).play(0.01);
+        if (_fixIOSBug && tween.vars.scrollY >= maxY || currentScroll >= maxY - 1) {
+          gsap4.to({}, {
+            onUpdate: onResize,
+            duration: dur
+          });
+        }
       }
-      this.sortable.animateAll();
-      if (putSortable2) {
-        putSortable2.animateAll();
+      onRelease && onRelease(self2);
+    };
+    vars.onWheel = function() {
+      tween._ts && tween.pause();
+      if (_getTime3() - wheelRefresh > 1e3) {
+        lastRefreshID = 0;
+        wheelRefresh = _getTime3();
       }
-    },
-    drop
+    };
+    vars.onChange = function(self2, dx, dy, xArray, yArray) {
+      _refreshID !== lastRefreshID && updateClamps();
+      dx && normalizeScrollX && scrollFuncX(scrollClampX(xArray[2] === dx ? startScrollX + (self2.startX - self2.x) : scrollFuncX() + dx - xArray[1]));
+      if (dy) {
+        scrollFuncY.offset && removeContentOffset();
+        var isTouch = yArray[2] === dy, y = isTouch ? startScrollY + self2.startY - self2.y : scrollFuncY() + dy - yArray[1], yClamped = scrollClampY(y);
+        isTouch && y !== yClamped && (startScrollY += yClamped - y);
+        scrollFuncY(yClamped);
+      }
+      (dy || dx) && _updateAll();
+    };
+    vars.onEnable = function() {
+      _allowNativePanning(target, normalizeScrollX ? false : "x");
+      ScrollTrigger2.addEventListener("refresh", onResize);
+      _addListener5(_win6, "resize", onResize);
+      if (scrollFuncY.smooth) {
+        scrollFuncY.target.style.scrollBehavior = "auto";
+        scrollFuncY.smooth = scrollFuncX.smooth = false;
+      }
+      inputObserver.enable();
+    };
+    vars.onDisable = function() {
+      _allowNativePanning(target, true);
+      _removeListener5(_win6, "resize", onResize);
+      ScrollTrigger2.removeEventListener("refresh", onResize);
+      inputObserver.kill();
+    };
+    vars.lockAxis = vars.lockAxis !== false;
+    self = new Observer(vars);
+    self.iOS = _fixIOSBug;
+    _fixIOSBug && !scrollFuncY() && scrollFuncY(1);
+    _fixIOSBug && gsap4.ticker.add(_passThrough3);
+    onStopDelayedCall = self._dc;
+    tween = gsap4.to(self, {
+      ease: "power4",
+      paused: true,
+      scrollX: normalizeScrollX ? "+=0.1" : "+=0",
+      scrollY: "+=0.1",
+      modifiers: {
+        scrollY: _interruptionTracker(scrollFuncY, scrollFuncY(), function() {
+          return tween.pause();
+        })
+      },
+      onUpdate: _updateAll,
+      onComplete: onStopDelayedCall.vars.onComplete
+    });
+    return self;
   };
-  _extends(Revert, {
-    pluginName: "revertOnSpill"
-  });
-  function Remove() {
+  ScrollTrigger2.sort = function(func) {
+    return _triggers.sort(func || function(a, b) {
+      return (a.vars.refreshPriority || 0) * -1e6 + a.start - (b.start + (b.vars.refreshPriority || 0) * -1e6);
+    });
+  };
+  ScrollTrigger2.observe = function(vars) {
+    return new Observer(vars);
+  };
+  ScrollTrigger2.normalizeScroll = function(vars) {
+    if (typeof vars === "undefined") {
+      return _normalizer2;
+    }
+    if (vars === true && _normalizer2) {
+      return _normalizer2.enable();
+    }
+    if (vars === false) {
+      return _normalizer2 && _normalizer2.kill();
+    }
+    var normalizer = vars instanceof Observer ? vars : _getScrollNormalizer(vars);
+    _normalizer2 && _normalizer2.target === normalizer.target && _normalizer2.kill();
+    _isViewport3(normalizer.target) && (_normalizer2 = normalizer);
+    return normalizer;
+  };
+  ScrollTrigger2.core = {
+    // smaller file size way to leverage in ScrollSmoother and Observer
+    _getVelocityProp,
+    _inputObserver,
+    _scrollers,
+    _proxies,
+    bridge: {
+      // when normalizeScroll sets the scroll position (ss = setScroll)
+      ss: function ss() {
+        _lastScrollTime || _dispatch3("scrollStart");
+        _lastScrollTime = _getTime3();
+      },
+      // a way to get the _refreshing value in Observer
+      ref: function ref() {
+        return _refreshing;
+      }
+    }
+  };
+  _getGSAP5() && gsap4.registerPlugin(ScrollTrigger2);
+
+  // node_modules/split-type/dist/index.js
+  (() => {
+    function append(...nodes) {
+      const length = nodes.length;
+      for (let i = 0; i < length; i++) {
+        const node = nodes[i];
+        if (node.nodeType === 1 || node.nodeType === 11)
+          this.appendChild(node);
+        else
+          this.appendChild(document.createTextNode(String(node)));
+      }
+    }
+    function replaceChildren(...nodes) {
+      while (this.lastChild) {
+        this.removeChild(this.lastChild);
+      }
+      if (nodes.length)
+        this.append(...nodes);
+    }
+    function replaceWith(...nodes) {
+      const parent = this.parentNode;
+      let i = nodes.length;
+      if (!parent)
+        return;
+      if (!i)
+        parent.removeChild(this);
+      while (i--) {
+        let node = nodes[i];
+        if (typeof node !== "object") {
+          node = this.ownerDocument.createTextNode(node);
+        } else if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
+        if (!i) {
+          parent.replaceChild(node, this);
+        } else {
+          parent.insertBefore(this.previousSibling, node);
+        }
+      }
+    }
+    if (typeof Element !== "undefined") {
+      if (!Element.prototype.append) {
+        Element.prototype.append = append;
+        DocumentFragment.prototype.append = append;
+      }
+      if (!Element.prototype.replaceChildren) {
+        Element.prototype.replaceChildren = replaceChildren;
+        DocumentFragment.prototype.replaceChildren = replaceChildren;
+      }
+      if (!Element.prototype.replaceWith) {
+        Element.prototype.replaceWith = replaceWith;
+        DocumentFragment.prototype.replaceWith = replaceWith;
+      }
+    }
+  })();
+  function extend(target, object) {
+    return Object.getOwnPropertyNames(Object(target)).reduce((extended, key) => {
+      const currentValue = Object.getOwnPropertyDescriptor(Object(target), key);
+      const newValue = Object.getOwnPropertyDescriptor(Object(object), key);
+      return Object.defineProperty(extended, key, newValue || currentValue);
+    }, {});
   }
-  Remove.prototype = {
-    onSpill: function onSpill2(_ref4) {
-      var dragEl2 = _ref4.dragEl, putSortable2 = _ref4.putSortable;
-      var parentSortable = putSortable2 || this.sortable;
-      parentSortable.captureAnimationState();
-      dragEl2.parentNode && dragEl2.parentNode.removeChild(dragEl2);
-      parentSortable.animateAll();
-    },
-    drop
+  function isString(value) {
+    return typeof value === "string";
+  }
+  function isArray(value) {
+    return Array.isArray(value);
+  }
+  function parseSettings(settings = {}) {
+    const object = extend(settings);
+    let types;
+    if (object.types !== void 0) {
+      types = object.types;
+    } else if (object.split !== void 0) {
+      types = object.split;
+    }
+    if (types !== void 0) {
+      object.types = (isString(types) || isArray(types) ? String(types) : "").split(",").map((type) => String(type).trim()).filter((type) => /((line)|(word)|(char))/i.test(type));
+    }
+    if (object.absolute || object.position) {
+      object.absolute = object.absolute || /absolute/.test(settings.position);
+    }
+    return object;
+  }
+  function parseTypes(value) {
+    const types = isString(value) || isArray(value) ? String(value) : "";
+    return {
+      none: !types,
+      lines: /line/i.test(types),
+      words: /word/i.test(types),
+      chars: /char/i.test(types)
+    };
+  }
+  function isObject(value) {
+    return value !== null && typeof value === "object";
+  }
+  function isNode(input) {
+    return isObject(input) && /^(1|3|11)$/.test(input.nodeType);
+  }
+  function isLength(value) {
+    return typeof value === "number" && value > -1 && value % 1 === 0;
+  }
+  function isArrayLike(value) {
+    return isObject(value) && isLength(value.length);
+  }
+  function toArray3(value) {
+    if (isArray(value))
+      return value;
+    if (value == null)
+      return [];
+    return isArrayLike(value) ? Array.prototype.slice.call(value) : [value];
+  }
+  function getTargetElements(target) {
+    let elements = target;
+    if (isString(target)) {
+      if (/^(#[a-z]\w+)$/.test(target.trim())) {
+        elements = document.getElementById(target.trim().slice(1));
+      } else {
+        elements = document.querySelectorAll(target);
+      }
+    }
+    return toArray3(elements).reduce((result, element) => {
+      return [...result, ...toArray3(element).filter(isNode)];
+    }, []);
+  }
+  var {
+    entries,
+    keys,
+    values
+  } = Object;
+  var expando = `_splittype`;
+  var cache = {};
+  var uid = 0;
+  function set(owner, key, value) {
+    if (!isObject(owner)) {
+      console.warn("[data.set] owner is not an object");
+      return null;
+    }
+    const id = owner[expando] || (owner[expando] = ++uid);
+    const data = cache[id] || (cache[id] = {});
+    if (value === void 0) {
+      if (!!key && Object.getPrototypeOf(key) === Object.prototype) {
+        cache[id] = {
+          ...data,
+          ...key
+        };
+      }
+    } else if (key !== void 0) {
+      data[key] = value;
+    }
+    return value;
+  }
+  function get(owner, key) {
+    const id = isObject(owner) ? owner[expando] : null;
+    const data = id && cache[id] || {};
+    if (key === void 0) {
+      return data;
+    }
+    return data[key];
+  }
+  function remove(element) {
+    const id = element && element[expando];
+    if (id) {
+      delete element[id];
+      delete cache[id];
+    }
+  }
+  function cleanup() {
+    entries(cache).forEach(([id, {
+      isRoot,
+      isSplit
+    }]) => {
+      if (!isRoot || !isSplit) {
+        cache[id] = null;
+        delete cache[id];
+      }
+    });
+  }
+  function toWords(value, separator = " ") {
+    const string = value ? String(value) : "";
+    return string.trim().replace(/\s+/g, " ").split(separator);
+  }
+  var rsAstralRange = "\\ud800-\\udfff";
+  var rsComboMarksRange = "\\u0300-\\u036f\\ufe20-\\ufe23";
+  var rsComboSymbolsRange = "\\u20d0-\\u20f0";
+  var rsVarRange = "\\ufe0e\\ufe0f";
+  var rsAstral = `[${rsAstralRange}]`;
+  var rsCombo = `[${rsComboMarksRange}${rsComboSymbolsRange}]`;
+  var rsFitz = "\\ud83c[\\udffb-\\udfff]";
+  var rsModifier = `(?:${rsCombo}|${rsFitz})`;
+  var rsNonAstral = `[^${rsAstralRange}]`;
+  var rsRegional = "(?:\\ud83c[\\udde6-\\uddff]){2}";
+  var rsSurrPair = "[\\ud800-\\udbff][\\udc00-\\udfff]";
+  var rsZWJ = "\\u200d";
+  var reOptMod = `${rsModifier}?`;
+  var rsOptVar = `[${rsVarRange}]?`;
+  var rsOptJoin = "(?:" + rsZWJ + "(?:" + [rsNonAstral, rsRegional, rsSurrPair].join("|") + ")" + rsOptVar + reOptMod + ")*";
+  var rsSeq = rsOptVar + reOptMod + rsOptJoin;
+  var rsSymbol = `(?:${[`${rsNonAstral}${rsCombo}?`, rsCombo, rsRegional, rsSurrPair, rsAstral].join("|")}
+)`;
+  var reUnicode = RegExp(`${rsFitz}(?=${rsFitz})|${rsSymbol}${rsSeq}`, "g");
+  var unicodeRange = [rsZWJ, rsAstralRange, rsComboMarksRange, rsComboSymbolsRange, rsVarRange];
+  var reHasUnicode = RegExp(`[${unicodeRange.join("")}]`);
+  function asciiToArray(string) {
+    return string.split("");
+  }
+  function hasUnicode(string) {
+    return reHasUnicode.test(string);
+  }
+  function unicodeToArray(string) {
+    return string.match(reUnicode) || [];
+  }
+  function stringToArray(string) {
+    return hasUnicode(string) ? unicodeToArray(string) : asciiToArray(string);
+  }
+  function toString(value) {
+    return value == null ? "" : String(value);
+  }
+  function toChars(string, separator = "") {
+    string = toString(string);
+    if (string && isString(string)) {
+      if (!separator && hasUnicode(string)) {
+        return stringToArray(string);
+      }
+    }
+    return string.split(separator);
+  }
+  function createElement(name, attributes) {
+    const element = document.createElement(name);
+    if (!attributes) {
+      return element;
+    }
+    Object.keys(attributes).forEach((attribute) => {
+      const rawValue = attributes[attribute];
+      const value = isString(rawValue) ? rawValue.trim() : rawValue;
+      if (value === null || value === "")
+        return;
+      if (attribute === "children") {
+        element.append(...toArray3(value));
+      } else {
+        element.setAttribute(attribute, value);
+      }
+    });
+    return element;
+  }
+  var defaults2 = {
+    splitClass: "",
+    lineClass: "line",
+    wordClass: "word",
+    charClass: "char",
+    types: ["lines", "words", "chars"],
+    absolute: false,
+    tagName: "div"
   };
-  _extends(Remove, {
-    pluginName: "removeOnSpill"
-  });
-  Sortable.mount(new AutoScrollPlugin());
-  Sortable.mount(Remove, Revert);
-  var sortable_esm_default = Sortable;
+  function splitWordsAndChars(textNode, settings) {
+    settings = extend(defaults2, settings);
+    const types = parseTypes(settings.types);
+    const TAG_NAME = settings.tagName;
+    const VALUE = textNode.nodeValue;
+    const splitText = document.createDocumentFragment();
+    let words = [];
+    let chars = [];
+    if (/^\s/.test(VALUE)) {
+      splitText.append(" ");
+    }
+    words = toWords(VALUE).reduce((result, WORD, idx, arr) => {
+      let wordElement;
+      let characterElementsForCurrentWord;
+      if (types.chars) {
+        characterElementsForCurrentWord = toChars(WORD).map((CHAR) => {
+          const characterElement = createElement(TAG_NAME, {
+            class: `${settings.splitClass} ${settings.charClass}`,
+            style: "display: inline-block;",
+            children: CHAR
+          });
+          set(characterElement, "isChar", true);
+          chars = [...chars, characterElement];
+          return characterElement;
+        });
+      }
+      if (types.words || types.lines) {
+        wordElement = createElement(TAG_NAME, {
+          class: `${settings.wordClass} ${settings.splitClass}`,
+          style: `display: inline-block; ${types.words && settings.absolute ? `position: relative;` : ""}`,
+          children: types.chars ? characterElementsForCurrentWord : WORD
+        });
+        set(wordElement, {
+          isWord: true,
+          isWordStart: true,
+          isWordEnd: true
+        });
+        splitText.appendChild(wordElement);
+      } else {
+        characterElementsForCurrentWord.forEach((characterElement) => {
+          splitText.appendChild(characterElement);
+        });
+      }
+      if (idx < arr.length - 1) {
+        splitText.append(" ");
+      }
+      return types.words ? result.concat(wordElement) : result;
+    }, []);
+    if (/\s$/.test(VALUE)) {
+      splitText.append(" ");
+    }
+    textNode.replaceWith(splitText);
+    return {
+      words,
+      chars
+    };
+  }
+  function split(node, settings) {
+    const type = node.nodeType;
+    const wordsAndChars = {
+      words: [],
+      chars: []
+    };
+    if (!/(1|3|11)/.test(type)) {
+      return wordsAndChars;
+    }
+    if (type === 3 && /\S/.test(node.nodeValue)) {
+      return splitWordsAndChars(node, settings);
+    }
+    const childNodes = toArray3(node.childNodes);
+    if (childNodes.length) {
+      set(node, "isSplit", true);
+      if (!get(node).isRoot) {
+        node.style.display = "inline-block";
+        node.style.position = "relative";
+        const nextSibling = node.nextSibling;
+        const prevSibling = node.previousSibling;
+        const text = node.textContent || "";
+        const textAfter = nextSibling ? nextSibling.textContent : " ";
+        const textBefore = prevSibling ? prevSibling.textContent : " ";
+        set(node, {
+          isWordEnd: /\s$/.test(text) || /^\s/.test(textAfter),
+          isWordStart: /^\s/.test(text) || /\s$/.test(textBefore)
+        });
+      }
+    }
+    return childNodes.reduce((result, child) => {
+      const {
+        words,
+        chars
+      } = split(child, settings);
+      return {
+        words: [...result.words, ...words],
+        chars: [...result.chars, ...chars]
+      };
+    }, wordsAndChars);
+  }
+  function getPosition(node, isWord, settings, scrollPos) {
+    if (!settings.absolute) {
+      return {
+        top: isWord ? node.offsetTop : null
+      };
+    }
+    const parent = node.offsetParent;
+    const [scrollX, scrollY] = scrollPos;
+    let parentX = 0;
+    let parentY = 0;
+    if (parent && parent !== document.body) {
+      const parentRect = parent.getBoundingClientRect();
+      parentX = parentRect.x + scrollX;
+      parentY = parentRect.y + scrollY;
+    }
+    const {
+      width,
+      height,
+      x,
+      y
+    } = node.getBoundingClientRect();
+    const top = y + scrollY - parentY;
+    const left = x + scrollX - parentX;
+    return {
+      width,
+      height,
+      top,
+      left
+    };
+  }
+  function unSplitWords(element) {
+    if (!get(element).isWord) {
+      toArray3(element.children).forEach((child) => unSplitWords(child));
+    } else {
+      remove(element);
+      element.replaceWith(...element.childNodes);
+    }
+  }
+  var createFragment = () => document.createDocumentFragment();
+  function repositionAfterSplit(element, settings, scrollPos) {
+    const types = parseTypes(settings.types);
+    const TAG_NAME = settings.tagName;
+    const nodes = element.getElementsByTagName("*");
+    const wordsInEachLine = [];
+    let wordsInCurrentLine = [];
+    let lineOffsetY = null;
+    let elementHeight;
+    let elementWidth;
+    let contentBox;
+    let lines = [];
+    const parent = element.parentElement;
+    const nextSibling = element.nextElementSibling;
+    const splitText = createFragment();
+    const cs = window.getComputedStyle(element);
+    const align = cs.textAlign;
+    const fontSize = parseFloat(cs.fontSize);
+    const lineThreshold = fontSize * 0.2;
+    if (settings.absolute) {
+      contentBox = {
+        left: element.offsetLeft,
+        top: element.offsetTop,
+        width: element.offsetWidth
+      };
+      elementWidth = element.offsetWidth;
+      elementHeight = element.offsetHeight;
+      set(element, {
+        cssWidth: element.style.width,
+        cssHeight: element.style.height
+      });
+    }
+    toArray3(nodes).forEach((node) => {
+      const isWordLike = node.parentElement === element;
+      const {
+        width,
+        height,
+        top,
+        left
+      } = getPosition(node, isWordLike, settings, scrollPos);
+      if (/^br$/i.test(node.nodeName))
+        return;
+      if (types.lines && isWordLike) {
+        if (lineOffsetY === null || top - lineOffsetY >= lineThreshold) {
+          lineOffsetY = top;
+          wordsInEachLine.push(wordsInCurrentLine = []);
+        }
+        wordsInCurrentLine.push(node);
+      }
+      if (settings.absolute) {
+        set(node, {
+          top,
+          left,
+          width,
+          height
+        });
+      }
+    });
+    if (parent) {
+      parent.removeChild(element);
+    }
+    if (types.lines) {
+      lines = wordsInEachLine.map((wordsInThisLine) => {
+        const lineElement = createElement(TAG_NAME, {
+          class: `${settings.splitClass} ${settings.lineClass}`,
+          style: `display: block; text-align: ${align}; width: 100%;`
+        });
+        set(lineElement, "isLine", true);
+        const lineDimensions = {
+          height: 0,
+          top: 1e4
+        };
+        splitText.appendChild(lineElement);
+        wordsInThisLine.forEach((wordOrElement, idx, arr) => {
+          const {
+            isWordEnd,
+            top,
+            height
+          } = get(wordOrElement);
+          const next = arr[idx + 1];
+          lineDimensions.height = Math.max(lineDimensions.height, height);
+          lineDimensions.top = Math.min(lineDimensions.top, top);
+          lineElement.appendChild(wordOrElement);
+          if (isWordEnd && get(next).isWordStart) {
+            lineElement.append(" ");
+          }
+        });
+        if (settings.absolute) {
+          set(lineElement, {
+            height: lineDimensions.height,
+            top: lineDimensions.top
+          });
+        }
+        return lineElement;
+      });
+      if (!types.words) {
+        unSplitWords(splitText);
+      }
+      element.replaceChildren(splitText);
+    }
+    if (settings.absolute) {
+      element.style.width = `${element.style.width || elementWidth}px`;
+      element.style.height = `${elementHeight}px`;
+      toArray3(nodes).forEach((node) => {
+        const {
+          isLine,
+          top,
+          left,
+          width,
+          height
+        } = get(node);
+        const parentData = get(node.parentElement);
+        const isChildOfLineNode = !isLine && parentData.isLine;
+        node.style.top = `${isChildOfLineNode ? top - parentData.top : top}px`;
+        node.style.left = isLine ? `${contentBox.left}px` : `${left - (isChildOfLineNode ? contentBox.left : 0)}px`;
+        node.style.height = `${height}px`;
+        node.style.width = isLine ? `${contentBox.width}px` : `${width}px`;
+        node.style.position = "absolute";
+      });
+    }
+    if (parent) {
+      if (nextSibling)
+        parent.insertBefore(element, nextSibling);
+      else
+        parent.appendChild(element);
+    }
+    return lines;
+  }
+  var _defaults3 = extend(defaults2, {});
+  var SplitType = class {
+    /**
+     * The internal data store
+     */
+    static get data() {
+      return cache;
+    }
+    /**
+     * The default settings for all splitType instances
+     * @static
+     */
+    static get defaults() {
+      return _defaults3;
+    }
+    /**
+     * Sets the default settings for all SplitType instances.
+     *
+     * Setting `SplitType.defaults` to an object will merge that object with the
+     * existing defaults.
+     *
+     * @param {Object} settings an object containing the settings to override
+     * @deprecated
+     * @static
+     * @example
+     * SplitType.defaults = { "position": "absolute" }
+     */
+    static set defaults(options) {
+      _defaults3 = extend(_defaults3, parseSettings(options));
+    }
+    /**
+     * Sets the default settings for all SplitType instances.
+     * The provided object will be merged with the existing defaults objects.
+     *
+     * @param {Object} settings an object containing the settings to override
+     * @returns {Object} the new default settings
+     * @public
+     * @static
+     * @example
+     * SplitType.setDefaults({ "position": "absolute" })
+     */
+    static setDefaults(options) {
+      _defaults3 = extend(_defaults3, parseSettings(options));
+      return defaults2;
+    }
+    /**
+     * Revert target elements to their original html content
+     * Has no effect on that
+     *
+     * @param {any} elements The target elements to revert. One of:
+     *  - {string} A css selector
+     *  - {HTMLElement} A single element
+     * -  {NodeList} A NodeList or collection
+     *  - {HTMLElement[]} An array of Elements
+     * -  {Array<HTMLElement|NodeList|HTMLElement[]>} A nested array of elements
+     * @static
+     */
+    static revert(elements) {
+      getTargetElements(elements).forEach((element) => {
+        const {
+          isSplit,
+          html,
+          cssWidth,
+          cssHeight
+        } = get(element);
+        if (isSplit) {
+          element.innerHTML = html;
+          element.style.width = cssWidth || "";
+          element.style.height = cssHeight || "";
+          remove(element);
+        }
+      });
+    }
+    /**
+     * Creates a new SplitType instance
+     * This static method provides a way to create a `SplitType` instance without
+     * using the `new` keyword.
+     *
+     * @param {any} target The target elements to split. One of:
+     *  - {string} A css selector
+     *  - {HTMLElement} A single element
+     * -  {NodeList} A NodeList or collection
+     *  - {HTMLElement[]} An array of Elements
+     * -  {Array<HTMLElement|NodeList|HTMLElement[]>} A nested array of elements
+     * @param {Object} [options] Settings for the SplitType instance
+     * @return {SplitType} the SplitType instance
+     * @static
+     */
+    static create(target, options) {
+      return new SplitType(target, options);
+    }
+    /**
+     * Creates a new `SplitType` instance
+     *
+     * @param {any} elements The target elements to split. One of:
+     *  - {string} A css selector
+     *  - {HTMLElement} A single element
+     * -  {NodeList} A NodeList or collection
+     *  - {HTMLElement[]} An array of Elements
+     * -  {Array<HTMLElement|NodeList|HTMLElement[]>} A nested array of elements
+     * @param {Object} [options] Settings for the SplitType instance
+     */
+    constructor(elements, options) {
+      this.isSplit = false;
+      this.settings = extend(_defaults3, parseSettings(options));
+      this.elements = getTargetElements(elements);
+      this.split();
+    }
+    /**
+     * Splits the text in all target elements. This method is called
+     * automatically when a new SplitType instance is created. It can also be
+     * called manually to re-split text with new options.
+     * @param {Object} options
+     * @public
+     */
+    split(options) {
+      this.revert();
+      this.elements.forEach((element) => {
+        set(element, "html", element.innerHTML);
+      });
+      this.lines = [];
+      this.words = [];
+      this.chars = [];
+      const scrollPos = [window.pageXOffset, window.pageYOffset];
+      if (options !== void 0) {
+        this.settings = extend(this.settings, parseSettings(options));
+      }
+      const types = parseTypes(this.settings.types);
+      if (types.none) {
+        return;
+      }
+      this.elements.forEach((element) => {
+        set(element, "isRoot", true);
+        const {
+          words,
+          chars
+        } = split(element, this.settings);
+        this.words = [...this.words, ...words];
+        this.chars = [...this.chars, ...chars];
+      });
+      this.elements.forEach((element) => {
+        if (types.lines || this.settings.absolute) {
+          const lines = repositionAfterSplit(element, this.settings, scrollPos);
+          this.lines = [...this.lines, ...lines];
+        }
+      });
+      this.isSplit = true;
+      window.scrollTo(scrollPos[0], scrollPos[1]);
+      cleanup();
+    }
+    /**
+     * Reverts target element(s) back to their original html content
+     * Deletes all stored data associated with the target elements
+     * Resets the properties on the splitType instance
+     *
+     * @public
+     */
+    revert() {
+      if (this.isSplit) {
+        this.lines = null;
+        this.words = null;
+        this.chars = null;
+        this.isSplit = false;
+      }
+      SplitType.revert(this.elements);
+    }
+  };
 
   // src/utils/globalvars.ts
   var gsapEaseType = "back.out";
   var gsapDuration = 0.75;
 
-  // src/profileadmin.ts
-  gsapWithCSS.registerPlugin(Observer, Draggable, sortable_esm_default);
+  // src/components/sliders.ts
+  gsapWithCSS.registerPlugin(Observer);
+  function initSliders() {
+    const sliders = gsapWithCSS.utils.toArray('[cs-el="slider"]');
+    sliders.forEach((slider) => {
+      if (slider) {
+        initSlider(slider);
+      }
+    });
+  }
+  function initSlider(slider) {
+    const slides = slider.querySelectorAll('[cs-el="slide"]');
+    const slidesLength = slides.length;
+    if (slidesLength === 0)
+      return;
+    if (slidesLength === 1) {
+      removeElementsByAttribute("slider-nav");
+      removeElementsByAttribute("slider-indicators");
+      removeElementsByAttribute("slider-cover");
+      return;
+    }
+    function removeElementsByAttribute(attributeValue) {
+      const elements = document.querySelectorAll(`[cs-el="${attributeValue}"]`);
+      elements.forEach((element) => {
+        element.remove();
+      });
+    }
+    let sliderType = slider.getAttribute("slider-type");
+    if (!sliderType)
+      sliderType = "fade";
+    let count;
+    const transitionDuration = 0.5;
+    const sliderEaseIn = "power2.out";
+    const sliderEaseOut = "power2.out";
+    let next;
+    let prev;
+    let isFirstSlide = false;
+    let isLastSlide = false;
+    const playDuration = 3e3;
+    const tl_slideIn = gsapWithCSS.timeline({ paused: true });
+    const tl_slideOut = gsapWithCSS.timeline({ paused: true });
+    let initialSlide = true;
+    const allowNext = true;
+    const allowPrev = true;
+    const tl_toggleControls = gsapWithCSS.timeline({ paused: true });
+    const nav = slider.querySelector('[cs-el="slider-nav"]');
+    if (nav)
+      setupNav(nav);
+    const indicators = slider.querySelector('[cs-el="slider-indicators"]');
+    let allIndicators = [];
+    if (indicators)
+      allIndicators = setupIndicators();
+    const cover = slider.querySelector('[cs-el="slider-cover"]');
+    const getLoop = slider.getAttribute("slider-loop");
+    let loop = false;
+    if (getLoop === "loop") {
+      loop = true;
+    }
+    const GetToggleControls = slider.getAttribute("slider-controls");
+    let toggleControls = false;
+    if (GetToggleControls === "toggle") {
+      toggleControls = true;
+      setupToggleControls();
+    }
+    const getAutoPlay = slider.getAttribute("slider-autoplay");
+    let isPlaying;
+    if (getAutoPlay === "play") {
+      playSlider();
+    }
+    gsapWithCSS.set(slides, { opacity: 0 });
+    function initAllPrevNextButtons() {
+      const allNextButtons = slider.querySelectorAll('[cs-el="slider-next"]');
+      const allPrevButtons = slider.querySelectorAll('[cs-el="slider-prev"]');
+      if (allNextButtons.length > 0) {
+        allNextButtons.forEach((el) => {
+          el.addEventListener("click", goNext);
+        });
+      }
+      if (allPrevButtons.length > 0) {
+        allPrevButtons.forEach((el) => {
+          el.addEventListener("click", goPrev);
+        });
+      }
+    }
+    initAllPrevNextButtons();
+    function setupNav(nav2) {
+      next = nav2.querySelector('[cs-el="slider-nav_next"]');
+      prev = nav2.querySelector('[cs-el="slider-nav_prev"]');
+      nav2.style.pointerEvents = "none";
+      if (next)
+        next.style.pointerEvents = "auto";
+      if (prev)
+        prev.style.pointerEvents = "auto";
+      navAddEventListeners(null);
+    }
+    function playSlider() {
+      isPlaying = setInterval(() => slideAction("next"), playDuration);
+    }
+    function stopSlider(ap) {
+      clearInterval(ap);
+    }
+    function setupIndicators() {
+      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+      if (!sliderIndicators) {
+        console.log("no sliderIndicators found");
+        return [];
+      }
+      const indicator = sliderIndicators.querySelectorAll('[cs-el="slider-indicator"]');
+      if (indicator.length === 0) {
+        console.log("no indicator found");
+        return [];
+      }
+      if (indicator.length === 1) {
+        const slideArray = Array.from(slides);
+        slideArray.slice(0, -1).forEach(() => {
+          const clonedIndicator = indicator[0].cloneNode(true);
+          indicator[0].parentNode?.appendChild(clonedIndicator);
+        });
+      }
+      const indicatorsArray = sliderIndicators.querySelectorAll(
+        '[cs-el="slider-indicator"]'
+      );
+      indicatorsArray.forEach((indicator2, i) => {
+        indicator2.addEventListener("click", () => goIndex(i));
+      });
+      return indicatorsArray;
+    }
+    function setupToggleControls() {
+      tl_toggleControls.from(next, {
+        autoAlpha: 0,
+        duration: gsapDuration,
+        ease: gsapEaseType,
+        x: "-100%"
+      });
+      tl_toggleControls.from(
+        prev,
+        { autoAlpha: 0, duration: gsapDuration, ease: gsapEaseType, x: "100%" },
+        "<"
+      );
+      const sliderIndicators = slider.querySelector('[cs-el="slider-indicators"]');
+      tl_toggleControls.from(
+        sliderIndicators,
+        {
+          autoAlpha: 0,
+          delay: 0.25,
+          duration: gsapDuration,
+          ease: gsapEaseType
+        },
+        "<"
+      );
+      if (!cover) {
+        slider.addEventListener("mouseenter", aL_mouseEnter);
+        slider.addEventListener("mouseleave", aL_mouseLeave);
+      }
+    }
+    function aL_mouseEnter() {
+      tl_toggleControls.timeScale(1).play();
+    }
+    function aL_mouseLeave() {
+      tl_toggleControls.timeScale(2).reverse();
+    }
+    function setSwipe() {
+      console.log("Fnc setSwipe called");
+      Observer.create({
+        target: slider,
+        type: "touch",
+        dragMinimum: 100,
+        onLeft: () => goNext(),
+        onRight: () => goPrev()
+      });
+    }
+    function slideAction(dir, index) {
+      console.log("Fnc slideAction called");
+      if (index && index > count && !allowNext)
+        return;
+      if (index && index < count && !allowPrev)
+        return;
+      const transitionType = sliderType;
+      if (!initialSlide)
+        gsapSlideOut(count);
+      initialSlide = false;
+      if (typeof index === "number" && index >= 0 && index < slidesLength) {
+        if (count > index) {
+          dir = "prev";
+        }
+        if (count < index) {
+          dir = "next";
+        }
+        count = index;
+        gsapSlideIn(count);
+      } else {
+        if (dir === "next") {
+          count = count < slidesLength - 1 ? count + 1 : loop ? 0 : count;
+          gsapSlideIn(count);
+        } else if (dir === "prev") {
+          count = count > 0 ? count - 1 : loop ? slidesLength - 1 : count;
+          gsapSlideIn(count);
+        }
+      }
+      checkSlideIndex(count);
+      if (!loop) {
+        next?.classList.remove("is-muted");
+        prev?.classList.remove("is-muted");
+        navAddEventListeners(null);
+        if (isFirstSlide)
+          ifIsFirstSlide();
+        if (isLastSlide)
+          ifIsLastSlide();
+      }
+      if (indicators) {
+        setActiveindicator(count);
+      }
+      function gsapSlideIn(i) {
+        if (transitionType === "fade") {
+          tl_slideIn.fromTo(slides[i], { opacity: 0 }, { duration: transitionDuration, opacity: 1 });
+        } else if (transitionType === "slide") {
+          const xPercent = dir === "next" ? 50 : dir === "prev" ? -50 : 0;
+          tl_slideIn.fromTo(
+            slides[i],
+            { opacity: 0, xPercent },
+            { duration: transitionDuration, opacity: 1, xPercent: 0, ease: sliderEaseIn }
+          );
+        } else if (transitionType === "updown") {
+          const yPercent = dir === "next" ? 50 : dir === "prev" ? -50 : 0;
+          tl_slideIn.fromTo(
+            slides[i],
+            { opacity: 0, yPercent },
+            { duration: transitionDuration, opacity: 1, yPercent: 0, ease: sliderEaseIn }
+          );
+        }
+        gsapWithCSS.set(slides, { zIndex: 1 });
+        slides[i].style.zIndex = "2";
+        tl_slideIn.timeScale(1).play();
+      }
+      function gsapSlideOut(i) {
+        if (transitionType === "fade") {
+          tl_slideOut.to(slides[i], { duration: transitionDuration, opacity: 0 });
+        } else if (transitionType === "slide") {
+          const xPercent = dir === "next" ? -50 : dir === "prev" ? 50 : 0;
+          tl_slideOut.fromTo(
+            slides[i],
+            { opacity: 1, xPercent: 0 },
+            { duration: transitionDuration, opacity: 0, xPercent, ease: sliderEaseOut }
+          );
+        } else if (transitionType === "updown") {
+          const yPercent = dir === "next" ? -50 : dir === "prev" ? 50 : 0;
+          tl_slideOut.fromTo(
+            slides[i],
+            { opacity: 1, yPercent: 0 },
+            { duration: transitionDuration, opacity: 0, yPercent, ease: sliderEaseOut }
+          );
+        }
+        gsapWithCSS.set(slides, { zIndex: 1 });
+        slides[i].style.zIndex = "2";
+        tl_slideOut.timeScale(1).play();
+      }
+    }
+    function checkSlideIndex(count2) {
+      isFirstSlide = count2 === 0;
+      isLastSlide = count2 === slidesLength - 1;
+    }
+    function ifIsFirstSlide() {
+      navRemoveEventListeners("prev");
+      prev?.classList.add("is-muted");
+    }
+    function ifIsLastSlide() {
+      navRemoveEventListeners("next");
+      next?.classList.add("is-muted");
+      if (isPlaying)
+        stopSlider(isPlaying);
+    }
+    function setActiveindicator(index) {
+      allIndicators.forEach((indicator, i) => {
+        if (i === index) {
+          if (indicator.firstChild instanceof Element) {
+            indicator.firstChild.classList.add("is-active");
+          }
+        } else {
+          if (indicator.firstChild instanceof Element) {
+            indicator.firstChild.classList.remove("is-active");
+          }
+        }
+      });
+    }
+    function goNext() {
+      if (!tl_slideIn.isActive() && allowNext) {
+        gsapWithCSS.killTweensOf(slideAction);
+        slideAction("next");
+        if (isPlaying)
+          stopSlider(isPlaying);
+      }
+    }
+    function goPrev() {
+      if (!tl_slideOut.isActive() && allowPrev) {
+        gsapWithCSS.killTweensOf(slideAction);
+        slideAction("prev");
+        if (isPlaying)
+          stopSlider(isPlaying);
+      }
+    }
+    function goIndex(i) {
+      gsapWithCSS.killTweensOf(slideAction);
+      slideAction(null, i);
+      if (isPlaying)
+        stopSlider(isPlaying);
+    }
+    function navAddEventListeners(variable) {
+      if (!variable) {
+        next?.addEventListener("click", goNext);
+        prev?.addEventListener("click", goPrev);
+      } else if (variable === "next") {
+        next?.addEventListener("click", goNext);
+      } else if (variable === "prev") {
+        prev?.addEventListener("click", goPrev);
+      }
+    }
+    function navRemoveEventListeners(variable) {
+      if (variable === "next") {
+        next?.removeEventListener("click", goNext);
+      }
+      if (variable === "prev") {
+        prev?.removeEventListener("click", goPrev);
+      }
+    }
+    function setCover(cover2) {
+      console.log("Fnc setCover called");
+      gsapWithCSS.to(cover2, { autoAlpha: 1 });
+      if (!toggleControls) {
+        setupToggleControls();
+      }
+      tl_toggleControls.progress(0);
+      const startSliderBtn = slider.querySelector('[cs-el="slider-start"]');
+      startSliderBtn?.addEventListener("click", () => {
+        startSlider(cover2);
+      });
+    }
+    function startSlider(cover2) {
+      console.log("Fnc startSlider called");
+      gsapWithCSS.to(cover2, { autoAlpha: 0 });
+      slideAction(null, 0);
+      tl_toggleControls.timeScale(1).play();
+      if (toggleControls) {
+        slider.addEventListener("mouseenter", aL_mouseEnter);
+        slider.addEventListener("mouseleave", aL_mouseLeave);
+      }
+    }
+    setSwipe();
+    if (!cover) {
+      slideAction(null, 0);
+    } else {
+      setCover(cover);
+    }
+  }
+
+  // src/utils/colors.ts
+  var green = "#9ccca1";
+  var aqua = "#96c1d4";
+  var marine = "#729dad";
+  var purple = "#c092b6";
+  var red = "#ea958f";
+  var yellow = "#f4d791";
+  var colorArray = [green, aqua, marine, purple, yellow, red];
+  function loopLogoLetters(letters) {
+    gsapWithCSS.utils.shuffle(colorArray);
+    gsapWithCSS.to(letters, { color: gsapWithCSS.utils.wrap(colorArray), duration: 0.25 });
+  }
+
+  // src/global.ts
+  gsapWithCSS.registerPlugin(ScrollTrigger2, Draggable, SplitType);
+  var globalEase = "back.out";
+  var globalDuration = 0.75;
   window.Webflow ||= [];
   window.Webflow.push(() => {
+    const buttons = document.querySelectorAll('[cs-el="button"]');
+    if (buttons.length > 0) {
+      buttons.forEach((button) => {
+        const icon = button.lastChild;
+        const buttonHover = gsapWithCSS.timeline({ paused: true });
+        buttonHover.to(icon, { x: "0.5rem", duration: 0.25, delay: 0.25, ease: "sin.in" });
+        button.addEventListener("mouseenter", () => {
+          buttonHover.timeScale(1).play();
+        });
+        button.addEventListener("mouseleave", () => {
+          buttonHover.timeScale(2).reverse();
+        });
+      });
+    }
+    const logo = document.querySelector('[cs-el="logo"]');
+    if (logo) {
+      const logoLetters = gsapWithCSS.utils.toArray('[cs-el="logo-letter"]');
+      if (logoLetters.length > 0) {
+        setInterval(() => loopLogoLetters(logoLetters), 1e3);
+      }
+    }
+    const splitTextElms = gsapWithCSS.utils.toArray("[txt-split]");
+    if (splitTextElms.length > 0) {
+      splitTextElms.forEach((el) => {
+        const splitTextType = el.getAttribute("txt-split");
+        if (splitTextType === "words") {
+          const typeSplit = new SplitType(el, {
+            types: "words",
+            tagName: "div",
+            wordClass: "el"
+          });
+        }
+        if (splitTextType === "chars") {
+          const typeSplit = new SplitType(el, {
+            types: "chars",
+            tagName: "div",
+            charClass: "el"
+          });
+        }
+        const letters = el.querySelectorAll(".el");
+        if (letters.length > 0) {
+          setInterval(() => loopLogoLetters(letters), 1e3);
+        }
+      });
+    }
+    const animatedGradientBackgroundElms = gsapWithCSS.utils.toArray(
+      '[hh-background-color="gradient-loop"]'
+    );
+    if (animatedGradientBackgroundElms.length > 0) {
+      animatedGradientBackgroundElms.forEach((el) => {
+        let currentColorIndex = 0;
+        function changeGradientColor() {
+          currentColorIndex = (currentColorIndex + 1) % colorArray.length;
+          const color1 = colorArray[currentColorIndex];
+          const color2 = colorArray[(currentColorIndex + 1) % colorArray.length];
+          const color3 = colorArray[(currentColorIndex + 2) % colorArray.length];
+          const color4 = colorArray[(currentColorIndex + 3) % colorArray.length];
+          gsapWithCSS.to(el, {
+            duration: 2,
+            // Adjust the duration as needed
+            background: `linear-gradient(to right, ${color1}, ${color2}, ${color3}, ${color4})`,
+            onComplete: changeGradientColor
+          });
+        }
+        changeGradientColor();
+      });
+    }
+    const loginModal = gsapWithCSS.utils.toArray('[cs-el="login-modal"]');
+    if (loginModal.length > 0) {
+      gsapWithCSS.set(loginModal, { autoAlpha: 0 });
+      let isOpen = false;
+      const body = document.querySelector("body");
+      const loginModalPanel = document.querySelector('[cs-el="login-modal-panel"]');
+      const loginModalTriggers = gsapWithCSS.utils.toArray('[cs-el="login-modal-toggle"]');
+      const openModal = gsapWithCSS.timeline({ paused: true });
+      openModal.to(loginModal, { autoAlpha: 1, duration: 1 });
+      openModal.from(loginModalPanel, { opacity: 0, yPercent: 5, ease: "back.out" }, "<.25");
+      loginModalTriggers.forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          if (isOpen) {
+            openModal.timeScale(2).reverse();
+            body?.classList.toggle("overflow-hidden");
+            isOpen = false;
+          } else {
+            openModal.timeScale(1).play();
+            body?.classList.toggle("overflow-hidden");
+            isOpen = true;
+          }
+        });
+      });
+    }
+    function init4() {
+      const onPageLoadElms = gsapWithCSS.utils.toArray('[cs-tr="pageload"]');
+      if (onPageLoadElms.length > 0) {
+        gsapWithCSS.to(onPageLoadElms, {
+          autoAlpha: 1,
+          duration: globalDuration,
+          ease: globalEase,
+          stagger: 0.25
+        });
+      }
+      const scrolltriggerOnEnterElms = gsapWithCSS.utils.toArray('[cs-st*="scroll-in"]');
+      if (scrolltriggerOnEnterElms.length > 0) {
+        scrolltriggerOnEnterElms.forEach((el) => {
+          gsapWithCSS.from(el, {
+            opacity: 0,
+            yPercent: 10,
+            ease: "sin.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top bottom",
+              end: "top 70%",
+              scrub: 1
+            }
+          });
+        });
+      }
+      const st_paralaxBgElms = gsapWithCSS.utils.toArray('[cs-st*="paralax-bg"]');
+      if (st_paralaxBgElms.length > 0) {
+        st_paralaxBgElms.forEach((el) => {
+          gsapWithCSS.to(el, {
+            yPercent: 20,
+            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 2 }
+          });
+        });
+      }
+      initSliders();
+    }
+    window.addEventListener("resize", () => {
+      init4();
+    });
+    window.addEventListener("load", () => {
+      init4();
+    });
+  });
+
+  // src/human.ts
+  var globalEase2 = "back.out";
+  window.Webflow ||= [];
+  window.Webflow.push(() => {
+    const hhpHeroImg = document.querySelector('[cs-el="userHeroImg"]');
+    if (hhpHeroImg) {
+      gsapWithCSS.to(hhpHeroImg, {
+        yPercent: 20,
+        scrollTrigger: { trigger: hhpHeroImg, start: "top top", end: "bottom top", scrub: 1 }
+      });
+    }
+    const hhpSections = gsapWithCSS.utils.toArray('[cs-el="userBodySection"]');
+    if (hhpSections.length > 0) {
+      hhpSections.forEach((el) => {
+        gsapWithCSS.from(el, {
+          opacity: 0,
+          yPercent: 20,
+          ease: "sin.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top bottom",
+            end: "top 75%",
+            scrub: 1,
+            markers: false
+          }
+        });
+      });
+    }
+    const hhpAside = document.querySelector('[cs-el="hhp-aside"]');
+    const hhpUserCard = document.querySelector('[cs-el="hhp-user-card"]');
+    const hhpBody = document.querySelector('[cs-el="hhp-body"]');
+    const toggleNav = gsapWithCSS.timeline({ paused: true });
+    const stNav = ScrollTrigger2.create({
+      trigger: hhpAside,
+      start: "top 34rem",
+      endTrigger: hhpBody,
+      end: () => `bottom ${hhpUserCard.offsetHeight + 64}`,
+      markers: false,
+      pin: hhpUserCard,
+      pinSpacing: true,
+      invalidateOnRefresh: true,
+      onEnter: () => toggleNav.delay(2).timeScale(1).play(),
+      onLeaveBack: () => toggleNav.timeScale(4).reverse()
+    });
+    const hhpNav = document.querySelector('[cs-el="hhp-nav"]');
+    if (hhpNav) {
+      const navItems = gsapWithCSS.utils.toArray('[cs-el="hhp-nav-item"]');
+      toggleNav.from(navItems, {
+        autoAlpha: 0,
+        duration: 0.3,
+        y: "-2rem",
+        ease: globalEase2,
+        stagger: 0.1
+      });
+      navItems.forEach((item) => {
+        const navItemHover = gsapWithCSS.timeline({ paused: true });
+        navItemHover.to(item, { x: "0.25rem", duration: 1, ease: globalEase2 });
+        item.addEventListener("mouseenter", () => {
+          navItemHover.timeScale(1).play();
+        });
+        item.addEventListener("mouseleave", () => {
+          navItemHover.timeScale(1.5).reverse();
+        });
+      });
+    }
+  });
+
+  // src/profileadmin.ts
+  gsapWithCSS.registerPlugin(Draggable);
+  window.Webflow ||= [];
+  window.Webflow.push(() => {
+    const userAdmin = document.querySelector('[cs-el="userAdmin"]');
+    if (userAdmin) {
+      const userAdminTab = document.querySelector('[cs-el="userAdminTab"]');
+      if (userAdminTab) {
+        const tl_hoverTab = gsapWithCSS.timeline({ paused: true });
+        tl_hoverTab.to(userAdminTab, { width: "+=0.5rem", paddingLeft: "0.5rem" });
+        userAdminTab.addEventListener("mouseenter", () => {
+          tl_hoverTab.timeScale(1).play();
+        });
+        userAdminTab.addEventListener("mouseleave", () => {
+          tl_hoverTab.timeScale(2).reverse();
+        });
+      }
+      const hhuPanelWidth = "45rem";
+      const userAdminDrawer = userAdmin.querySelector('[cs-el="userAdminDrawer"]');
+      const userAdminHeader = userAdminDrawer?.querySelector('[cs-el="userAdminHeader"]');
+      const userAdminContent = userAdminDrawer?.querySelector('[cs-el="userAdminMain"]');
+      const userAdminBackdrop = userAdmin?.querySelector('[cs-el="userAdminBackdrop"]');
+      const userCloseDrawer = userAdmin?.querySelector('[cs-el="adminCloseDrawer"]');
+      let isOpen = false;
+      const openPanel = gsapWithCSS.timeline({ paused: true });
+      openPanel.to(userAdminDrawer, { width: hhuPanelWidth, ease: "Power.out", duration: 0.375 });
+      openPanel.to(userAdminTab, { opacity: 0, duration: 0.375 }, "<");
+      openPanel.to([userAdminBackdrop], { autoAlpha: 1, duration: 0.375 }, "<");
+      openPanel.from([userAdminHeader, userAdminContent], { opacity: 0, duration: 0.25 });
+      userAdminTab.addEventListener("click", () => {
+        if (isOpen) {
+          isOpen = false;
+          openPanel.timeScale(1.5).reverse();
+        } else {
+          isOpen = true;
+          openPanel.timeScale(1).play();
+        }
+      });
+      const closeDrawer = () => {
+        if (isOpen) {
+          isOpen = false;
+          openPanel.timeScale(1.5).reverse();
+        }
+      };
+      userAdminBackdrop.addEventListener("click", closeDrawer);
+      userCloseDrawer.addEventListener("click", closeDrawer);
+    }
     function customColorPicker(handle, parent) {
       function getParentGradientColor(eventX) {
         const parentWidth = parent.clientWidth;
@@ -9133,30 +10066,31 @@
           throw new Error("Invalid color format.");
         }
         const interpolatedRGB = startRGB.map(
-          (startChannel, index2) => Math.round(startChannel + percentage * (endRGB[index2] - startChannel))
+          (startChannel, index) => Math.round(startChannel + percentage * (endRGB[index] - startChannel))
         );
         return `rgba(${interpolatedRGB.join(", ")})`;
       }
-      const hhColorElms = document.querySelectorAll("[hh-color], [hh-link-color]");
-      const hhBgColorElms = gsapWithCSS.utils.toArray("[hh-background-color], [hh-button-color]");
+      const hhColorElms = gsapWithCSS.utils.toArray("[hh-color], [hh-link-color]");
+      const hhBgColorElms = gsapWithCSS.utils.toArray(
+        "[hh-background-color], [hh-button-color]"
+      );
       const selectedColorHex = document.querySelector('[cs-el="hha-color-selected-hex"]');
       let color = "";
       Draggable.create(handle, {
         type: "x",
         bounds: parent,
-        onClick: function() {
-        },
+        //onClick: function () {},
         onDrag: function() {
           color = getParentGradientColor(
             handle.getBoundingClientRect().left - parent.getBoundingClientRect().left
           );
           const hexColor = rgbStringToHex(color);
           selectedColorHex.textContent = hexColor;
-          hhColorElms.forEach((el2) => {
-            el2.style.color = color;
+          hhColorElms.forEach((el) => {
+            el.style.color = color;
           });
-          hhBgColorElms.forEach((el2) => {
-            el2.style.backgroundColor = color;
+          hhBgColorElms.forEach((el) => {
+            el.style.backgroundColor = color;
           });
         }
       });
@@ -9168,109 +10102,6 @@
       const colorPickerHandle = colorPicker.querySelector('[cs-el="hha-colorpicker-handle"]');
       customColorPicker(colorPickerHandle, colorPickerGradient);
     }
-    const hhuTab = document.querySelector('[cs-el="hhu-admin-tab"]');
-    const hhuPanelWidth = "35rem";
-    if (hhuTab) {
-      const hhuAdminMain = document.querySelector('[cs-el="hhu-admin-main"]');
-      const hhuAdminContent = hhuAdminMain?.querySelector('[cs-el="hhu-admin-main-content"]');
-      let isOpen = false;
-      const openPanel = gsapWithCSS.timeline({ paused: true });
-      openPanel.to(hhuAdminMain, { width: hhuPanelWidth, ease: "Power2.out" });
-      openPanel.to(hhuAdminContent, { opacity: 1 });
-      hhuTab.addEventListener("click", () => {
-        if (isOpen) {
-          isOpen = false;
-          openPanel.timeScale(1.75).reverse();
-        } else {
-          isOpen = true;
-          openPanel.timeScale(1).play();
-        }
-      });
-    }
-    const drag = document.querySelector('[cs-el="hhu-admin-modal"]');
-    if (drag) {
-      Draggable.create(drag, {});
-    }
-    const editables = gsapWithCSS.utils.toArray('[cs-el="hha_editable"]');
-    editables.forEach((el2) => {
-      const tl_hoverEditable = gsapWithCSS.timeline({ paused: true });
-      const tl_openCopyAsist = gsapWithCSS.timeline({ paused: true });
-      const hoverWrap = el2.querySelector('[cs-el="hha_editable-hover"]');
-      const openCopyAsist = el2.querySelector('[cs-el="open-asist"]');
-      const closeCopyAsist = el2.querySelectorAll('[cs-el="close-asist"]');
-      const copyAsist = el2.querySelector('[cs-el="asist"]');
-      let isOpen = false;
-      gsapWithCSS.set(hoverWrap, { opacity: 0, scale: 1.03 });
-      gsapWithCSS.set(copyAsist, { autoAlpha: 0, scale: 1 });
-      gsapWithCSS.set(openCopyAsist, { color: "#C3bdb7" });
-      tl_hoverEditable.to(hoverWrap, {
-        opacity: 1,
-        scale: 1,
-        duration: gsapDuration,
-        ease: gsapEaseType
-      });
-      tl_openCopyAsist.to(copyAsist, {
-        autoAlpha: 1,
-        scale: 1,
-        duration: gsapDuration,
-        ease: gsapEaseType
-      });
-      tl_openCopyAsist.to(
-        openCopyAsist,
-        {
-          color: "#70c278",
-          duration: gsapDuration,
-          ease: gsapEaseType
-        },
-        "<"
-      );
-      el2.addEventListener("mouseenter", () => {
-        tl_hoverEditable.timeScale(1).play();
-      });
-      el2.addEventListener("mouseleave", () => {
-        if (!isOpen) {
-          tl_hoverEditable.timeScale(2).reverse();
-        }
-      });
-      openCopyAsist.addEventListener("click", () => {
-        tl_openCopyAsist.timeScale(1).play();
-        isOpen = true;
-      });
-      closeCopyAsist.forEach((el3) => {
-        el3.addEventListener("click", () => {
-          tl_openCopyAsist.timeScale(2).reverse();
-          isOpen = false;
-        });
-      });
-      document.addEventListener("click", (event) => {
-        if (!el2.contains(event.target)) {
-          tl_hoverEditable.timeScale(2).reverse();
-          if (isOpen) {
-            tl_openCopyAsist.timeScale(2).reverse();
-          }
-        }
-      });
-    });
-    const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
-    const style = document.createElement("style");
-    style.innerHTML = sortableClasses;
-    document.head.appendChild(style);
-    const el = document.querySelector('[cs-el="sortable-list"]');
-    const sortable = sortable_esm_default.create(el, {
-      handle: ".hha_icon-btn",
-      ghostClass: "ghost",
-      //dragClass: 'drag',
-      animation: 250,
-      forceFallback: false
-    });
-    function init4() {
-    }
-    window.addEventListener("resize", () => {
-      init4();
-    });
-    window.addEventListener("load", () => {
-      init4();
-    });
   });
 })();
 /*! Bundled license information:
@@ -9330,12 +10161,15 @@ gsap/Observer.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 
-sortablejs/modular/sortable.esm.js:
-  (**!
-   * Sortable 1.15.0
-   * @author	RubaXa   <trash@rubaxa.org>
-   * @author	owenm    <owen23355@gmail.com>
-   * @license MIT
-   *)
+gsap/ScrollTrigger.js:
+  (*!
+   * ScrollTrigger 3.12.2
+   * https://greensock.com
+   *
+   * @license Copyright 2008-2023, GreenSock. All rights reserved.
+   * Subject to the terms at https://greensock.com/standard-license or for
+   * Club GreenSock members, the agreement issued with that membership.
+   * @author: Jack Doyle, jack@greensock.com
+  *)
 */
 //# sourceMappingURL=profileadmin.js.map

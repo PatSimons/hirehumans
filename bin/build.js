@@ -8,7 +8,7 @@ const PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Config entrypoint files
 const ENTRY_POINTS = [
-  'src/global.ts',
+  //'src/global.ts',
   'src/home.ts',
   'src/humans.ts',
   'src/human.ts',
