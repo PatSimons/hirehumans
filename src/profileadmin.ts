@@ -139,10 +139,13 @@ window.Webflow.push(() => {
     } // End: function interpolateColor()
 
     // Array of all elements that have dynamic text color
-    const hhColorElms = gsap.utils.toArray<HTMLElement>('[hh-color], [hh-link-color]');
-    // Array of all elements that have dynamic backround color
+    const hhColorElms = gsap.utils.toArray<HTMLElement>(
+      '[hh-color="text"], [hh-color="textDark"], [hh-color="textLight"], [hh-color="link"]'
+    );
+
+    // Array of all elements that have dynamic background color
     const hhBgColorElms = gsap.utils.toArray<HTMLElement>(
-      '[hh-background-color], [hh-button-color]'
+      '[hh-color="background"], [hh-color="backgroundDark"], [hh-color="backgroundLight"], [hh-color="button"]'
     );
 
     // Text field that displays the selected Hex value
