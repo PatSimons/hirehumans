@@ -38,7 +38,7 @@ window.Webflow.push(() => {
     const openPanel = gsap.timeline({ paused: true });
 
     openPanel.to(userAdminDrawer, { width: hhuPanelWidth, ease: 'Power.out', duration: 0.375 });
-    openPanel.to(userAdminTab, { opacity: 0, duration: 0.375 }, '<');
+    openPanel.to(userAdminTab, { left: '-2rem', duration: 0.375, ease: 'back.out' });
     openPanel.to([userAdminBackdrop], { autoAlpha: 1, duration: 0.375 }, '<');
     openPanel.from([userAdminHeader, userAdminContent], { opacity: 0, duration: 0.25 });
 
