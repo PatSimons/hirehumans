@@ -45,7 +45,7 @@ window.Webflow.push(() => {
     }
   }
 
-  //_______________________________________________________________________________________________________ Split text into spans
+  //_______________________________________________________________________________________________________ Split text into letters/words
   const splitTextElms = gsap.utils.toArray<HTMLElement>('[txt-split]');
   if (splitTextElms.length > 0) {
     splitTextElms.forEach((el) => {
@@ -57,6 +57,7 @@ window.Webflow.push(() => {
           wordClass: 'el',
         });
       }
+
       if (splitTextType === 'chars') {
         const typeSplit = new SplitType(el, {
           types: 'chars',
@@ -64,6 +65,7 @@ window.Webflow.push(() => {
           charClass: 'el',
         });
       }
+      // Loop colors for each letter/word
       const letters = el.querySelectorAll<HTMLElement>('.el');
       if (letters.length > 0) {
         setInterval(() => loopLogoLetters(letters), 1000);
@@ -134,7 +136,7 @@ window.Webflow.push(() => {
   //_______________________________________________________________________________________________________ Initiate Function when DOM ready
   function init() {
     // Animate elements On Page Load
-    const onPageLoadElms = gsap.utils.toArray<HTMLElement>('[cs-tr="pageload"]');
+    const onPageLoadElms = gsap.utils.toArray<HTMLElement>('[st*="pageload"]');
     if (onPageLoadElms.length > 0) {
       gsap.to(onPageLoadElms, {
         autoAlpha: 1,
@@ -144,7 +146,7 @@ window.Webflow.push(() => {
       });
     }
     // Scrolltrigger elements On Enter Viewport
-    const scrolltriggerOnEnterElms = gsap.utils.toArray<HTMLElement>('[cs-st*="scroll-in"]');
+    const scrolltriggerOnEnterElms = gsap.utils.toArray<HTMLElement>('[st*="scroll-in"]');
     if (scrolltriggerOnEnterElms.length > 0) {
       scrolltriggerOnEnterElms.forEach((el) => {
         gsap.from(el, {
@@ -161,7 +163,7 @@ window.Webflow.push(() => {
       });
     }
     // Scrolltrigger paralax auto
-    const st_paralaxBgElms = gsap.utils.toArray<HTMLElement>('[cs-st*="paralax-bg"]');
+    const st_paralaxBgElms = gsap.utils.toArray<HTMLElement>('[st*="paralax-bg"]');
     if (st_paralaxBgElms.length > 0) {
       st_paralaxBgElms.forEach((el) => {
         gsap.to(el, {
@@ -170,6 +172,7 @@ window.Webflow.push(() => {
         });
       });
     }
+    //_______________________________________________________________________________________________________ Initite Sliders Functionality
     initSliders();
   }
   //_______________________________________________________________________________________________________ Add Window Event Listeners

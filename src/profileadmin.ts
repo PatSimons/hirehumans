@@ -2,12 +2,13 @@ import './global';
 import './human';
 
 import { Draggable } from 'gsap/Draggable';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 //import Sortable from 'sortablejs'; // Added "esModuleInterop": true to tsconfig.json
 //import { gsapDuration, gsapEaseType } from '$utils/globalvars';
 import { gsap } from './global';
 gsap.registerPlugin(Draggable);
-//gsap.registerPlugin(Sortable);
+gsap.registerPlugin(ScrollTrigger);
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
@@ -37,12 +38,19 @@ window.Webflow.push(() => {
 
     const openPanel = gsap.timeline({ paused: true });
 
+    // // Define the ScrollTrigger
+    // const pin = ScrollTrigger.create({
+    //   trigger: userAdminHeader,
+    //   start: 'top top',
+    //   pin: true,
+    // });
+
     openPanel.to(userAdminDrawer, { width: hhuPanelWidth, ease: 'Power.out', duration: 0.375 });
     openPanel.to(userAdminTab, { left: '-2rem', duration: 0.375, ease: 'back.out' });
     openPanel.to([userAdminBackdrop], { autoAlpha: 1, duration: 0.375 }, '<');
     openPanel.from([userAdminHeader, userAdminContent], { opacity: 0, duration: 0.25 });
 
-    userAdminTab.addEventListener('click', () => {
+    userAdminTab?.addEventListener('click', () => {
       if (isOpen) {
         isOpen = false;
         openPanel.timeScale(1.5).reverse();
@@ -150,6 +158,7 @@ window.Webflow.push(() => {
 
     // Text field that displays the selected Hex value
     const selectedColorHex = document.querySelector('[cs-el="hha-color-selected-hex"]');
+    const selectedColorInput = document.querySelector('[cs-el="hhaColorInput"]');
 
     // Drag handle function
     let color = '';
@@ -163,6 +172,7 @@ window.Webflow.push(() => {
         );
         const hexColor = rgbStringToHex(color);
         selectedColorHex.textContent = hexColor;
+        selectedColorInput.value = hexColor;
 
         hhColorElms.forEach((el: HTMLElement) => {
           el.style.color = color;
