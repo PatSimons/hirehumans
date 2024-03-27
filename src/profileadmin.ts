@@ -196,6 +196,35 @@ window.Webflow.push(() => {
     customColorPicker(colorPickerHandle, colorPickerGradient);
   }
 
+  //_______________________________________________________________________________________________________ Services
+  const services = document.querySelector<HTMLElement>('[cs-el="services"]');
+
+  if (services) {
+    const serviceItems = document.querySelectorAll<HTMLElement>('[cs-el="serviceItem"]');
+    serviceItems.forEach((item) => {
+      const serviceEdit = item.querySelector<HTMLElement>('[cs-el="serviceEdit"]');
+      const serviceFormInputs = item.querySelector<HTMLElement>('[cs-el="serviceFormInputs"]');
+      const serviceFormInputsHeight = serviceFormInputs?.clientHeight ?? 0;
+      gsap.set(serviceFormInputs, { opacity: 0, display: 'none', height: 0 });
+      const tl_editService = gsap.timeline({ paused: true });
+      tl_editService.to(serviceFormInputs, { display: 'block', duration: 0.1 });
+      tl_editService.to(serviceFormInputs, { opacity: 1, height: serviceFormInputsHeight }, '<');
+
+      let isOpen = false;
+
+      const openFromInputs = () => {
+        if (isOpen) {
+          isOpen = false;
+          tl_editService.timeScale(1.5).reverse();
+        } else {
+          isOpen = true;
+          tl_editService.timeScale(1).play();
+        }
+      };
+
+      serviceEdit?.addEventListener('click', openFromInputs);
+    });
+  }
   //_______________________________________________________________________________________________________ On Page Editables
   // const editables = gsap.utils.toArray('[cs-el="hha_editable"]');
   // editables.forEach((el: any) => {
