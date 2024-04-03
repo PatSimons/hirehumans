@@ -3,8 +3,8 @@ import './human';
 
 import { Draggable } from 'gsap/Draggable';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Sortable from 'sortablejs'; // Added "esModuleInterop": true to tsconfig.json
 
-//import Sortable from 'sortablejs'; // Added "esModuleInterop": true to tsconfig.json
 //import { gsapDuration, gsapEaseType } from '$utils/globalvars';
 import { gsap } from './global';
 gsap.registerPlugin(Draggable);
@@ -200,31 +200,112 @@ window.Webflow.push(() => {
   const services = document.querySelector<HTMLElement>('[cs-el="services"]');
 
   if (services) {
-    const serviceItems = document.querySelectorAll<HTMLElement>('[cs-el="serviceItem"]');
-    serviceItems.forEach((item) => {
-      const serviceEdit = item.querySelector<HTMLElement>('[cs-el="serviceEdit"]');
-      const serviceFormInputs = item.querySelector<HTMLElement>('[cs-el="serviceFormInputs"]');
-      const serviceFormInputsHeight = serviceFormInputs?.clientHeight ?? 0;
-      gsap.set(serviceFormInputs, { opacity: 0, display: 'none', height: 0 });
-      const tl_editService = gsap.timeline({ paused: true });
-      tl_editService.to(serviceFormInputs, { display: 'block', duration: 0.1 });
-      tl_editService.to(serviceFormInputs, { opacity: 1, height: serviceFormInputsHeight }, '<');
+    //_______________________________________________________________________________________________________ Sortable Service Items
+    const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
 
-      let isOpen = false;
+    // Then, you can insert this class into a style tag in your HTML document.
+    const style = document.createElement('style');
+    style.innerHTML = sortableClasses;
+    document.head.appendChild(style);
 
-      const openFromInputs = () => {
-        if (isOpen) {
-          isOpen = false;
-          tl_editService.timeScale(1.5).reverse();
-        } else {
-          isOpen = true;
-          tl_editService.timeScale(1).play();
+    const sortable = Sortable.create(services, {
+      handle: '[cs-el="sortableHandle"]',
+      ghostClass: 'ghost',
+      //dragClass: 'drag',
+      animation: 250,
+      forceFallback: false,
+      onEnd: function (evt) {
+        const items = evt.from.children;
+        for (let i = 0; i < items.length; i++) {
+          items[i].setAttribute('data-index', i);
         }
-      };
+      },
+      // onEnd: function (evt) {
+      //   const { newIndex } = evt;
+      //   const { item } = evt;
+      //   item.setAttribute('data-index', newIndex);
+      // },
+    });
 
-      serviceEdit?.addEventListener('click', openFromInputs);
+    // Toggle (Enable/disable) serviceItem Function
+    const moveElement = (element: HTMLElement, itemStatus: string) => {
+      const handleBtn = element.querySelector<HTMLElement>('[cs-el="sortableHandle"]');
+      const visibilityBtn = element.querySelector<HTMLElement>('[cs-el="toggleVisibility"]');
+      const itemHeader = element.querySelector<HTMLElement>('[cs-el="serviceHeader"]');
+      if (handleBtn && visibilityBtn) {
+        let newParent: HTMLElement | null;
+        if (itemStatus === 'hide') {
+          newParent = document.querySelector('[cs-el="disabledServices"]');
+          visibilityBtn?.classList.add('is-off');
+          itemHeader?.classList.add('is-off');
+          handleBtn.style.display = 'none';
+        } else {
+          newParent = document.querySelector('[cs-el="services"]');
+          visibilityBtn.classList.remove('is-off');
+          itemHeader?.classList.remove('is-off');
+          handleBtn.style.display = 'block';
+        }
+
+        if (newParent) {
+          newParent.appendChild(element);
+        }
+      }
+    };
+
+    const toggleButtons = document.querySelectorAll('[cs-el="toggleVisibility"]');
+    toggleButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        // Find parent 'serviceItem' of clicked edit button
+        const elementToMove = (event.target as HTMLElement).closest(
+          '[cs-el="serviceItem"]'
+        ) as HTMLElement;
+
+        // If 'serviceItem' if disabled
+        if (elementToMove.classList.contains('is-off')) {
+          moveElement(elementToMove, 'show'); // Shouldn't it be 'hide' instead of 'show'?
+          elementToMove.classList.remove('is-off'); // Use remove() method to remove a class
+        }
+        // If 'serviceItem' if enabled
+        else {
+          moveElement(elementToMove, 'hide');
+          elementToMove.classList.add('is-off'); // Use add() method to add a class
+        }
+      });
+    });
+
+    const items = gsap.utils.toArray<HTMLElement>('[cs-el="serviceItem"]');
+    let currentItem: number | null = null;
+
+    items.forEach((e, i) => {
+      const content = e.querySelector<HTMLElement>('[cs-el="serviceFormInputs"]');
+      const openButton = e.querySelector<HTMLElement>('[cs-el="serviceEdit"]');
+      if (!content) return;
+
+      const t = gsap.to(content, {
+        height: 'auto',
+        paddingTop: '0.5rem',
+        paused: true,
+        duration: 0.35,
+      });
+
+      (e as any)._accordionTween = t;
+
+      openButton?.addEventListener('click', () => {
+        if (currentItem !== null) {
+          items[currentItem].classList.toggle('active');
+          if (currentItem === i) {
+            currentItem = null;
+            return t.timeScale(1.5).reverse();
+          }
+          (items[currentItem] as any)._accordionTween.reverse();
+        }
+        e.classList.toggle('active');
+        t.timeScale(1).play();
+        currentItem = i;
+      });
     });
   }
+
   //_______________________________________________________________________________________________________ On Page Editables
   // const editables = gsap.utils.toArray('[cs-el="hha_editable"]');
   // editables.forEach((el: any) => {
@@ -287,22 +368,5 @@ window.Webflow.push(() => {
   //       }
   //     }
   //   });
-  // });
-
-  //_______________________________________________________________________________________________________ Sortable Items
-  // const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
-
-  // // Then, you can insert this class into a style tag in your HTML document.
-  // const style = document.createElement('style');
-  // style.innerHTML = sortableClasses;
-  // document.head.appendChild(style);
-
-  // const el = document.querySelector('[cs-el="sortable-list"]');
-  // const sortable = Sortable.create(el, {
-  //   handle: '.hha_icon-btn',
-  //   ghostClass: 'ghost',
-  //   //dragClass: 'drag',
-  //   animation: 250,
-  //   forceFallback: false,
   // });
 }); // End: Webflow Push
