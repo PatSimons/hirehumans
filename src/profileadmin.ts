@@ -232,6 +232,7 @@ window.Webflow.push(() => {
       const handleBtn = element.querySelector<HTMLElement>('[cs-el="sortableHandle"]');
       const visibilityBtn = element.querySelector<HTMLElement>('[cs-el="toggleVisibility"]');
       const itemHeader = element.querySelector<HTMLElement>('[cs-el="serviceHeader"]');
+      gsap.set(element, { opacity: 0 });
       if (handleBtn && visibilityBtn) {
         let newParent: HTMLElement | null;
         if (itemStatus === 'hide') {
@@ -248,6 +249,8 @@ window.Webflow.push(() => {
 
         if (newParent) {
           newParent.appendChild(element);
+
+          gsap.to(element, { opacity: 1, duration: 1 });
         }
       }
     };

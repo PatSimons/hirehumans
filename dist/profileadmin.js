@@ -12346,6 +12346,7 @@
         const handleBtn = element.querySelector('[cs-el="sortableHandle"]');
         const visibilityBtn = element.querySelector('[cs-el="toggleVisibility"]');
         const itemHeader = element.querySelector('[cs-el="serviceHeader"]');
+        gsapWithCSS.set(element, { opacity: 0 });
         if (handleBtn && visibilityBtn) {
           let newParent;
           if (itemStatus === "hide") {
@@ -12361,6 +12362,7 @@
           }
           if (newParent) {
             newParent.appendChild(element);
+            gsapWithCSS.to(element, { opacity: 1, duration: 1 });
           }
         }
       };
