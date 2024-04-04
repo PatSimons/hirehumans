@@ -12318,6 +12318,21 @@
       const colorPickerHandle = colorPicker.querySelector('[cs-el="hha-colorpicker-handle"]');
       customColorPicker(colorPickerHandle, colorPickerGradient);
     }
+    const forms = document.querySelectorAll('[cs-el="form"]');
+    forms.forEach((form) => {
+      const warningElement = form.querySelector('[cs-el="warning"]');
+      const tl_showUnsavedChangesWarning = gsapWithCSS.timeline({ paused: true });
+      const inputFields = form.querySelectorAll("input, select, textarea");
+      gsapWithCSS.set(warningElement, { opacity: 0 });
+      tl_showUnsavedChangesWarning.to(warningElement, { opacity: 1 });
+      inputFields.forEach((inputField) => {
+        inputField.addEventListener("input", () => {
+          if (warningElement) {
+            tl_showUnsavedChangesWarning.play();
+          }
+        });
+      });
+    });
     const services = document.querySelector('[cs-el="services"]');
     if (services) {
       const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
@@ -12333,14 +12348,18 @@
         onEnd: function(evt) {
           const items2 = evt.from.children;
           for (let i = 0; i < items2.length; i++) {
-            items2[i].setAttribute("data-index", i);
+            items2[i].setAttribute("data-index", i.toString());
+            const inputIndex = items2[i].querySelector('[cs-el="formInputIndex"]');
+            if (inputIndex) {
+              inputIndex.value = i.toString();
+            }
+          }
+          const warningSibling = services?.parentNode?.querySelector('[cs-el="warning"]');
+          if (warningSibling) {
+            console.log("found");
+            gsapWithCSS.to(warningSibling, { opacity: 1 });
           }
         }
-        // onEnd: function (evt) {
-        //   const { newIndex } = evt;
-        //   const { item } = evt;
-        //   item.setAttribute('data-index', newIndex);
-        // },
       });
       const moveElement = (element, itemStatus) => {
         const handleBtn = element.querySelector('[cs-el="sortableHandle"]');
@@ -12408,6 +12427,14 @@
           t.timeScale(1).play();
           currentItem = i;
         });
+        const inputTitle = content.querySelector('[cs-el="formInputName"]');
+        const textDiv = e.querySelector('[cs-el="serviceHeader"] > div');
+        if (inputTitle && textDiv) {
+          inputTitle.addEventListener("input", (event) => {
+            const inputValue = event.target.value;
+            textDiv.textContent = inputValue;
+          });
+        }
       });
     }
   });

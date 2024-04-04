@@ -196,6 +196,29 @@ window.Webflow.push(() => {
     customColorPicker(colorPickerHandle, colorPickerGradient);
   }
 
+  //_______________________________________________________________________________________________________ Unsaved Changes Warnings all forms
+
+  // Find all form elements with the attribute cs-el="form"
+  const forms = document.querySelectorAll<HTMLFormElement>('[cs-el="form"]');
+
+  forms.forEach((form) => {
+    const warningElement = form.querySelector<HTMLElement>('[cs-el="warning"]');
+    const tl_showUnsavedChangesWarning = gsap.timeline({ paused: true });
+    const inputFields = form.querySelectorAll<HTMLInputElement>('input, select, textarea');
+
+    gsap.set(warningElement, { opacity: 0 });
+    tl_showUnsavedChangesWarning.to(warningElement, { opacity: 1 });
+
+    inputFields.forEach((inputField) => {
+      inputField.addEventListener('input', () => {
+        // Show the warning element
+        if (warningElement) {
+          tl_showUnsavedChangesWarning.play();
+        }
+      });
+    });
+  });
+
   //_______________________________________________________________________________________________________ Services
   const services = document.querySelector<HTMLElement>('[cs-el="services"]');
 
@@ -208,6 +231,7 @@ window.Webflow.push(() => {
     style.innerHTML = sortableClasses;
     document.head.appendChild(style);
 
+    // Setup SortableJS for serviceItems
     const sortable = Sortable.create(services, {
       handle: '[cs-el="sortableHandle"]',
       ghostClass: 'ghost',
@@ -217,14 +241,21 @@ window.Webflow.push(() => {
       onEnd: function (evt) {
         const items = evt.from.children;
         for (let i = 0; i < items.length; i++) {
-          items[i].setAttribute('data-index', i);
+          items[i].setAttribute('data-index', i.toString());
+          const inputIndex = items[i].querySelector<HTMLInputElement>('[cs-el="formInputIndex"]');
+          if (inputIndex) {
+            inputIndex.value = i.toString();
+          }
+        }
+        // STILL WORING ON THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        const warningSibling =
+          services?.parentNode?.querySelector<HTMLElement>('[cs-el="warning"]');
+        if (warningSibling) {
+          // Do something with the warning sibling element
+          console.log('found');
+          gsap.to(warningSibling, { opacity: 1 });
         }
       },
-      // onEnd: function (evt) {
-      //   const { newIndex } = evt;
-      //   const { item } = evt;
-      //   item.setAttribute('data-index', newIndex);
-      // },
     });
 
     // Toggle (Enable/disable) serviceItem Function
@@ -306,6 +337,21 @@ window.Webflow.push(() => {
         t.timeScale(1).play();
         currentItem = i;
       });
+
+      // Setup listeners for InputChange
+      // Find the input element and the text div
+      const inputTitle = content.querySelector<HTMLInputElement>('[cs-el="formInputName"]');
+      const textDiv = e.querySelector<HTMLElement>('[cs-el="serviceHeader"] > div');
+      if (inputTitle && textDiv) {
+        // Add an input event listener to the input field
+        inputTitle.addEventListener('input', (event) => {
+          // Get the value of the input field
+          const inputValue = (event.target as HTMLInputElement).value;
+
+          // Update the text content of the text div with the input value
+          textDiv.textContent = inputValue;
+        });
+      }
     });
   }
 
