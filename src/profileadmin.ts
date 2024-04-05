@@ -57,6 +57,7 @@ window.Webflow.push(() => {
       } else {
         isOpen = true;
         openPanel.timeScale(1).play();
+        setEventListeners_UnsavedWarnings();
       }
     });
     // Close Drawer Const
@@ -197,27 +198,43 @@ window.Webflow.push(() => {
   }
 
   //_______________________________________________________________________________________________________ Unsaved Changes Warnings all forms
+  // User Tabs Function
+  function setUnsavedUserTab() {
+    const userTabs = document.querySelector('.user_tabs-menu');
+    const currentTab = userTabs?.querySelector('.w--current');
+    currentTab?.classList.add('is-unsaved');
+  }
+  // Unsaved warning function
+  function showUnsavedWarning(element: HTMLElement) {
+    // Create a GSAP timeline to animate the element
+    gsap.to(element, { opacity: 1 });
+  }
+  const warningElements = document.querySelectorAll<HTMLElement>('[cs-el="warning"]');
+  warningElements.forEach((warningElement) => {
+    gsap.set(warningElement, { opacity: 0 });
+  });
 
   // Find all form elements with the attribute cs-el="form"
-  const forms = document.querySelectorAll<HTMLFormElement>('[cs-el="form"]');
+  function setEventListeners_UnsavedWarnings() {
+    const forms = document.querySelectorAll<HTMLFormElement>('[cs-el="form"]');
+    if (forms.length > 0) {
+      forms.forEach((form) => {
+        const inputFields = form.querySelectorAll<HTMLInputElement>('input, select, textarea');
 
-  forms.forEach((form) => {
-    const warningElement = form.querySelector<HTMLElement>('[cs-el="warning"]');
-    const tl_showUnsavedChangesWarning = gsap.timeline({ paused: true });
-    const inputFields = form.querySelectorAll<HTMLInputElement>('input, select, textarea');
+        inputFields.forEach((inputField) => {
+          inputField.addEventListener('input', () => {
+            console.log(inputField);
+            const warningElement = form?.querySelector<HTMLElement>('[cs-el="warning"]');
 
-    gsap.set(warningElement, { opacity: 0 });
-    tl_showUnsavedChangesWarning.to(warningElement, { opacity: 1 });
-
-    inputFields.forEach((inputField) => {
-      inputField.addEventListener('input', () => {
-        // Show the warning element
-        if (warningElement) {
-          tl_showUnsavedChangesWarning.play();
-        }
+            if (warningElement) {
+              setUnsavedUserTab();
+              showUnsavedWarning(warningElement);
+            }
+          });
+        });
       });
-    });
-  });
+    }
+  }
 
   //_______________________________________________________________________________________________________ Services
   const services = document.querySelector<HTMLElement>('[cs-el="services"]');
@@ -247,6 +264,7 @@ window.Webflow.push(() => {
             inputIndex.value = i.toString();
           }
         }
+        setUnsavedUserTab();
         // STILL WORING ON THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         const warningSibling =
           services?.parentNode?.querySelector<HTMLElement>('[cs-el="warning"]');

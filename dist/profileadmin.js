@@ -12225,6 +12225,7 @@
         } else {
           isOpen = true;
           openPanel.timeScale(1).play();
+          setEventListeners_UnsavedWarnings();
         }
       });
       const closeDrawer = () => {
@@ -12318,21 +12319,36 @@
       const colorPickerHandle = colorPicker.querySelector('[cs-el="hha-colorpicker-handle"]');
       customColorPicker(colorPickerHandle, colorPickerGradient);
     }
-    const forms = document.querySelectorAll('[cs-el="form"]');
-    forms.forEach((form) => {
-      const warningElement = form.querySelector('[cs-el="warning"]');
-      const tl_showUnsavedChangesWarning = gsapWithCSS.timeline({ paused: true });
-      const inputFields = form.querySelectorAll("input, select, textarea");
+    function setUnsavedUserTab() {
+      const userTabs = document.querySelector(".user_tabs-menu");
+      const currentTab = userTabs?.querySelector(".w--current");
+      currentTab?.classList.add("is-unsaved");
+    }
+    function showUnsavedWarning(element) {
+      gsapWithCSS.to(element, { opacity: 1 });
+    }
+    const warningElements = document.querySelectorAll('[cs-el="warning"]');
+    warningElements.forEach((warningElement) => {
       gsapWithCSS.set(warningElement, { opacity: 0 });
-      tl_showUnsavedChangesWarning.to(warningElement, { opacity: 1 });
-      inputFields.forEach((inputField) => {
-        inputField.addEventListener("input", () => {
-          if (warningElement) {
-            tl_showUnsavedChangesWarning.play();
-          }
-        });
-      });
     });
+    function setEventListeners_UnsavedWarnings() {
+      const forms = document.querySelectorAll('[cs-el="form"]');
+      if (forms.length > 0) {
+        forms.forEach((form) => {
+          const inputFields = form.querySelectorAll("input, select, textarea");
+          inputFields.forEach((inputField) => {
+            inputField.addEventListener("input", () => {
+              console.log(inputField);
+              const warningElement = form?.querySelector('[cs-el="warning"]');
+              if (warningElement) {
+                setUnsavedUserTab();
+                showUnsavedWarning(warningElement);
+              }
+            });
+          });
+        });
+      }
+    }
     const services = document.querySelector('[cs-el="services"]');
     if (services) {
       const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
@@ -12354,6 +12370,7 @@
               inputIndex.value = i.toString();
             }
           }
+          setUnsavedUserTab();
           const warningSibling = services?.parentNode?.querySelector('[cs-el="warning"]');
           if (warningSibling) {
             console.log("found");
