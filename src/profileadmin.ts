@@ -30,7 +30,7 @@ window.Webflow.push(() => {
     const hhuPanelWidth = '45rem';
     const userAdminDrawer = userAdmin.querySelector('[cs-el="userAdminDrawer"]');
     const userAdminHeader = userAdminDrawer?.querySelector('[cs-el="userAdminHeader"]');
-    const userAdminContent = userAdminDrawer?.querySelector('[cs-el="userAdminMain"]');
+    const userAdminformInputs = userAdminDrawer?.querySelector('[cs-el="userAdminMain"]');
     const userAdminBackdrop = userAdmin?.querySelector('[cs-el="userAdminBackdrop"]');
     const userCloseDrawer = userAdmin?.querySelector('[cs-el="adminCloseDrawer"]');
 
@@ -48,7 +48,7 @@ window.Webflow.push(() => {
     openPanel.to(userAdminDrawer, { width: hhuPanelWidth, ease: 'Power.out', duration: 0.375 });
     openPanel.to(userAdminTab, { left: '-2rem', duration: 0.375, ease: 'back.out' });
     openPanel.to([userAdminBackdrop], { autoAlpha: 1, duration: 0.375 }, '<');
-    openPanel.from([userAdminHeader, userAdminContent], { opacity: 0, duration: 0.25 });
+    openPanel.from([userAdminHeader, userAdminformInputs], { opacity: 0, duration: 0.25 });
 
     userAdminTab?.addEventListener('click', () => {
       if (isOpen) {
@@ -172,7 +172,7 @@ window.Webflow.push(() => {
           handle.getBoundingClientRect().left - parent.getBoundingClientRect().left
         );
         const hexColor = rgbStringToHex(color);
-        selectedColorHex.textContent = hexColor;
+        selectedColorHex.textformInputs = hexColor;
         selectedColorInput.value = hexColor;
 
         hhColorElms.forEach((el: HTMLElement) => {
@@ -198,25 +198,38 @@ window.Webflow.push(() => {
   }
 
   //_______________________________________________________________________________________________________ Unsaved Changes Warnings all forms
-  // User Tabs Function
-  function setUnsavedUserTab() {
-    const userTabs = document.querySelector('.user_tabs-menu');
-    const currentTab = userTabs?.querySelector('.w--current');
-    currentTab?.classList.add('is-unsaved');
-  }
-  // Unsaved warning function
-  function showUnsavedWarning(element: HTMLElement) {
-    // Create a GSAP timeline to animate the element
-    gsap.to(element, { opacity: 1 });
-  }
+
+  // Hide all Unsaved Warnings on page init.
   const warningElements = document.querySelectorAll<HTMLElement>('[cs-el="warning"]');
   warningElements.forEach((warningElement) => {
     gsap.set(warningElement, { opacity: 0 });
   });
 
-  // Find all form elements with the attribute cs-el="form"
+  // Function: Show Unsaved warning
+  const userTabs = document.querySelectorAll<HTMLElement>('[cs-el="userTab');
+
+  function showUnsavedWarning(warningElement: HTMLElement) {
+    const activeForm = warningElement.closest('[cs-el="form"]');
+    if (activeForm && activeForm.classList.contains('is-unsaved')) return;
+
+    // Create a GSAP timeline to animate the element
+    gsap.to(warningElement, { opacity: 1 });
+
+    // Add is-unsaved class to parent form
+    activeForm?.classList.add('is-unsaved');
+
+    // Add 'unsaved' class and eventListeners User Tab
+    if (userTabs.length > 0) {
+      userTabs.forEach((userTab) => {
+        if (userTab.classList.contains('w--current')) {
+          userTab.classList.add('is-unsaved');
+        }
+      });
+    }
+  }
+
+  //_______________________________________________________________________________________________________ Set eventeListeners for all input fields
   function setEventListeners_UnsavedWarnings() {
-    setUnsavedUserTab();
     const forms = document.querySelectorAll<HTMLFormElement>('[cs-el="form"]');
     if (forms.length > 0) {
       forms.forEach((form) => {
@@ -224,9 +237,8 @@ window.Webflow.push(() => {
 
         inputFields.forEach((inputField) => {
           inputField.addEventListener('input', () => {
-            console.log(inputField);
+            // Find related Warning and call function to show it.
             const warningElement = form?.querySelector<HTMLElement>('[cs-el="warning"]');
-
             if (warningElement) {
               showUnsavedWarning(warningElement);
             }
@@ -236,137 +248,163 @@ window.Webflow.push(() => {
     }
   }
 
-  //_______________________________________________________________________________________________________ Services
+  //_______________________________________________________________________________________________________ Sortable Service Items
   const services = document.querySelector<HTMLElement>('[cs-el="services"]');
-
   if (services) {
-    //_______________________________________________________________________________________________________ Sortable Service Items
+    // Define Sortable classes
     const sortableClasses = `.ghost { opacity: 0; }, .drag { opacity: 0.1; }`;
-
-    // Then, you can insert this class into a style tag in your HTML document.
     const style = document.createElement('style');
     style.innerHTML = sortableClasses;
     document.head.appendChild(style);
 
     // Setup SortableJS for serviceItems
-    const sortable = Sortable.create(services, {
+    Sortable.create(services, {
       handle: '[cs-el="sortableHandle"]',
       ghostClass: 'ghost',
       //dragClass: 'drag',
       animation: 250,
       forceFallback: false,
       onEnd: function (evt) {
-        const items = evt.from.children;
-        for (let i = 0; i < items.length; i++) {
-          items[i].setAttribute('data-index', i.toString());
-          const inputIndex = items[i].querySelector<HTMLInputElement>('[cs-el="formInputIndex"]');
-          if (inputIndex) {
-            inputIndex.value = i.toString();
-          }
-        }
-        setUnsavedUserTab();
-        // STILL WORING ON THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        const warningSibling =
+        // Update indexes
+        updateIndexes();
+
+        // Find related Warning and call function to show it.
+        const warningElement =
           services?.parentNode?.querySelector<HTMLElement>('[cs-el="warning"]');
-        if (warningSibling) {
-          // Do something with the warning sibling element
-          console.log('found');
-          gsap.to(warningSibling, { opacity: 1 });
+        if (warningElement) {
+          showUnsavedWarning(warningElement);
         }
       },
     });
 
-    // Toggle (Enable/disable) serviceItem Function
+    // Define the updateIndexes function
+    function updateIndexes() {
+      const items = services?.querySelectorAll('[cs-el="serviceItem"]');
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        items[i].setAttribute('data-index', i.toString());
+        const inputIndex = items[i].querySelector<HTMLInputElement>('[cs-el="formInputIndex"]');
+        if (inputIndex) {
+          inputIndex.value = i.toString();
+        }
+      }
+    }
+    updateIndexes();
+
+    //_______________________________________________________________________________________________________ Toggle visibility (Enable/disable) serviceItem Function
     const moveElement = (element: HTMLElement, itemStatus: string) => {
       const handleBtn = element.querySelector<HTMLElement>('[cs-el="sortableHandle"]');
       const visibilityBtn = element.querySelector<HTMLElement>('[cs-el="toggleVisibility"]');
       const itemHeader = element.querySelector<HTMLElement>('[cs-el="serviceHeader"]');
+
       gsap.set(element, { opacity: 0 });
       if (handleBtn && visibilityBtn) {
         let newParent: HTMLElement | null;
+        // Set visibility Input
+        const inputVisibility = element.querySelector<HTMLInputElement>(
+          '[cs-el="formInputVisibility"]'
+        );
         if (itemStatus === 'hide') {
           newParent = document.querySelector('[cs-el="disabledServices"]');
           visibilityBtn?.classList.add('is-off');
           itemHeader?.classList.add('is-off');
           handleBtn.style.display = 'none';
+          if (inputVisibility) {
+            inputVisibility.value = '0';
+          }
         } else {
           newParent = document.querySelector('[cs-el="services"]');
           visibilityBtn.classList.remove('is-off');
           itemHeader?.classList.remove('is-off');
           handleBtn.style.display = 'block';
+          if (inputVisibility) {
+            inputVisibility.value = '1';
+          }
         }
 
         if (newParent) {
+          // Move the item to new Parent
           newParent.appendChild(element);
-
           gsap.to(element, { opacity: 1, duration: 1 });
+          // Update indexes
+          updateIndexes();
+          // Find related Warning and call function to show it.
+          const warningElement = element
+            ?.closest('[cs-el="form"]')
+            ?.querySelector<HTMLElement>('[cs-el="warning"]');
+          if (warningElement) {
+            showUnsavedWarning(warningElement);
+          }
         }
       }
     };
 
+    // Toggle serviceItem visibility
     const toggleButtons = document.querySelectorAll('[cs-el="toggleVisibility"]');
     toggleButtons.forEach((button) => {
       button.addEventListener('click', (event) => {
-        // Find parent 'serviceItem' of clicked edit button
+        // Find parent 'serviceItem' of clicked button
         const elementToMove = (event.target as HTMLElement).closest(
           '[cs-el="serviceItem"]'
         ) as HTMLElement;
 
         // If 'serviceItem' if disabled
         if (elementToMove.classList.contains('is-off')) {
-          moveElement(elementToMove, 'show'); // Shouldn't it be 'hide' instead of 'show'?
-          elementToMove.classList.remove('is-off'); // Use remove() method to remove a class
+          moveElement(elementToMove, 'show');
+          elementToMove.classList.remove('is-off');
         }
         // If 'serviceItem' if enabled
         else {
           moveElement(elementToMove, 'hide');
-          elementToMove.classList.add('is-off'); // Use add() method to add a class
+          elementToMove.classList.add('is-off');
         }
       });
     });
 
+    // Accordion functionality for open/close inputFornFields each serviceItem
     const items = gsap.utils.toArray<HTMLElement>('[cs-el="serviceItem"]');
     let currentItem: number | null = null;
 
-    items.forEach((e, i) => {
-      const content = e.querySelector<HTMLElement>('[cs-el="serviceFormInputs"]');
-      const openButton = e.querySelector<HTMLElement>('[cs-el="serviceEdit"]');
-      if (!content) return;
+    items.forEach((item, i) => {
+      const formInputs = item.querySelector<HTMLElement>('[cs-el="serviceFormInputs"]');
+      const openButton = item.querySelector<HTMLElement>('[cs-el="serviceEdit"]');
+      if (!formInputs) return;
 
-      const t = gsap.to(content, {
+      const tl_openInputs = gsap.to(formInputs, {
         height: 'auto',
+        overflow: 'visible',
         paddingTop: '0.5rem',
         paused: true,
         duration: 0.35,
       });
 
-      (e as any)._accordionTween = t;
+      (item as any)._accordionAnimation = tl_openInputs;
 
       openButton?.addEventListener('click', () => {
         if (currentItem !== null) {
           items[currentItem].classList.toggle('active');
           if (currentItem === i) {
             currentItem = null;
-            return t.timeScale(1.5).reverse();
+            return tl_openInputs.timeScale(1.5).reverse();
           }
-          (items[currentItem] as any)._accordionTween.reverse();
+          (items[currentItem] as any)._accordionAnimation.reverse();
         }
-        e.classList.toggle('active');
-        t.timeScale(1).play();
+        item.classList.toggle('active');
+        tl_openInputs.timeScale(1).play();
         currentItem = i;
       });
 
       // Setup listeners for InputChange
       // Find the input element and the text div
-      const inputTitle = content.querySelector<HTMLInputElement>('[cs-el="formInputName"]');
-      const textDiv = e.querySelector<HTMLElement>('[cs-el="serviceHeader"] > div');
+      const inputTitle = formInputs.querySelector<HTMLInputElement>('[cs-el="formInputName"]');
+      const textDiv = item.querySelector<HTMLElement>('[cs-el="serviceHeader"] > div');
       if (inputTitle && textDiv) {
         // Add an input event listener to the input field
         inputTitle.addEventListener('input', (event) => {
           // Get the value of the input field
           const inputValue = (event.target as HTMLInputElement).value;
 
-          // Update the text content of the text div with the input value
+          // Update the text formInputs of the text div with the input value
           textDiv.textContent = inputValue;
         });
       }
