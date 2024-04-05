@@ -216,6 +216,7 @@ window.Webflow.push(() => {
 
   // Find all form elements with the attribute cs-el="form"
   function setEventListeners_UnsavedWarnings() {
+    setUnsavedUserTab();
     const forms = document.querySelectorAll<HTMLFormElement>('[cs-el="form"]');
     if (forms.length > 0) {
       forms.forEach((form) => {
@@ -227,7 +228,6 @@ window.Webflow.push(() => {
             const warningElement = form?.querySelector<HTMLElement>('[cs-el="warning"]');
 
             if (warningElement) {
-              setUnsavedUserTab();
               showUnsavedWarning(warningElement);
             }
           });
