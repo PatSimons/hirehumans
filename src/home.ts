@@ -7,6 +7,7 @@ import { gsap } from './global';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
+  //_______________________________________________________________________________________________________ FANTAIL Calculate Scores
   function sortListByNumber(list: string[]): string[] {
     // Define a regular expression pattern to match the number
     const pattern = /_(\d+):/;

@@ -16,6 +16,7 @@ const ENTRY_POINTS = [
   'src/auth.ts',
   'src/profileadmin.ts',
   'src/dashboard.ts',
+  'src/sliders.ts',
 ];
 
 // Config dev serving
