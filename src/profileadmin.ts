@@ -197,12 +197,12 @@ window.Webflow.push(() => {
     customColorPicker(colorPickerHandle, colorPickerGradient);
   }
 
-  //_______________________________________________________________________________________________________ Unsaved Changes Warnings all forms
+  //_______________________________________________________________________________________________________ Unsaved Changes Warning
 
-  // Hide all Unsaved Warnings on page init.
+  // Hide all Unsaved Warnings on PAGE INIT.
   const warningElements = document.querySelectorAll<HTMLElement>('[cs-el="warning"]');
   warningElements.forEach((warningElement) => {
-    gsap.set(warningElement, { opacity: 0 });
+    gsap.set(warningElement, { opacity: 0, height: 0 });
   });
 
   // Function: Show Unsaved warning
@@ -213,7 +213,8 @@ window.Webflow.push(() => {
     if (activeForm && activeForm.classList.contains('is-unsaved')) return;
 
     // Create a GSAP timeline to animate the element
-    gsap.to(warningElement, { opacity: 1 });
+    gsap.to(warningElement, { height: '3rem' });
+    gsap.to(warningElement, { opacity: 1, delay: 0.5 });
 
     // Add is-unsaved class to parent form
     activeForm?.classList.add('is-unsaved');
@@ -249,6 +250,7 @@ window.Webflow.push(() => {
   }
 
   //_______________________________________________________________________________________________________ Sortable Service Items
+
   const services = document.querySelector<HTMLElement>('[cs-el="services"]');
   if (services) {
     // Define Sortable classes
@@ -266,7 +268,7 @@ window.Webflow.push(() => {
       forceFallback: false,
       onEnd: function (evt) {
         // Update indexes
-        updateIndexes();
+        setIndexesAndVisibilty();
 
         // Find related Warning and call function to show it.
         const warningElement =
@@ -278,18 +280,25 @@ window.Webflow.push(() => {
     });
 
     // Define the updateIndexes function
-    function updateIndexes() {
+    function setIndexesAndVisibilty() {
       const items = services?.querySelectorAll('[cs-el="serviceItem"]');
       if (!items) return;
       for (let i = 0; i < items.length; i++) {
         items[i].setAttribute('data-index', i.toString());
+        items[i].setAttribute('data-visibility', '1');
         const inputIndex = items[i].querySelector<HTMLInputElement>('[cs-el="formInputIndex"]');
-        if (inputIndex) {
+        const inputVisibility = items[i].querySelector<HTMLInputElement>(
+          '[cs-el="formInputVisibility"]'
+        );
+        if (inputIndex && inputVisibility) {
           inputIndex.value = i.toString();
+          inputVisibility.value = '1';
         }
       }
     }
-    updateIndexes();
+
+    // Update sortable indexes & visibilty on PAGE INIT
+    setIndexesAndVisibilty();
 
     //_______________________________________________________________________________________________________ Toggle visibility (Enable/disable) serviceItem Function
     const moveElement = (element: HTMLElement, itemStatus: string) => {
@@ -327,7 +336,7 @@ window.Webflow.push(() => {
           newParent.appendChild(element);
           gsap.to(element, { opacity: 1, duration: 1 });
           // Update indexes
-          updateIndexes();
+          setIndexesAndVisibilty();
           // Find related Warning and call function to show it.
           const warningElement = element
             ?.closest('[cs-el="form"]')
